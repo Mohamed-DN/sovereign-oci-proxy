@@ -16,6 +16,21 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
+if [ ! -f "config.env" ]; then
+  echo -e "${RED}[!] ERROR: config.env not found!${NC}"
+  echo -e "Please copy config.env.example to config.env and fill in your details:"
+  echo -e "  cp config.env.example config.env"
+  echo -e "  nano config.env"
+  exit 1
+fi
+
+source config.env
+
+if [[ "$DUCKDNS_DOMAIN" == *"YOUR-SUBDOMAIN"* ]]; then
+  echo -e "${RED}[!] ERROR: You haven't changed the default values in config.env!${NC}"
+  exit 1
+fi
+
 chmod +x scripts/modules/*.sh
 
 echo -e "${GREEN}[1/6] Running System Hardening (Swap, BBR, Firewall)...${NC}"

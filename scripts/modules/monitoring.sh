@@ -3,8 +3,10 @@
 # MONITORING, HONEYPOT AND KEEPALIVE SCRIPT
 # =========================================================
 
-# Ensure you replace this with your actual ntfy URL before running
-NTFY_URL="https://ntfy.sh/YOUR-SECRET-TOPIC-HERE" 
+# NTFY_URL is sourced from config.env in the master install script
+if [ -z "$NTFY_URL" ]; then
+  NTFY_URL="https://ntfy.sh/YOUR-SECRET-TOPIC-HERE"
+fi
 
 echo "Deploying Oracle Keepalive (Anti-Idle)..."
 # 1. ORACLE KEEPALIVE (Prevents Instance Deletion)

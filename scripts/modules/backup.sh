@@ -5,7 +5,10 @@
 BACKUP_DIR="/root/backups"
 B2_BUCKET="sovereign-xray-backups"
 DATE=$(date +%Y%m%d_%H%M)
-GPG_RECIPIENT="YOUR_EMAIL_HERE"
+# These variables are sourced from config.env via install.sh
+if [ -z "$GPG_RECIPIENT" ]; then
+  GPG_RECIPIENT="YOUR_EMAIL_HERE"
+fi
 
 mkdir -p "${BACKUP_DIR}"
 cp /etc/x-ui/x-ui.db "${BACKUP_DIR}/x-ui_${DATE}.db"

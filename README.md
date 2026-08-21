@@ -82,6 +82,12 @@ The correct sequence:
 # On the Oracle instance:
 git clone https://github.com/Mohamed-DN/sovereign-oci-proxy.git
 cd sovereign-oci-proxy
+
+# Create and edit the configuration file!
+cp config.env.example config.env
+nano config.env # <--- Fill in your DuckDNS token and Ntfy URL here
+
+# Run the installer
 sudo chmod +x scripts/**/*.sh scripts/*.sh tests/*.sh
 sudo ./scripts/install.sh
 ```
