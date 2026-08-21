@@ -15,14 +15,9 @@ cat << 'HTML_EOF' > /var/www/decoy/index.html
 </html>
 HTML_EOF
 
-cat << 'NGINX_EOF' > /etc/nginx/sites-available/decoy
-server {
-    listen 127.0.0.1:8443;
-    server_name _;
-    root /var/www/decoy;
-    index index.html;
-}
-NGINX_EOF
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cp "$SCRIPT_DIR/../../configs/nginx/decoy.conf" /etc/nginx/sites-available/decoy
 
 ln -sf /etc/nginx/sites-available/decoy /etc/nginx/sites-enabled/decoy
+rm -f /etc/nginx/sites-enabled/default
 systemctl restart nginx
