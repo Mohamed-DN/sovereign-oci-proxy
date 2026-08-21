@@ -1,2 +1,19 @@
 [Unit]
-Description=Sovereign Honeypot
+Description=Sovereign Honeypot - Scanner Trap
+Documentation=https://github.com/Mohamed-DN/sovereign-oci-proxy
+After=network.target ufw.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /usr/local/bin/sovereign-honeypot.py
+Restart=always
+RestartSec=5
+User=root
+
+# Security hardening
+NoNewPrivileges=false
+ProtectSystem=strict
+ReadWritePaths=/var/log /usr/local/bin
+
+[Install]
+WantedBy=multi-user.target

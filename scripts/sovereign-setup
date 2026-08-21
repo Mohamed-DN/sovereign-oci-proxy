@@ -1,2 +1,50 @@
 #!/bin/bash
-# TUI Configurator
+# =========================================================
+# Sovereign OCI Proxy - Interactive Setup Menu
+# =========================================================
+
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+NC='\033[0m'
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+show_menu() {
+    clear
+    echo -e "${CYAN}"
+    echo "╔═══════════════════════════════════════════════╗"
+    echo "║     Sovereign OCI Proxy - Interactive Setup   ║"
+    echo "╚═══════════════════════════════════════════════╝"
+    echo -e "${NC}"
+    echo "  1) Run Full Installation"
+    echo "  2) Run Hardening Only"
+    echo "  3) Run Decoy Setup Only"
+    echo "  4) Run DuckDNS Setup Only"
+    echo "  5) Run Monitoring & Honeypot Setup Only"
+    echo "  6) Fix Xray Routing (Enable Tailscale/Homelab)"
+    echo "  7) Fix 3x-ui Client Database (v3.6.0+)"
+    echo "  8) Run 20-Point Validation Test"
+    echo "  9) Uninstall"
+    echo "  0) Exit"
+    echo ""
+}
+
+while true; do
+    show_menu
+    read -p "Select an option [0-9]: " choice
+    case $choice in
+        1) sudo "${SCRIPT_DIR}/install.sh" ;;
+        2) sudo "${SCRIPT_DIR}/modules/hardening.sh" ;;
+        3) sudo "${SCRIPT_DIR}/modules/decoy.sh" ;;
+        4) sudo "${SCRIPT_DIR}/modules/duckdns.sh" ;;
+        5) sudo "${SCRIPT_DIR}/modules/monitoring.sh" ;;
+        6) sudo python3 "${SCRIPT_DIR}/modules/xray-routing-fix.py" ;;
+        7) sudo python3 "${SCRIPT_DIR}/modules/xray-client-fix.py" ;;
+        8) sudo "${SCRIPT_DIR}/../tests/sovereign-test.sh" ;;
+        9) sudo "${SCRIPT_DIR}/uninstall.sh" ;;
+        0) echo -e "${GREEN}Goodbye!${NC}"; exit 0 ;;
+        *) echo "Invalid option. Press Enter to continue..."; read ;;
+    esac
+    echo ""
+    read -p "Press Enter to return to menu..."
+done

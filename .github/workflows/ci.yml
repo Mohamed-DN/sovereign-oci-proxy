@@ -1,1 +1,73 @@
 name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-scripts:
+    name: Lint Shell Scripts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install ShellCheck
+        run: sudo apt-get install -y shellcheck
+
+      - name: Run ShellCheck on all .sh files
+        run: |
+          find . -name "*.sh" -not -path "./.git/*" | while read -r file; do
+            echo "Checking $file..."
+            shellcheck -x "$file" || true
+          done
+
+  lint-python:
+    name: Lint Python Scripts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Compile-check all .py files
+        run: |
+          find . -name "*.py" -not -path "./.git/*" | while read -r file; do
+            echo "Checking $file..."
+            python3 -m py_compile "$file"
+          done
+
+  secret-scan:
+    name: Scan for Leaked Secrets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for hardcoded secrets
+        run: |
+          echo "Scanning for potential secrets..."
+          FOUND=0
+          # Check for common secret patterns (excluding templates and docs)
+          if grep -rn --include="*.sh" --include="*.py" --include="*.conf" \
+            -E '(password|passwd|secret|token|api_key)\s*=\s*["\x27][^"\x27]{8,}' \
+            --exclude-dir=.git . ; then
+            echo "WARNING: Potential hardcoded secrets detected!"
+            FOUND=1
+          fi
+          # Check for private keys
+          if grep -rn "BEGIN.*PRIVATE KEY" --exclude-dir=.git . ; then
+            echo "CRITICAL: Private key found in repository!"
+            FOUND=1
+          fi
+          if [ "$FOUND" -eq 1 ]; then
+            echo "Please review the above matches and ensure no real secrets are committed."
+            exit 1
+          fi
+          echo "No secrets detected."

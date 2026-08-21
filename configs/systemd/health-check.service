@@ -1,2 +1,7 @@
 [Unit]
-Description=Health Check
+Description=Sovereign Health Check
+Documentation=https://github.com/Mohamed-DN/sovereign-oci-proxy
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/sovereign-healthcheck.sh

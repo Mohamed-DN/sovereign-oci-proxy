@@ -1,4 +1,92 @@
 {
-  "inbounds": [],
-  "outbounds": []
+  "log": {
+    "loglevel": "warning",
+    "access": "/var/log/xray/access.log",
+    "error": "/var/log/xray/error.log"
+  },
+  "dns": {
+    "servers": [
+      {
+        "address": "https://1.1.1.1/dns-query",
+        "domains": ["geosite:geolocation-!cn"]
+      },
+      {
+        "address": "https://8.8.8.8/dns-query",
+        "domains": []
+      },
+      {
+        "address": "https://9.9.9.9:5053/dns-query",
+        "domains": []
+      },
+      {
+        "address": "https://doh.opendns.com/dns-query",
+        "domains": []
+      },
+      {
+        "address": "https://dns.quad9.net/dns-query",
+        "domains": []
+      }
+    ],
+    "queryStrategy": "UseIPv4",
+    "fallbackStrategy": "CheckDNSSEC"
+  },
+  "routing": {
+    "domainStrategy": "AsIs",
+    "rules": [
+      {
+        "type": "field",
+        "outboundTag": "api",
+        "inboundTag": ["api"]
+      },
+      {
+        "type": "field",
+        "outboundTag": "direct",
+        "ip": ["geoip:private"],
+        "_comment": "Allow traffic to Tailscale and Homelab private IPs"
+      },
+      {
+        "type": "field",
+        "outboundTag": "direct",
+        "domain": ["geosite:private"],
+        "_comment": "Allow .internal and other private domains"
+      },
+      {
+        "type": "field",
+        "outboundTag": "blocked",
+        "ip": ["geoip:ir", "geoip:cn", "geoip:ru", "geoip:kp"],
+        "_comment": "Block traffic from hostile nations"
+      },
+      {
+        "type": "field",
+        "outboundTag": "blocked",
+        "domain": ["geosite:category-ads-all"],
+        "_comment": "Block advertising and tracking domains"
+      },
+      {
+        "type": "field",
+        "outboundTag": "warp",
+        "domain": ["geosite:openai", "geosite:netflix", "domain:chatgpt.com", "domain:claude.ai"],
+        "_comment": "Route strict services through Cloudflare WARP to hide datacenter IP"
+      }
+    ]
+  },
+  "outbounds": [
+    {
+      "tag": "direct",
+      "protocol": "freedom",
+      "settings": {}
+    },
+    {
+      "tag": "blocked",
+      "protocol": "blackhole",
+      "settings": {}
+    },
+    {
+      "tag": "warp",
+      "protocol": "wireguard",
+      "settings": {
+        "_comment": "WARP credentials are auto-generated via the 3x-ui panel. Do not edit manually."
+      }
+    }
+  ]
 }

@@ -1,3 +1,35 @@
+version: "3.8"
+
 services:
-  sovereign:
-    image: sovereign-proxy
+  sovereign-proxy:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: sovereign-proxy
+    restart: unless-stopped
+    ports:
+      - "443:443"
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - proxy-data:/etc/x-ui
+      - proxy-certs:/root/cert
+      - proxy-logs:/var/log
+    environment:
+      - TZ=Europe/Rome
+    cap_add:
+      - NET_ADMIN
+    networks:
+      - sovereign-net
+
+networks:
+  sovereign-net:
+    driver: bridge
+
+volumes:
+  proxy-data:
+    driver: local
+  proxy-certs:
+    driver: local
+  proxy-logs:
+    driver: local

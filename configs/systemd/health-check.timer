@@ -1,0 +1,10 @@
+[Unit]
+Description=Run Sovereign Health Check every 5 minutes
+Documentation=https://github.com/Mohamed-DN/sovereign-oci-proxy
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=5min
+
+[Install]
+WantedBy=timers.target
