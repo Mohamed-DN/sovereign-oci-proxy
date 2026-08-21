@@ -1,17 +1,37 @@
 #!/bin/bash
 # Sovereign OCI Proxy - Master Installer
-echo "Starting Sovereign Proxy Installation..."
+# Run this script as root to orchestrate the entire deployment.
+
+set -e
+
+# Colors for output
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
+echo -e "${GREEN}[*] Starting Sovereign Proxy Installation...${NC}"
+
+if [ "$EUID" -ne 0 ]; then
+  echo -e "${RED}[!] Please run this script as root (sudo ./scripts/install.sh)${NC}"
+  exit 1
+fi
 
 chmod +x scripts/modules/*.sh
 
-echo "[1/4] Running Hardening..."
+echo -e "${GREEN}[1/6] Running System Hardening (Swap, BBR, Firewall)...${NC}"
 ./scripts/modules/hardening.sh
 
-echo "[2/4] Setting up Decoy..."
+echo -e "${GREEN}[2/6] Setting up Nginx Decoy...${NC}"
 ./scripts/modules/decoy.sh
 
-echo "[3/4] Installing Monitoring & Honeypot..."
+echo -e "${GREEN}[3/6] Installing Monitoring & Honeypot...${NC}"
 ./scripts/modules/monitoring.sh
 
-echo "[4/4] Setup complete. Please install 3x-ui manually via:"
-echo "bash <(curl -Ls https://raw.githubusercontent.com/MHSanaei/3x-ui/master/install.sh)"
+echo -e "${GREEN}[4/6] Setting up DuckDNS Auto-Updater...${NC}"
+./scripts/modules/duckdns.sh
+
+echo -e "${GREEN}[5/6] Setting up Xray Core (3x-ui)...${NC}"
+./scripts/modules/xray.sh
+
+echo -e "${GREEN}[6/6] Installation Complete!${NC}"
+echo -e "${GREEN}Please remember to configure your GPG keys before enabling backup.sh${NC}"
