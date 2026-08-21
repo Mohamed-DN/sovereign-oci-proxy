@@ -1,4 +1,9 @@
-# 🛡️ Sovereign OCI Proxy (Ultimate Edition)
+import os
+import glob
+
+base_dir = r"C:\home_server\sovereign-oci-proxy"
+
+readme_en = """# 🛡️ Sovereign OCI Proxy (Ultimate Edition)
 
 ![Sovereign Proxy](https://img.shields.io/badge/Status-Active-success.svg) ![Platform](https://img.shields.io/badge/Platform-Oracle_Cloud-red.svg) ![Protocol](https://img.shields.io/badge/Protocol-VLESS%2BReality-blue.svg) ![License](https://img.shields.io/badge/License-AGPL_3.0-green.svg)
 
@@ -49,3 +54,123 @@ We are working on bringing this to an enterprise level with 100% IaC:
 - **Ansible:** Fully idempotent OS hardening (Swap, BBR, SSH, Fail2ban, UFW, Honeypot) and proxy deployment.
 
 *No passwords, SSH keys, or UUIDs are stored in this repository. Ensure you use a `.env` file or a password manager for secrets.*
+"""
+
+def write_file(path, content):
+    with open(os.path.join(base_dir, path), "w", encoding="utf-8") as f:
+        f.write(content)
+
+write_file("README.md", readme_en)
+
+# Rewrite the python scripts to have English docstrings
+routing_fix_en = '''#!/usr/bin/env python3
+"""
+XRAY ROUTING FIX (SOVEREIGN HOMELAB)
+This script modifies the xrayTemplateConfig in the 3x-ui SQLite database
+to allow VLESS traffic to reach private IPs (Homelab/Tailscale).
+Without this, Xray blocks all traffic to 192.168.x.x or 100.64.x.x by default.
+"""
+import sqlite3
+import json
+
+DB_PATH = "/etc/x-ui/x-ui.db"
+
+def fix_routing():
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute("SELECT value FROM settings WHERE key='xrayTemplateConfig'")
+        row = c.fetchone()
+        
+        if not row:
+            print("xrayTemplateConfig not found.")
+            return
+
+        config = json.loads(row[0])
+        routing = config.get("routing", {})
+        rules = routing.get("rules", [])
+        
+        for rule in rules:
+            if rule.get("outboundTag") == "block":
+                ip_list = rule.get("ip", [])
+                if "geoip:private" in ip_list:
+                    ip_list.remove("geoip:private")
+                    print("Removed geoip:private from block rule")
+
+        direct_rule_found = False
+        for rule in rules:
+            if rule.get("outboundTag") == "direct":
+                ip_list = rule.get("ip", [])
+                if "geoip:private" not in ip_list:
+                    ip_list.append("geoip:private")
+                    print("Added geoip:private to direct rule")
+                direct_rule_found = True
+                
+        if not direct_rule_found:
+            rules.insert(0, {
+                "type": "field",
+                "outboundTag": "direct",
+                "ip": ["geoip:private"]
+            })
+            print("Created new direct rule for geoip:private")
+
+        new_config = json.dumps(config, indent=2)
+        c.execute("UPDATE settings SET value=? WHERE key='xrayTemplateConfig'", (new_config,))
+        conn.commit()
+        print("Routing successfully updated. Please restart x-ui (systemctl restart x-ui).")
+        
+    except Exception as e:
+        print(f"Error: {e}")
+    finally:
+        if conn:
+            conn.close()
+
+if __name__ == "__main__":
+    fix_routing()
+'''
+write_file("scripts/modules/xray-routing-fix.py", routing_fix_en)
+
+client_fix_en = '''#!/usr/bin/env python3
+"""
+3X-UI v3.6.0 RELATIONAL CLIENTS FIX
+In newer versions of 3x-ui, clients are no longer read from the JSON settings.
+They MUST be inserted into the relational `clients` and `client_inbounds` tables.
+This script injects a client correctly into the database to avoid silent drops.
+"""
+import sqlite3
+import uuid
+
+DB_PATH = "/etc/x-ui/x-ui.db"
+
+def add_client(inbound_id, email, client_uuid):
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        
+        # 1. Insert into clients
+        c.execute("""
+            INSERT OR IGNORE INTO clients (id, email, enable, up, down, expiry, total) 
+            VALUES (?, ?, 1, 0, 0, 0, 0)
+        """, (client_uuid, email))
+        
+        # 2. Link in client_inbounds
+        c.execute("""
+            INSERT OR IGNORE INTO client_inbounds (client_id, inbound_id)
+            VALUES (?, ?)
+        """, (client_uuid, inbound_id))
+        
+        conn.commit()
+        print(f"Client {email} successfully inserted into relational tables.")
+    except Exception as e:
+        print(f"DB Error: {e}")
+    finally:
+        if conn:
+            conn.close()
+
+if __name__ == "__main__":
+    my_uuid = str(uuid.uuid4())
+    print(f"Generated new UUID: {my_uuid}")
+'''
+write_file("scripts/modules/xray-client-fix.py", client_fix_en)
+
+print("English translation complete.")

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-FIX CLIENTI RELAZIONALI 3X-UI v3.6.0
-Nelle nuove versioni di 3x-ui, i client non vengono più letti dal JSON settings della tabella inbounds,
-ma devono essere inseriti obbligatoriamente nelle tabelle relazionali `clients` e `client_inbounds`.
-Questo script inietta un client correttamente.
+3X-UI v3.6.0 RELATIONAL CLIENTS FIX
+In newer versions of 3x-ui, clients are no longer read from the JSON settings.
+They MUST be inserted into the relational `clients` and `client_inbounds` tables.
+This script injects a client correctly into the database to avoid silent drops.
 """
 import sqlite3
 import uuid
@@ -15,29 +15,26 @@ def add_client(inbound_id, email, client_uuid):
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
         
-        # 1. Inserisci in clients
+        # 1. Insert into clients
         c.execute("""
             INSERT OR IGNORE INTO clients (id, email, enable, up, down, expiry, total) 
             VALUES (?, ?, 1, 0, 0, 0, 0)
         """, (client_uuid, email))
         
-        # 2. Collega in client_inbounds
-        # L'ID in client_inbounds è tipicamente autoincrement o gestito diversamente, ma x-ui lo collega.
+        # 2. Link in client_inbounds
         c.execute("""
             INSERT OR IGNORE INTO client_inbounds (client_id, inbound_id)
             VALUES (?, ?)
         """, (client_uuid, inbound_id))
         
         conn.commit()
-        print(f"Client {email} inserito correttamente nelle tabelle relazionali.")
+        print(f"Client {email} successfully inserted into relational tables.")
     except Exception as e:
-        print(f"Errore DB: {e}")
+        print(f"DB Error: {e}")
     finally:
         if conn:
             conn.close()
 
 if __name__ == "__main__":
-    # Esempio d'uso
     my_uuid = str(uuid.uuid4())
-    print(f"Generato nuovo UUID: {my_uuid}")
-    # add_client(1, "utente-mobile", my_uuid)
+    print(f"Generated new UUID: {my_uuid}")
