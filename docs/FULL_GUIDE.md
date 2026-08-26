@@ -104,3 +104,67 @@ To bypass this, configure a **Cloudflare WARP** outbound inside the 3x-ui panel:
 2. Navigate to Routing Rules.
 3. Route strict domains (e.g., `geosite:netflix, domain:chatgpt.com`) to the `warp` outbound tag. 
 4. This initiates a Double-Hop VPN: Your traffic is encrypted to Oracle, then re-encrypted via WireGuard to Cloudflare. Destination websites will see a highly trusted Cloudflare IP instead of your Oracle Datacenter IP.
+
+---
+
+## 8. WireGuard VPN — Gaming & Full VPN Mode
+
+### 8.1 Why WireGuard?
+The VLESS + REALITY proxy operates at Layer 4/7 (application proxy). It works perfectly for apps that support proxy configuration (browsers, Telegram, etc.). However, **games and VoIP apps** like Among Us, WhatsApp calls, FaceTime, and Discord voice use raw UDP sockets and **cannot use a proxy at all**.
+
+WireGuard solves this by creating a **Layer 3 tunnel** — a virtual network interface on your device that captures ALL traffic (both TCP and UDP) transparently, exactly like Cloudflare WARP / 1.1.1.1.
+
+### 8.2 Installation
+```bash
+sudo ./scripts/modules/wireguard.sh
+```
+
+This script:
+1. Installs WireGuard and generates server/client keypairs.
+2. Creates the `wg0` interface with NAT masquerade.
+3. Opens UDP port 51820 in UFW.
+4. Generates your first client profile (`phone`) with a QR code.
+5. Installs the `sovereign-wg-client.sh` management CLI.
+
+⚠️ **CRITICAL:** You must also add an Ingress Rule in your **Oracle Cloud Security List** for **UDP port 51820** (Networking → VCN → Security Lists → Default Security List, Protocol: UDP, Source: 0.0.0.0/0, Port: 51820).
+
+### 8.3 Client Management
+```bash
+sovereign-wg-client.sh add laptop     # Create a new client profile
+sovereign-wg-client.sh list           # Show all clients & connections
+sovereign-wg-client.sh qr phone       # Display QR code for mobile
+sovereign-wg-client.sh remove laptop  # Remove a client
+```
+
+On the client device (iPhone, Android, Mac, Windows, Linux):
+1. Install the free **WireGuard app** from [wireguard.com/install](https://www.wireguard.com/install/).
+2. Scan the QR code displayed by the server (or import the `.conf` file).
+3. Toggle the tunnel ON. Done — all traffic now flows through your server.
+
+### 8.4 Split Tunnel vs Full Tunnel
+By default, the client is configured in **Full Tunnel** mode (`AllowedIPs = 0.0.0.0/0`), routing ALL traffic through the server — identical to Cloudflare WARP.
+
+To configure Split Tunnel (only gaming traffic through VPN):
+```bash
+sudo ./scripts/modules/split-tunnel.sh apply phone
+```
+
+### 8.5 Anti-DPI Obfuscation (Egypt, China, Iran)
+Standard WireGuard traffic can be detected and blocked by advanced DPI systems. If your ISP blocks WireGuard:
+```bash
+sudo ./scripts/modules/wg-obfs.sh
+```
+
+This offers two obfuscation methods:
+- **wstunnel (Recommended):** Wraps WireGuard inside a WebSocket tunnel on port 443 (~5ms overhead).
+- **udp2raw:** Disguises UDP packets as fake TCP/ICMP (~3ms overhead).
+
+### 8.6 Dual-Channel Architecture
+After installing WireGuard, your server provides two independent channels:
+
+| Channel | Protocol | Use Case | Layer |
+| --- | --- | --- | --- |
+| **VLESS + REALITY** | TCP 443 | Anti-censorship browsing, streaming, AI services | Layer 4/7 (Proxy) |
+| **WireGuard** | UDP 51820 | Gaming, VoIP, WhatsApp calls, full VPN | Layer 3 (Tunnel) |
+
+Both channels coexist on the same server without conflicts. Use VLESS when you need DPI invisibility (e.g., in a censored country); use WireGuard when you need native UDP support (e.g., for Among Us or WhatsApp calls).

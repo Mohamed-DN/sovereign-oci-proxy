@@ -1,0 +1,32 @@
+# =========================================================
+# Sovereign Proxy - WireGuard Client Template
+# Import this file into the WireGuard app on your device.
+# NOTE: wireguard.sh generates this automatically.
+# =========================================================
+
+[Interface]
+# The private IP assigned to this device inside the VPN tunnel
+Address = 10.66.66.2/32
+# Your device's private key (NEVER share this)
+PrivateKey = <CLIENT_PRIVATE_KEY>
+# DNS servers used while the tunnel is active
+DNS = 1.1.1.1, 8.8.8.8
+
+[Peer]
+# The server's public key (safe to share)
+PublicKey = <SERVER_PUBLIC_KEY>
+# Extra layer of symmetric encryption (NEVER share this)
+PresharedKey = <CLIENT_PRESHARED_KEY>
+# Your server's public address and WireGuard port
+Endpoint = YOUR-SUBDOMAIN.duckdns.org:51820
+
+# FULL TUNNEL: Route ALL traffic through the VPN (like Cloudflare WARP)
+# Use this for gaming, censorship bypass, and full privacy.
+AllowedIPs = 0.0.0.0/0
+
+# SPLIT TUNNEL (alternative): Route only the VPN subnet and DNS
+# Uncomment the line below and comment out 0.0.0.0/0 above.
+# AllowedIPs = 10.66.66.0/24, 1.1.1.1/32, 8.8.8.8/32
+
+# Keep the NAT mapping alive (essential for mobile networks)
+PersistentKeepalive = 25

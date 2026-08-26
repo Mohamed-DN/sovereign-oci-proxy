@@ -1,0 +1,116 @@
+{
+  "log": {
+    "level": "warn",
+    "timestamp": true
+  },
+  "dns": {
+    "servers": [
+      {
+        "tag": "local-adguard",
+        "address": "127.0.0.1",
+        "detour": "direct"
+      },
+      {
+        "tag": "cloudflare-doh",
+        "address": "https://1.1.1.1/dns-query",
+        "detour": "direct"
+      }
+    ],
+    "rules": [
+      {
+        "outbound": "any",
+        "server": "local-adguard"
+      }
+    ]
+  },
+  "inbounds": [
+    {
+      "type": "vless",
+      "tag": "vless-reality-in",
+      "listen": "::",
+      "listen_port": 443,
+      "users": [
+        {
+          "name": "enterprise-user-1",
+          "uuid": "00000000-0000-0000-0000-000000000000",
+          "flow": "xtls-rprx-vision"
+        }
+      ],
+      "tls": {
+        "enabled": true,
+        "server_name": "aws.amazon.com",
+        "reality": {
+          "enabled": true,
+          "handshake": {
+            "server": "aws.amazon.com",
+            "server_port": 443
+          },
+          "private_key": "ENTER_YOUR_PRIVATE_KEY_HERE",
+          "short_id": [
+            "0123456789abcdef"
+          ]
+        }
+      }
+    },
+    {
+      "type": "hysteria2",
+      "tag": "hysteria-in",
+      "listen": "::",
+      "listen_port": 443,
+      "users": [
+        {
+          "name": "enterprise-user-1",
+          "password": "SUPER_SECURE_HYSTERIA_PASSWORD"
+        }
+      ],
+      "tls": {
+        "enabled": true,
+        "alpn": [
+          "h3"
+        ],
+        "certificate_path": "/etc/letsencrypt/live/proxy.yourdomain.com/fullchain.pem",
+        "key_path": "/etc/letsencrypt/live/proxy.yourdomain.com/privkey.pem"
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "direct",
+      "tag": "direct"
+    },
+    {
+      "type": "block",
+      "tag": "block"
+    },
+    {
+      "type": "wireguard",
+      "tag": "warp-out",
+      "server": "engage.cloudflareclient.com",
+      "server_port": 2408,
+      "local_address": [
+        "172.16.0.2/32",
+        "2606:4700:110:8f6a:9139:69be:c5df:571f/128"
+      ],
+      "private_key": "YOUR_WARP_PRIVATE_KEY",
+      "peer_public_key": "bmXOC+F1FxEMF9dyiK2H5/1SUtzH0JuVo51h2wPfgyo="
+    }
+  ],
+  "route": {
+    "rules": [
+      {
+        "geosite": [
+          "netflix",
+          "openai"
+        ],
+        "outbound": "warp-out"
+      },
+      {
+        "geoip": [
+          "private"
+        ],
+        "outbound": "block"
+      }
+    ],
+    "auto_detect_interface": true
+  }
+}

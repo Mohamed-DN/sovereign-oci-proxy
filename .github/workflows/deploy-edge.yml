@@ -1,0 +1,33 @@
+name: Enterprise Edge Fleet Deployment
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docker/**'
+      - 'ansible/**'
+      - 'docker-compose.yml'
+
+jobs:
+  deploy-edge-nodes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH Key
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.EDGE_NODE_SSH_KEY }}
+
+      - name: Install Ansible
+        run: sudo apt-get update && sudo apt-get install -y ansible
+
+      - name: Run Ansible Playbook
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: "False"
+        run: |
+          # The inventory file should be managed in GitHub Secrets or generated dynamically
+          echo "${{ secrets.EDGE_NODES_INVENTORY }}" > inventory.ini
+          ansible-playbook -i inventory.ini ansible/deploy-edge-node.yml -u ubuntu

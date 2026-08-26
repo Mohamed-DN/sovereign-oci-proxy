@@ -1,0 +1,52 @@
+name: sovereign-edge-node
+
+services:
+  sing-box:
+    image: ghcr.io/sagernet/sing-box:latest
+    container_name: sovereign-sing-box
+    restart: always
+    network_mode: "host" # Required for raw UDP/TCP performance and WireGuard/Hysteria2
+    volumes:
+      - ./docker/sing-box/config.json:/etc/sing-box/config.json:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro # For auto-provisioned certs
+    cap_add:
+      - NET_ADMIN
+      - NET_BIND_SERVICE
+
+  adguardhome:
+    image: adguard/adguardhome
+    container_name: sovereign-adguard
+    restart: always
+    ports:
+      # We only bind DNS to the docker bridge or localhost to prevent open resolvers
+      - "127.0.0.1:53:53/tcp"
+      - "127.0.0.1:53:53/udp"
+      - "127.0.0.1:3000:3000/tcp" # Web UI (accessible via Cloudflare Tunnel)
+    volumes:
+      - ./docker/adguard/work:/opt/adguardhome/work
+      - ./docker/adguard/conf:/opt/adguardhome/conf
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: sovereign-zerotrust
+    restart: always
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: sovereign-telemetry
+    restart: always
+    ports:
+      # Metrics exposed locally. The Control Plane Prometheus will scrape this via Zero Trust
+      - "127.0.0.1:9100:9100"
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro

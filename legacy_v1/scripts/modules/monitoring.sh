@@ -71,3 +71,30 @@ systemctl enable --now honeypot
 
 echo "Adding Keepalive to Crontab (Runs every 4 hours)..."
 (crontab -l 2>/dev/null; echo "0 */4 * * * /usr/local/bin/oracle-keepalive.sh") | crontab -
+
+# 3. WIREGUARD HEALTH MONITOR (Optional: alerts if wg0 goes down)
+echo "Deploying WireGuard Health Monitor..."
+cat << 'WG_MON_EOF' > /usr/local/bin/sovereign-wg-monitor.sh
+#!/bin/bash
+# Check if WireGuard interface is active and report via Ntfy
+NTFY_URL="${NTFY_URL:-https://ntfy.sh/YOUR-SECRET-TOPIC-HERE}"
+
+if command -v wg &>/dev/null && [ -f /etc/wireguard/wg0.conf ]; then
+    if ! wg show wg0 &>/dev/null; then
+        curl -s -d "⚠️ WireGuard wg0 is DOWN! Attempting restart..." "$NTFY_URL"
+        systemctl restart wg-quick@wg0
+        sleep 3
+        if wg show wg0 &>/dev/null; then
+            curl -s -d "✅ WireGuard wg0 recovered after restart." "$NTFY_URL"
+        else
+            curl -s -d "🚨 WireGuard wg0 FAILED to restart! Manual intervention needed." "$NTFY_URL"
+        fi
+    fi
+fi
+WG_MON_EOF
+
+chmod +x /usr/local/bin/sovereign-wg-monitor.sh
+
+# Add WireGuard monitor to the existing keepalive cron (runs every 4 hours alongside it)
+(crontab -l 2>/dev/null; echo "5 */4 * * * /usr/local/bin/sovereign-wg-monitor.sh") | sort -u | crontab -
+

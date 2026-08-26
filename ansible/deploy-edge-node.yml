@@ -1,0 +1,120 @@
+---
+- name: Provision Sovereign Edge Node
+  hosts: edge_nodes
+  become: yes
+  vars:
+    docker_compose_version: "v2.24.5"
+    repo_dir: "/opt/sovereign-edge"
+  
+  tasks:
+    - name: Ensure APT cache is updated
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install required baseline packages
+      apt:
+        name:
+          - curl
+          - git
+          - ufw
+          - apt-transport-https
+          - ca-certificates
+          - gnupg
+          - lsb-release
+        state: present
+
+    - name: Configure Kernel Parameters (BBR & IP Forwarding)
+      sysctl:
+        name: "{{ item.key }}"
+        value: "{{ item.value }}"
+        state: present
+        reload: yes
+      loop:
+        - { key: "net.core.default_qdisc", value: "fq" }
+        - { key: "net.ipv4.tcp_congestion_control", value: "bbr" }
+        - { key: "net.ipv4.ip_forward", value: "1" }
+        - { key: "net.ipv6.conf.all.forwarding", value: "1" }
+        - { key: "fs.file-max", value: "1048576" }
+
+    - name: Install Docker
+      shell: |
+        if ! command -v docker &> /dev/null; then
+          curl -fsSL https://get.docker.com -o get-docker.sh
+          sh get-docker.sh
+        fi
+      args:
+        creates: /usr/bin/docker
+
+    - name: Start and enable Docker
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Configure UFW (Firewall)
+      ufw:
+        state: enabled
+        policy: deny
+    
+    - name: Allow SSH (Port 2222)
+      ufw:
+        rule: allow
+        port: '2222'
+        proto: tcp
+
+    - name: Allow Sing-box / Hysteria2 (Port 443 TCP/UDP)
+      ufw:
+        rule: allow
+        port: '443'
+
+    - name: Configure Anti-DDoS UDP Rate Limiting
+      iptables:
+        chain: INPUT
+        protocol: udp
+        match: hashlimit
+        hashlimit_name: udp_rate
+        hashlimit_upto: 50/sec
+        hashlimit_burst: 100
+        hashlimit_mode: srcip
+        jump: ACCEPT
+
+    - name: Drop Excess UDP (DDoS Mitigation)
+      iptables:
+        chain: INPUT
+        protocol: udp
+        jump: DROP
+
+    - name: Ensure Let's Encrypt directory exists
+      file:
+        path: /etc/letsencrypt
+        state: directory
+        mode: '0755'
+
+    - name: Deploy Edge Node Docker Stack
+      copy:
+        src: ../docker-compose.yml
+        dest: "{{ repo_dir }}/docker-compose.yml"
+
+    - name: Copy Sing-box Configuration
+      copy:
+        src: ../docker/sing-box/config.json
+        dest: "{{ repo_dir }}/docker/sing-box/config.json"
+
+    - name: Provision TLS Certificate (ACME.sh DNS-01)
+      docker_container:
+        name: acme_sh
+        image: neilpang/acme.sh:latest
+        command: daemon
+        volumes:
+          - /etc/letsencrypt:/acme.sh
+        env:
+          CF_Token: "{{ cloudflare_dns_token }}"
+          CF_Account_ID: "{{ cloudflare_account_id }}"
+        restart_policy: always
+      ignore_errors: yes # Graceful fail if variables not set
+
+    - name: Start Edge Services
+      command: docker compose up -d
+      args:
+        chdir: "{{ repo_dir }}"

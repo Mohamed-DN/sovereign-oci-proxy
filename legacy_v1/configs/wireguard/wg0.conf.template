@@ -1,0 +1,27 @@
+# =========================================================
+# Sovereign Proxy - WireGuard Server Template (wg0.conf)
+# Copy this to /etc/wireguard/wg0.conf and fill in values.
+# NOTE: wireguard.sh generates this automatically.
+# =========================================================
+
+[Interface]
+Address = 10.66.66.1/24
+ListenPort = 51820
+PrivateKey = <SERVER_PRIVATE_KEY>
+
+# NAT: Masquerade outgoing traffic through the public interface
+PostUp   = iptables -t nat -A POSTROUTING -s 10.66.66.0/24 -o eth0 -j MASQUERADE
+PostUp   = iptables -A FORWARD -i wg0 -j ACCEPT
+PostUp   = iptables -A FORWARD -o wg0 -j ACCEPT
+PostDown = iptables -t nat -D POSTROUTING -s 10.66.66.0/24 -o eth0 -j MASQUERADE
+PostDown = iptables -D FORWARD -i wg0 -j ACCEPT
+PostDown = iptables -D FORWARD -o wg0 -j ACCEPT
+
+# --- Client Peers ---
+# Add one [Peer] block per device.
+# Use: sovereign-wg-client.sh add <name>
+
+# [Peer]  # phone
+# PublicKey = <CLIENT_PUBLIC_KEY>
+# PresharedKey = <CLIENT_PRESHARED_KEY>
+# AllowedIPs = 10.66.66.2/32
