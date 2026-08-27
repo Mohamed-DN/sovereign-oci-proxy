@@ -1,0 +1,75 @@
+{{- if .Values.controlPlane.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "sovereign.fullname" . }}-control-plane
+  labels:
+    {{- include "sovereign.labels" . | nindent 4 }}
+    app.kubernetes.io/component: control-plane
+spec:
+  {{- if not .Values.controlPlane.autoscaling.enabled }}
+  replicas: {{ .Values.controlPlane.replicas }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "sovereign.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: control-plane
+  template:
+    metadata:
+      labels:
+        {{- include "sovereign.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: control-plane
+    spec:
+      serviceAccountName: {{ include "sovereign.serviceAccountName" . }}
+      {{- with .Values.controlPlane.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: control-plane
+          image: "{{ .Values.global.imageRegistry }}/{{ .Values.controlPlane.image.repository }}:{{ .Values.controlPlane.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+          ports:
+            - name: http-api
+              containerPort: {{ .Values.controlPlane.service.port }}
+              protocol: TCP
+            - name: grpc-api
+              containerPort: {{ .Values.controlPlane.service.grpcPort }}
+              protocol: TCP
+            - name: metrics
+              containerPort: 9090
+              protocol: TCP
+          env:
+            - name: MESH_DOMAIN
+              value: {{ .Values.global.domain | quote }}
+            - name: CLUSTER_NAME
+              value: {{ .Values.global.clusterName | quote }}
+            - name: OVERLAY_CIDR
+              value: {{ .Values.global.overlayCidr | quote }}
+            - name: NOISE_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "sovereign.fullname" . }}-secrets
+                  key: control-plane-noise-key
+                  optional: true
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http-api
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http-api
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            {{- toYaml .Values.controlPlane.resources | nindent 12 }}
+          volumeMounts:
+            - name: raft-storage
+              mountPath: /var/lib/sovereign/raft
+      volumes:
+        - name: raft-storage
+          emptyDir: {}
+{{- end }}

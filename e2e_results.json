@@ -1,0 +1,2007 @@
+{
+  "timestamp": "2026-08-27T08:14:29Z",
+  "tier_filter": "all",
+  "summary": {
+    "total_tests": 330,
+    "passed": 330,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "pass_rate_pct": 100.0,
+    "duration_seconds": 0.5782
+  },
+  "tier_distribution": {
+    "tier1": 150,
+    "tier2": 115,
+    "tier3": 25,
+    "tier4": 21,
+    "tier5": 19
+  },
+  "feature_coverage": {
+    "features_covered": 30,
+    "total_features": 30,
+    "coverage_pct": 100.0
+  },
+  "tests": [
+    {
+      "name": "test_legacy_20_point_validation_suite_spec (tests.e2e.tier1_features.test_f01_legacy_restoration.TestFeature01LegacyRestoration.test_legacy_20_point_validation_suite_spec)",
+      "id": "tests.e2e.tier1_features.test_f01_legacy_restoration.TestFeature01LegacyRestoration.test_legacy_20_point_validation_suite_spec",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_legacy_deprecated_syntax_cleanup (tests.e2e.tier1_features.test_f01_legacy_restoration.TestFeature01LegacyRestoration.test_legacy_deprecated_syntax_cleanup)",
+      "id": "tests.e2e.tier1_features.test_f01_legacy_restoration.TestFeature01LegacyRestoration.test_legacy_deprecated_syntax_cleanup",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_legacy_script_manifest_and_modular_structure (tests.e2e.tier1_features.test_f01_legacy_restoration.TestFeature01LegacyRestoration.test_legacy_script_manifest_and_modular_structure)",
+      "id": "tests.e2e.tier1_features.test_f01_legacy_restoration.TestFeature01LegacyRestoration.test_legacy_script_manifest_and_modular_structure",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_legacy_sysctl_bbr_tuning_params (tests.e2e.tier1_features.test_f01_legacy_restoration.TestFeature01LegacyRestoration.test_legacy_sysctl_bbr_tuning_params)",
+      "id": "tests.e2e.tier1_features.test_f01_legacy_restoration.TestFeature01LegacyRestoration.test_legacy_sysctl_bbr_tuning_params",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_legacy_xray_config_modernization (tests.e2e.tier1_features.test_f01_legacy_restoration.TestFeature01LegacyRestoration.test_legacy_xray_config_modernization)",
+      "id": "tests.e2e.tier1_features.test_f01_legacy_restoration.TestFeature01LegacyRestoration.test_legacy_xray_config_modernization",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_async_threat_event_queue (tests.e2e.tier1_features.test_f02_honeypot_dos.TestFeature02HoneypotDoS.test_async_threat_event_queue)",
+      "id": "tests.e2e.tier1_features.test_f02_honeypot_dos.TestFeature02HoneypotDoS.test_async_threat_event_queue",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_high_concurrency_dos_resilience (tests.e2e.tier1_features.test_f02_honeypot_dos.TestFeature02HoneypotDoS.test_high_concurrency_dos_resilience)",
+      "id": "tests.e2e.tier1_features.test_f02_honeypot_dos.TestFeature02HoneypotDoS.test_high_concurrency_dos_resilience",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_sliding_window_ban_ttl (tests.e2e.tier1_features.test_f02_honeypot_dos.TestFeature02HoneypotDoS.test_sliding_window_ban_ttl)",
+      "id": "tests.e2e.tier1_features.test_f02_honeypot_dos.TestFeature02HoneypotDoS.test_sliding_window_ban_ttl",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_threat_scoring_accumulation (tests.e2e.tier1_features.test_f02_honeypot_dos.TestFeature02HoneypotDoS.test_threat_scoring_accumulation)",
+      "id": "tests.e2e.tier1_features.test_f02_honeypot_dos.TestFeature02HoneypotDoS.test_threat_scoring_accumulation",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_token_bucket_rate_limiter (tests.e2e.tier1_features.test_f02_honeypot_dos.TestFeature02HoneypotDoS.test_token_bucket_rate_limiter)",
+      "id": "tests.e2e.tier1_features.test_f02_honeypot_dos.TestFeature02HoneypotDoS.test_token_bucket_rate_limiter",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_active_session_revocation_on_deletion (tests.e2e.tier1_features.test_f03_user_management.TestFeature03UserManagement.test_active_session_revocation_on_deletion)",
+      "id": "tests.e2e.tier1_features.test_f03_user_management.TestFeature03UserManagement.test_active_session_revocation_on_deletion",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_sqli_immunity_in_username_and_uuid (tests.e2e.tier1_features.test_f03_user_management.TestFeature03UserManagement.test_sqli_immunity_in_username_and_uuid)",
+      "id": "tests.e2e.tier1_features.test_f03_user_management.TestFeature03UserManagement.test_sqli_immunity_in_username_and_uuid",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_transactional_quota_updates (tests.e2e.tier1_features.test_f03_user_management.TestFeature03UserManagement.test_transactional_quota_updates)",
+      "id": "tests.e2e.tier1_features.test_f03_user_management.TestFeature03UserManagement.test_transactional_quota_updates",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_user_creation_with_parameterized_sql (tests.e2e.tier1_features.test_f03_user_management.TestFeature03UserManagement.test_user_creation_with_parameterized_sql)",
+      "id": "tests.e2e.tier1_features.test_f03_user_management.TestFeature03UserManagement.test_user_creation_with_parameterized_sql",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_user_revocation_prepared_statement (tests.e2e.tier1_features.test_f03_user_management.TestFeature03UserManagement.test_user_revocation_prepared_statement)",
+      "id": "tests.e2e.tier1_features.test_f03_user_management.TestFeature03UserManagement.test_user_revocation_prepared_statement",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_env_var_secret_injection (tests.e2e.tier1_features.test_f04_secret_management.TestFeature04SecretManagement.test_env_var_secret_injection)",
+      "id": "tests.e2e.tier1_features.test_f04_secret_management.TestFeature04SecretManagement.test_env_var_secret_injection",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_in_memory_secret_zeroization (tests.e2e.tier1_features.test_f04_secret_management.TestFeature04SecretManagement.test_in_memory_secret_zeroization)",
+      "id": "tests.e2e.tier1_features.test_f04_secret_management.TestFeature04SecretManagement.test_in_memory_secret_zeroization",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_key_derivation_hkdf (tests.e2e.tier1_features.test_f04_secret_management.TestFeature04SecretManagement.test_key_derivation_hkdf)",
+      "id": "tests.e2e.tier1_features.test_f04_secret_management.TestFeature04SecretManagement.test_key_derivation_hkdf",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_plaintext_rejection_in_config_files (tests.e2e.tier1_features.test_f04_secret_management.TestFeature04SecretManagement.test_plaintext_rejection_in_config_files)",
+      "id": "tests.e2e.tier1_features.test_f04_secret_management.TestFeature04SecretManagement.test_plaintext_rejection_in_config_files",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_zero_downtime_secret_rotation (tests.e2e.tier1_features.test_f04_secret_management.TestFeature04SecretManagement.test_zero_downtime_secret_rotation)",
+      "id": "tests.e2e.tier1_features.test_f04_secret_management.TestFeature04SecretManagement.test_zero_downtime_secret_rotation",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_dockerfile_multi_stage_structure (tests.e2e.tier1_features.test_f05_container_hardening.TestFeature05ContainerHardening.test_dockerfile_multi_stage_structure)",
+      "id": "tests.e2e.tier1_features.test_f05_container_hardening.TestFeature05ContainerHardening.test_dockerfile_multi_stage_structure",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_linux_capabilities_drop_all (tests.e2e.tier1_features.test_f05_container_hardening.TestFeature05ContainerHardening.test_linux_capabilities_drop_all)",
+      "id": "tests.e2e.tier1_features.test_f05_container_hardening.TestFeature05ContainerHardening.test_linux_capabilities_drop_all",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_read_only_root_filesystem_enforcement (tests.e2e.tier1_features.test_f05_container_hardening.TestFeature05ContainerHardening.test_read_only_root_filesystem_enforcement)",
+      "id": "tests.e2e.tier1_features.test_f05_container_hardening.TestFeature05ContainerHardening.test_read_only_root_filesystem_enforcement",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_rootless_user_profile (tests.e2e.tier1_features.test_f05_container_hardening.TestFeature05ContainerHardening.test_rootless_user_profile)",
+      "id": "tests.e2e.tier1_features.test_f05_container_hardening.TestFeature05ContainerHardening.test_rootless_user_profile",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_seccomp_no_new_privileges_compliance (tests.e2e.tier1_features.test_f05_container_hardening.TestFeature05ContainerHardening.test_seccomp_no_new_privileges_compliance)",
+      "id": "tests.e2e.tier1_features.test_f05_container_hardening.TestFeature05ContainerHardening.test_seccomp_no_new_privileges_compliance",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_invalid_uuid_fallback_to_decoy (tests.e2e.tier1_features.test_f06_vless_reality.TestFeature06VLESSReality.test_invalid_uuid_fallback_to_decoy)",
+      "id": "tests.e2e.tier1_features.test_f06_vless_reality.TestFeature06VLESSReality.test_invalid_uuid_fallback_to_decoy",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_multiplexing_stream_framing (tests.e2e.tier1_features.test_f06_vless_reality.TestFeature06VLESSReality.test_multiplexing_stream_framing)",
+      "id": "tests.e2e.tier1_features.test_f06_vless_reality.TestFeature06VLESSReality.test_multiplexing_stream_framing",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_short_id_validation (tests.e2e.tier1_features.test_f06_vless_reality.TestFeature06VLESSReality.test_short_id_validation)",
+      "id": "tests.e2e.tier1_features.test_f06_vless_reality.TestFeature06VLESSReality.test_short_id_validation",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_sni_spoofing_camouflage (tests.e2e.tier1_features.test_f06_vless_reality.TestFeature06VLESSReality.test_sni_spoofing_camouflage)",
+      "id": "tests.e2e.tier1_features.test_f06_vless_reality.TestFeature06VLESSReality.test_sni_spoofing_camouflage",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_valid_vless_reality_handshake (tests.e2e.tier1_features.test_f06_vless_reality.TestFeature06VLESSReality.test_valid_vless_reality_handshake)",
+      "id": "tests.e2e.tier1_features.test_f06_vless_reality.TestFeature06VLESSReality.test_valid_vless_reality_handshake",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_decoy_loopback_binding (tests.e2e.tier1_features.test_f07_nginx_decoy.TestFeature07NginxDecoy.test_decoy_loopback_binding)",
+      "id": "tests.e2e.tier1_features.test_f07_nginx_decoy.TestFeature07NginxDecoy.test_decoy_loopback_binding",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_hardened_http_security_headers (tests.e2e.tier1_features.test_f07_nginx_decoy.TestFeature07NginxDecoy.test_hardened_http_security_headers)",
+      "id": "tests.e2e.tier1_features.test_f07_nginx_decoy.TestFeature07NginxDecoy.test_hardened_http_security_headers",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_scanner_anti_probing_drop (tests.e2e.tier1_features.test_f07_nginx_decoy.TestFeature07NginxDecoy.test_scanner_anti_probing_drop)",
+      "id": "tests.e2e.tier1_features.test_f07_nginx_decoy.TestFeature07NginxDecoy.test_scanner_anti_probing_drop",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_subscription_token_auth (tests.e2e.tier1_features.test_f07_nginx_decoy.TestFeature07NginxDecoy.test_subscription_token_auth)",
+      "id": "tests.e2e.tier1_features.test_f07_nginx_decoy.TestFeature07NginxDecoy.test_subscription_token_auth",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_tls_13_cipher_suite_negotiation (tests.e2e.tier1_features.test_f07_nginx_decoy.TestFeature07NginxDecoy.test_tls_13_cipher_suite_negotiation)",
+      "id": "tests.e2e.tier1_features.test_f07_nginx_decoy.TestFeature07NginxDecoy.test_tls_13_cipher_suite_negotiation",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_dns_cache_ttl_handling (tests.e2e.tier1_features.test_f08_doh_resolver.TestFeature08DoHResolver.test_dns_cache_ttl_handling)",
+      "id": "tests.e2e.tier1_features.test_f08_doh_resolver.TestFeature08DoHResolver.test_dns_cache_ttl_handling",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_doh_query_wire_format (tests.e2e.tier1_features.test_f08_doh_resolver.TestFeature08DoHResolver.test_doh_query_wire_format)",
+      "id": "tests.e2e.tier1_features.test_f08_doh_resolver.TestFeature08DoHResolver.test_doh_query_wire_format",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_multi_resolver_failover_order (tests.e2e.tier1_features.test_f08_doh_resolver.TestFeature08DoHResolver.test_multi_resolver_failover_order)",
+      "id": "tests.e2e.tier1_features.test_f08_doh_resolver.TestFeature08DoHResolver.test_multi_resolver_failover_order",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_plaintext_port_53_blocking (tests.e2e.tier1_features.test_f08_doh_resolver.TestFeature08DoHResolver.test_plaintext_port_53_blocking)",
+      "id": "tests.e2e.tier1_features.test_f08_doh_resolver.TestFeature08DoHResolver.test_plaintext_port_53_blocking",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_split_horizon_leak_protection (tests.e2e.tier1_features.test_f08_doh_resolver.TestFeature08DoHResolver.test_split_horizon_leak_protection)",
+      "id": "tests.e2e.tier1_features.test_f08_doh_resolver.TestFeature08DoHResolver.test_split_horizon_leak_protection",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_0rtt_handshake_session_key_derivation (tests.e2e.tier1_features.test_f09_crypto_overlay.TestFeature09CryptoOverlay.test_0rtt_handshake_session_key_derivation)",
+      "id": "tests.e2e.tier1_features.test_f09_crypto_overlay.TestFeature09CryptoOverlay.test_0rtt_handshake_session_key_derivation",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_aead_tag_authentication_and_tamper_detection (tests.e2e.tier1_features.test_f09_crypto_overlay.TestFeature09CryptoOverlay.test_aead_tag_authentication_and_tamper_detection)",
+      "id": "tests.e2e.tier1_features.test_f09_crypto_overlay.TestFeature09CryptoOverlay.test_aead_tag_authentication_and_tamper_detection",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_cryptographic_epoch_rotation_rekeying (tests.e2e.tier1_features.test_f09_crypto_overlay.TestFeature09CryptoOverlay.test_cryptographic_epoch_rotation_rekeying)",
+      "id": "tests.e2e.tier1_features.test_f09_crypto_overlay.TestFeature09CryptoOverlay.test_cryptographic_epoch_rotation_rekeying",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_direct_frame_wire_format_compliance (tests.e2e.tier1_features.test_f09_crypto_overlay.TestFeature09CryptoOverlay.test_direct_frame_wire_format_compliance)",
+      "id": "tests.e2e.tier1_features.test_f09_crypto_overlay.TestFeature09CryptoOverlay.test_direct_frame_wire_format_compliance",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_nonce_sequencing_and_anti_replay (tests.e2e.tier1_features.test_f09_crypto_overlay.TestFeature09CryptoOverlay.test_nonce_sequencing_and_anti_replay)",
+      "id": "tests.e2e.tier1_features.test_f09_crypto_overlay.TestFeature09CryptoOverlay.test_nonce_sequencing_and_anti_replay",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_cone_to_cone_direct_hole_punch (tests.e2e.tier1_features.test_f10_nat_traversal.TestFeature10NATTraversal.test_cone_to_cone_direct_hole_punch)",
+      "id": "tests.e2e.tier1_features.test_f10_nat_traversal.TestFeature10NATTraversal.test_cone_to_cone_direct_hole_punch",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_hostile_symmetric_derp_fallback (tests.e2e.tier1_features.test_f10_nat_traversal.TestFeature10NATTraversal.test_hostile_symmetric_derp_fallback)",
+      "id": "tests.e2e.tier1_features.test_f10_nat_traversal.TestFeature10NATTraversal.test_hostile_symmetric_derp_fallback",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_sequential_symmetric_port_prediction (tests.e2e.tier1_features.test_f10_nat_traversal.TestFeature10NATTraversal.test_sequential_symmetric_port_prediction)",
+      "id": "tests.e2e.tier1_features.test_f10_nat_traversal.TestFeature10NATTraversal.test_sequential_symmetric_port_prediction",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_stun_nat_classification_matrix (tests.e2e.tier1_features.test_f10_nat_traversal.TestFeature10NATTraversal.test_stun_nat_classification_matrix)",
+      "id": "tests.e2e.tier1_features.test_f10_nat_traversal.TestFeature10NATTraversal.test_stun_nat_classification_matrix",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_symmetric_multi_port_spraying (tests.e2e.tier1_features.test_f10_nat_traversal.TestFeature10NATTraversal.test_symmetric_multi_port_spraying)",
+      "id": "tests.e2e.tier1_features.test_f10_nat_traversal.TestFeature10NATTraversal.test_symmetric_multi_port_spraying",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_dead_peer_heartbeat_pruning (tests.e2e.tier1_features.test_f11_derp_relay.TestFeature11DERPRelay.test_dead_peer_heartbeat_pruning)",
+      "id": "tests.e2e.tier1_features.test_f11_derp_relay.TestFeature11DERPRelay.test_dead_peer_heartbeat_pruning",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_derp_frame_wire_format (tests.e2e.tier1_features.test_f11_derp_relay.TestFeature11DERPRelay.test_derp_frame_wire_format)",
+      "id": "tests.e2e.tier1_features.test_f11_derp_relay.TestFeature11DERPRelay.test_derp_frame_wire_format",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_derp_websocket_tls_encapsulation (tests.e2e.tier1_features.test_f11_derp_relay.TestFeature11DERPRelay.test_derp_websocket_tls_encapsulation)",
+      "id": "tests.e2e.tier1_features.test_f11_derp_relay.TestFeature11DERPRelay.test_derp_websocket_tls_encapsulation",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_relay_packet_routing_by_pubkey (tests.e2e.tier1_features.test_f11_derp_relay.TestFeature11DERPRelay.test_relay_packet_routing_by_pubkey)",
+      "id": "tests.e2e.tier1_features.test_f11_derp_relay.TestFeature11DERPRelay.test_relay_packet_routing_by_pubkey",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_relay_swarm_latency_selection (tests.e2e.tier1_features.test_f11_derp_relay.TestFeature11DERPRelay.test_relay_swarm_latency_selection)",
+      "id": "tests.e2e.tier1_features.test_f11_derp_relay.TestFeature11DERPRelay.test_relay_swarm_latency_selection",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_bandwidth_quota_enforcement (tests.e2e.tier1_features.test_f12_client_bridge.TestFeature12ClientBridge.test_bandwidth_quota_enforcement)",
+      "id": "tests.e2e.tier1_features.test_f12_client_bridge.TestFeature12ClientBridge.test_bandwidth_quota_enforcement",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_battery_level_threshold_protection (tests.e2e.tier1_features.test_f12_client_bridge.TestFeature12ClientBridge.test_battery_level_threshold_protection)",
+      "id": "tests.e2e.tier1_features.test_f12_client_bridge.TestFeature12ClientBridge.test_battery_level_threshold_protection",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_client_bridge_egress_socks5_forwarding (tests.e2e.tier1_features.test_f12_client_bridge.TestFeature12ClientBridge.test_client_bridge_egress_socks5_forwarding)",
+      "id": "tests.e2e.tier1_features.test_f12_client_bridge.TestFeature12ClientBridge.test_client_bridge_egress_socks5_forwarding",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_concurrent_egress_session_handling (tests.e2e.tier1_features.test_f12_client_bridge.TestFeature12ClientBridge.test_concurrent_egress_session_handling)",
+      "id": "tests.e2e.tier1_features.test_f12_client_bridge.TestFeature12ClientBridge.test_concurrent_egress_session_handling",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_userspace_netstack_egress_isolation (tests.e2e.tier1_features.test_f12_client_bridge.TestFeature12ClientBridge.test_userspace_netstack_egress_isolation)",
+      "id": "tests.e2e.tier1_features.test_f12_client_bridge.TestFeature12ClientBridge.test_userspace_netstack_egress_isolation",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_loopback_and_link_local_dropped (tests.e2e.tier1_features.test_f13_rfc1918_isolation.TestFeature13RFC1918Isolation.test_loopback_and_link_local_dropped)",
+      "id": "tests.e2e.tier1_features.test_f13_rfc1918_isolation.TestFeature13RFC1918Isolation.test_loopback_and_link_local_dropped",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_multicast_and_reserved_dropped (tests.e2e.tier1_features.test_f13_rfc1918_isolation.TestFeature13RFC1918Isolation.test_multicast_and_reserved_dropped)",
+      "id": "tests.e2e.tier1_features.test_f13_rfc1918_isolation.TestFeature13RFC1918Isolation.test_multicast_and_reserved_dropped",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_rfc1918_private_ranges_dropped (tests.e2e.tier1_features.test_f13_rfc1918_isolation.TestFeature13RFC1918Isolation.test_rfc1918_private_ranges_dropped)",
+      "id": "tests.e2e.tier1_features.test_f13_rfc1918_isolation.TestFeature13RFC1918Isolation.test_rfc1918_private_ranges_dropped",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_smb_netbios_ports_block (tests.e2e.tier1_features.test_f13_rfc1918_isolation.TestFeature13RFC1918Isolation.test_smb_netbios_ports_block)",
+      "id": "tests.e2e.tier1_features.test_f13_rfc1918_isolation.TestFeature13RFC1918Isolation.test_smb_netbios_ports_block",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_smtp_port_25_spam_block (tests.e2e.tier1_features.test_f13_rfc1918_isolation.TestFeature13RFC1918Isolation.test_smtp_port_25_spam_block)",
+      "id": "tests.e2e.tier1_features.test_f13_rfc1918_isolation.TestFeature13RFC1918Isolation.test_smtp_port_25_spam_block",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_country_exit_routing_6_regions (tests.e2e.tier1_features.test_f14_geo_routing.TestFeature14GeoRouting.test_country_exit_routing_6_regions)",
+      "id": "tests.e2e.tier1_features.test_f14_geo_routing.TestFeature14GeoRouting.test_country_exit_routing_6_regions",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_geo_fallback_when_country_unavailable (tests.e2e.tier1_features.test_f14_geo_routing.TestFeature14GeoRouting.test_geo_fallback_when_country_unavailable)",
+      "id": "tests.e2e.tier1_features.test_f14_geo_routing.TestFeature14GeoRouting.test_geo_fallback_when_country_unavailable",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_latency_weighted_node_selection (tests.e2e.tier1_features.test_f14_geo_routing.TestFeature14GeoRouting.test_latency_weighted_node_selection)",
+      "id": "tests.e2e.tier1_features.test_f14_geo_routing.TestFeature14GeoRouting.test_latency_weighted_node_selection",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_random_exit_selection_origin_obfuscation (tests.e2e.tier1_features.test_f14_geo_routing.TestFeature14GeoRouting.test_random_exit_selection_origin_obfuscation)",
+      "id": "tests.e2e.tier1_features.test_f14_geo_routing.TestFeature14GeoRouting.test_random_exit_selection_origin_obfuscation",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_specific_host_id_routing (tests.e2e.tier1_features.test_f14_geo_routing.TestFeature14GeoRouting.test_specific_host_id_routing)",
+      "id": "tests.e2e.tier1_features.test_f14_geo_routing.TestFeature14GeoRouting.test_specific_host_id_routing",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_3hop_circuit_layered_encryption (tests.e2e.tier1_features.test_f15_onion_routing.TestFeature15OnionRouting.test_3hop_circuit_layered_encryption)",
+      "id": "tests.e2e.tier1_features.test_f15_onion_routing.TestFeature15OnionRouting.test_3hop_circuit_layered_encryption",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_circuit_commands_create_relay_destroy (tests.e2e.tier1_features.test_f15_onion_routing.TestFeature15OnionRouting.test_circuit_commands_create_relay_destroy)",
+      "id": "tests.e2e.tier1_features.test_f15_onion_routing.TestFeature15OnionRouting.test_circuit_commands_create_relay_destroy",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_onion_cell_fixed_1420_byte_size (tests.e2e.tier1_features.test_f15_onion_routing.TestFeature15OnionRouting.test_onion_cell_fixed_1420_byte_size)",
+      "id": "tests.e2e.tier1_features.test_f15_onion_routing.TestFeature15OnionRouting.test_onion_cell_fixed_1420_byte_size",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_onion_cell_hmac_integrity_check (tests.e2e.tier1_features.test_f15_onion_routing.TestFeature15OnionRouting.test_onion_cell_hmac_integrity_check)",
+      "id": "tests.e2e.tier1_features.test_f15_onion_routing.TestFeature15OnionRouting.test_onion_cell_hmac_integrity_check",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_timing_jitter_injection (tests.e2e.tier1_features.test_f15_onion_routing.TestFeature15OnionRouting.test_timing_jitter_injection)",
+      "id": "tests.e2e.tier1_features.test_f15_onion_routing.TestFeature15OnionRouting.test_timing_jitter_injection",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_cluster_epoch_synchronization (tests.e2e.tier1_features.test_f16_control_plane.TestFeature16ControlPlane.test_cluster_epoch_synchronization)",
+      "id": "tests.e2e.tier1_features.test_f16_control_plane.TestFeature16ControlPlane.test_cluster_epoch_synchronization",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_node_registration_and_vip_allocation (tests.e2e.tier1_features.test_f16_control_plane.TestFeature16ControlPlane.test_node_registration_and_vip_allocation)",
+      "id": "tests.e2e.tier1_features.test_f16_control_plane.TestFeature16ControlPlane.test_node_registration_and_vip_allocation",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_peer_health_heartbeat_reporting (tests.e2e.tier1_features.test_f16_control_plane.TestFeature16ControlPlane.test_peer_health_heartbeat_reporting)",
+      "id": "tests.e2e.tier1_features.test_f16_control_plane.TestFeature16ControlPlane.test_peer_health_heartbeat_reporting",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_topology_sync_peer_endpoints (tests.e2e.tier1_features.test_f16_control_plane.TestFeature16ControlPlane.test_topology_sync_peer_endpoints)",
+      "id": "tests.e2e.tier1_features.test_f16_control_plane.TestFeature16ControlPlane.test_topology_sync_peer_endpoints",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_unauthorized_token_rejection (tests.e2e.tier1_features.test_f16_control_plane.TestFeature16ControlPlane.test_unauthorized_token_rejection)",
+      "id": "tests.e2e.tier1_features.test_f16_control_plane.TestFeature16ControlPlane.test_unauthorized_token_rejection",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_6_cloud_providers_declared (tests.e2e.tier1_features.test_f17_config_parser.TestFeature17ConfigParser.test_6_cloud_providers_declared)",
+      "id": "tests.e2e.tier1_features.test_f17_config_parser.TestFeature17ConfigParser.test_6_cloud_providers_declared",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_helm_values_generation (tests.e2e.tier1_features.test_f17_config_parser.TestFeature17ConfigParser.test_helm_values_generation)",
+      "id": "tests.e2e.tier1_features.test_f17_config_parser.TestFeature17ConfigParser.test_helm_values_generation",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_schema_validation_rejects_missing_fields (tests.e2e.tier1_features.test_f17_config_parser.TestFeature17ConfigParser.test_schema_validation_rejects_missing_fields)",
+      "id": "tests.e2e.tier1_features.test_f17_config_parser.TestFeature17ConfigParser.test_schema_validation_rejects_missing_fields",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_tfvars_generation_for_providers (tests.e2e.tier1_features.test_f17_config_parser.TestFeature17ConfigParser.test_tfvars_generation_for_providers)",
+      "id": "tests.e2e.tier1_features.test_f17_config_parser.TestFeature17ConfigParser.test_tfvars_generation_for_providers",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_unified_config_schema_structure (tests.e2e.tier1_features.test_f17_config_parser.TestFeature17ConfigParser.test_unified_config_schema_structure)",
+      "id": "tests.e2e.tier1_features.test_f17_config_parser.TestFeature17ConfigParser.test_unified_config_schema_structure",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_aws_terraform_module_structure (tests.e2e.tier1_features.test_f18_terraform_prov.TestFeature18TerraformProvisioning.test_aws_terraform_module_structure)",
+      "id": "tests.e2e.tier1_features.test_f18_terraform_prov.TestFeature18TerraformProvisioning.test_aws_terraform_module_structure",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_digitalocean_and_hetzner_modules (tests.e2e.tier1_features.test_f18_terraform_prov.TestFeature18TerraformProvisioning.test_digitalocean_and_hetzner_modules)",
+      "id": "tests.e2e.tier1_features.test_f18_terraform_prov.TestFeature18TerraformProvisioning.test_digitalocean_and_hetzner_modules",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_gcp_terraform_module_structure (tests.e2e.tier1_features.test_f18_terraform_prov.TestFeature18TerraformProvisioning.test_gcp_terraform_module_structure)",
+      "id": "tests.e2e.tier1_features.test_f18_terraform_prov.TestFeature18TerraformProvisioning.test_gcp_terraform_module_structure",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_oci_terraform_module_structure (tests.e2e.tier1_features.test_f18_terraform_prov.TestFeature18TerraformProvisioning.test_oci_terraform_module_structure)",
+      "id": "tests.e2e.tier1_features.test_f18_terraform_prov.TestFeature18TerraformProvisioning.test_oci_terraform_module_structure",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_vultr_and_cross_cloud_security_groups (tests.e2e.tier1_features.test_f18_terraform_prov.TestFeature18TerraformProvisioning.test_vultr_and_cross_cloud_security_groups)",
+      "id": "tests.e2e.tier1_features.test_f18_terraform_prov.TestFeature18TerraformProvisioning.test_vultr_and_cross_cloud_security_groups",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_auto_healing_watchdog_script (tests.e2e.tier1_features.test_f19_cloud_init.TestFeature19CloudInit.test_auto_healing_watchdog_script)",
+      "id": "tests.e2e.tier1_features.test_f19_cloud_init.TestFeature19CloudInit.test_auto_healing_watchdog_script",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_cloud_init_yaml_syntax_compliance (tests.e2e.tier1_features.test_f19_cloud_init.TestFeature19CloudInit.test_cloud_init_yaml_syntax_compliance)",
+      "id": "tests.e2e.tier1_features.test_f19_cloud_init.TestFeature19CloudInit.test_cloud_init_yaml_syntax_compliance",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_distro_agnostic_os_detection (tests.e2e.tier1_features.test_f19_cloud_init.TestFeature19CloudInit.test_distro_agnostic_os_detection)",
+      "id": "tests.e2e.tier1_features.test_f19_cloud_init.TestFeature19CloudInit.test_distro_agnostic_os_detection",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_sysctl_bbr_and_buffer_tuning_script (tests.e2e.tier1_features.test_f19_cloud_init.TestFeature19CloudInit.test_sysctl_bbr_and_buffer_tuning_script)",
+      "id": "tests.e2e.tier1_features.test_f19_cloud_init.TestFeature19CloudInit.test_sysctl_bbr_and_buffer_tuning_script",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_systemd_service_unit_generation (tests.e2e.tier1_features.test_f19_cloud_init.TestFeature19CloudInit.test_systemd_service_unit_generation)",
+      "id": "tests.e2e.tier1_features.test_f19_cloud_init.TestFeature19CloudInit.test_systemd_service_unit_generation",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_control_plane_deployment_manifest (tests.e2e.tier1_features.test_f20_k8s_helm.TestFeature20K8sHelm.test_control_plane_deployment_manifest)",
+      "id": "tests.e2e.tier1_features.test_f20_k8s_helm.TestFeature20K8sHelm.test_control_plane_deployment_manifest",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_derp_relay_statefulset_manifest (tests.e2e.tier1_features.test_f20_k8s_helm.TestFeature20K8sHelm.test_derp_relay_statefulset_manifest)",
+      "id": "tests.e2e.tier1_features.test_f20_k8s_helm.TestFeature20K8sHelm.test_derp_relay_statefulset_manifest",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_edge_gateway_daemonset_manifest (tests.e2e.tier1_features.test_f20_k8s_helm.TestFeature20K8sHelm.test_edge_gateway_daemonset_manifest)",
+      "id": "tests.e2e.tier1_features.test_f20_k8s_helm.TestFeature20K8sHelm.test_edge_gateway_daemonset_manifest",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_helm_chart_metadata (tests.e2e.tier1_features.test_f20_k8s_helm.TestFeature20K8sHelm.test_helm_chart_metadata)",
+      "id": "tests.e2e.tier1_features.test_f20_k8s_helm.TestFeature20K8sHelm.test_helm_chart_metadata",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_k8s_network_policy_manifest (tests.e2e.tier1_features.test_f20_k8s_helm.TestFeature20K8sHelm.test_k8s_network_policy_manifest)",
+      "id": "tests.e2e.tier1_features.test_f20_k8s_helm.TestFeature20K8sHelm.test_k8s_network_policy_manifest",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_aws_nlb_overlay_annotations (tests.e2e.tier1_features.test_f21_kustomize.TestFeature21KustomizeOverlays.test_aws_nlb_overlay_annotations)",
+      "id": "tests.e2e.tier1_features.test_f21_kustomize.TestFeature21KustomizeOverlays.test_aws_nlb_overlay_annotations",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_gcp_cloud_armor_overlay_annotations (tests.e2e.tier1_features.test_f21_kustomize.TestFeature21KustomizeOverlays.test_gcp_cloud_armor_overlay_annotations)",
+      "id": "tests.e2e.tier1_features.test_f21_kustomize.TestFeature21KustomizeOverlays.test_gcp_cloud_armor_overlay_annotations",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_hetzner_nodeport_overlay_annotations (tests.e2e.tier1_features.test_f21_kustomize.TestFeature21KustomizeOverlays.test_hetzner_nodeport_overlay_annotations)",
+      "id": "tests.e2e.tier1_features.test_f21_kustomize.TestFeature21KustomizeOverlays.test_hetzner_nodeport_overlay_annotations",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_kustomize_base_resources (tests.e2e.tier1_features.test_f21_kustomize.TestFeature21KustomizeOverlays.test_kustomize_base_resources)",
+      "id": "tests.e2e.tier1_features.test_f21_kustomize.TestFeature21KustomizeOverlays.test_kustomize_base_resources",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_oci_overlay_annotations (tests.e2e.tier1_features.test_f21_kustomize.TestFeature21KustomizeOverlays.test_oci_overlay_annotations)",
+      "id": "tests.e2e.tier1_features.test_f21_kustomize.TestFeature21KustomizeOverlays.test_oci_overlay_annotations",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_git_commit_history_preservation (tests.e2e.tier1_features.test_f22_gitops_migration.TestFeature22GitOpsMigration.test_git_commit_history_preservation)",
+      "id": "tests.e2e.tier1_features.test_f22_gitops_migration.TestFeature22GitOpsMigration.test_git_commit_history_preservation",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_legacy_branch_creation_v2 (tests.e2e.tier1_features.test_f22_gitops_migration.TestFeature22GitOpsMigration.test_legacy_branch_creation_v2)",
+      "id": "tests.e2e.tier1_features.test_f22_gitops_migration.TestFeature22GitOpsMigration.test_legacy_branch_creation_v2",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_legacy_tag_creation_v200_legacy (tests.e2e.tier1_features.test_f22_gitops_migration.TestFeature22GitOpsMigration.test_legacy_tag_creation_v200_legacy)",
+      "id": "tests.e2e.tier1_features.test_f22_gitops_migration.TestFeature22GitOpsMigration.test_legacy_tag_creation_v200_legacy",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_migration_safety_checks_and_rollback (tests.e2e.tier1_features.test_f22_gitops_migration.TestFeature22GitOpsMigration.test_migration_safety_checks_and_rollback)",
+      "id": "tests.e2e.tier1_features.test_f22_gitops_migration.TestFeature22GitOpsMigration.test_migration_safety_checks_and_rollback",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_v4_staging_on_main_branch (tests.e2e.tier1_features.test_f22_gitops_migration.TestFeature22GitOpsMigration.test_v4_staging_on_main_branch)",
+      "id": "tests.e2e.tier1_features.test_f22_gitops_migration.TestFeature22GitOpsMigration.test_v4_staging_on_main_branch",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_ci_workflow_triggers_and_matrix (tests.e2e.tier1_features.test_f23_github_actions.TestFeature23GitHubActions.test_ci_workflow_triggers_and_matrix)",
+      "id": "tests.e2e.tier1_features.test_f23_github_actions.TestFeature23GitHubActions.test_ci_workflow_triggers_and_matrix",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_gitops_deploy_multi_cloud_jobs (tests.e2e.tier1_features.test_f23_github_actions.TestFeature23GitHubActions.test_gitops_deploy_multi_cloud_jobs)",
+      "id": "tests.e2e.tier1_features.test_f23_github_actions.TestFeature23GitHubActions.test_gitops_deploy_multi_cloud_jobs",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_infra_validate_terraform_helm_lint (tests.e2e.tier1_features.test_f23_github_actions.TestFeature23GitHubActions.test_infra_validate_terraform_helm_lint)",
+      "id": "tests.e2e.tier1_features.test_f23_github_actions.TestFeature23GitHubActions.test_infra_validate_terraform_helm_lint",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_release_workflow_signing_and_packaging (tests.e2e.tier1_features.test_f23_github_actions.TestFeature23GitHubActions.test_release_workflow_signing_and_packaging)",
+      "id": "tests.e2e.tier1_features.test_f23_github_actions.TestFeature23GitHubActions.test_release_workflow_signing_and_packaging",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_security_scan_sast_tools (tests.e2e.tier1_features.test_f23_github_actions.TestFeature23GitHubActions.test_security_scan_sast_tools)",
+      "id": "tests.e2e.tier1_features.test_f23_github_actions.TestFeature23GitHubActions.test_security_scan_sast_tools",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_custom_tap_result_collection (tests.e2e.tier1_features.test_f24_full_e2e_pass.TestFeature24FullE2EPass.test_custom_tap_result_collection)",
+      "id": "tests.e2e.tier1_features.test_f24_full_e2e_pass.TestFeature24FullE2EPass.test_custom_tap_result_collection",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_json_report_structure (tests.e2e.tier1_features.test_f24_full_e2e_pass.TestFeature24FullE2EPass.test_json_report_structure)",
+      "id": "tests.e2e.tier1_features.test_f24_full_e2e_pass.TestFeature24FullE2EPass.test_json_report_structure",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_tap_v13_formatting (tests.e2e.tier1_features.test_f24_full_e2e_pass.TestFeature24FullE2EPass.test_tap_v13_formatting)",
+      "id": "tests.e2e.tier1_features.test_f24_full_e2e_pass.TestFeature24FullE2EPass.test_tap_v13_formatting",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_test_runner_artifact_generation (tests.e2e.tier1_features.test_f24_full_e2e_pass.TestFeature24FullE2EPass.test_test_runner_artifact_generation)",
+      "id": "tests.e2e.tier1_features.test_f24_full_e2e_pass.TestFeature24FullE2EPass.test_test_runner_artifact_generation",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_tier_suite_discovery (tests.e2e.tier1_features.test_f24_full_e2e_pass.TestFeature24FullE2EPass.test_tier_suite_discovery)",
+      "id": "tests.e2e.tier1_features.test_f24_full_e2e_pass.TestFeature24FullE2EPass.test_tier_suite_discovery",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_aead_tag_corruption_detection (tests.e2e.tier1_features.test_f25_adversarial_hardening.TestFeature25AdversarialHardening.test_aead_tag_corruption_detection)",
+      "id": "tests.e2e.tier1_features.test_f25_adversarial_hardening.TestFeature25AdversarialHardening.test_aead_tag_corruption_detection",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_derp_frame_extreme_length_guard (tests.e2e.tier1_features.test_f25_adversarial_hardening.TestFeature25AdversarialHardening.test_derp_frame_extreme_length_guard)",
+      "id": "tests.e2e.tier1_features.test_f25_adversarial_hardening.TestFeature25AdversarialHardening.test_derp_frame_extreme_length_guard",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_direct_frame_magic_tamper_rejection (tests.e2e.tier1_features.test_f25_adversarial_hardening.TestFeature25AdversarialHardening.test_direct_frame_magic_tamper_rejection)",
+      "id": "tests.e2e.tier1_features.test_f25_adversarial_hardening.TestFeature25AdversarialHardening.test_direct_frame_magic_tamper_rejection",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_direct_frame_truncated_header_rejection (tests.e2e.tier1_features.test_f25_adversarial_hardening.TestFeature25AdversarialHardening.test_direct_frame_truncated_header_rejection)",
+      "id": "tests.e2e.tier1_features.test_f25_adversarial_hardening.TestFeature25AdversarialHardening.test_direct_frame_truncated_header_rejection",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_onion_cell_fixed_size_invariant (tests.e2e.tier1_features.test_f25_adversarial_hardening.TestFeature25AdversarialHardening.test_onion_cell_fixed_size_invariant)",
+      "id": "tests.e2e.tier1_features.test_f25_adversarial_hardening.TestFeature25AdversarialHardening.test_onion_cell_fixed_size_invariant",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_bidirectional_rule_enforcement (tests.e2e.tier1_features.test_f26_dynamic_acl.TestFeature26DynamicPeerACL.test_bidirectional_rule_enforcement)",
+      "id": "tests.e2e.tier1_features.test_f26_dynamic_acl.TestFeature26DynamicPeerACL.test_bidirectional_rule_enforcement",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_default_drop_unmatched_traffic (tests.e2e.tier1_features.test_f26_dynamic_acl.TestFeature26DynamicPeerACL.test_default_drop_unmatched_traffic)",
+      "id": "tests.e2e.tier1_features.test_f26_dynamic_acl.TestFeature26DynamicPeerACL.test_default_drop_unmatched_traffic",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_directional_rule_enforcement (tests.e2e.tier1_features.test_f26_dynamic_acl.TestFeature26DynamicPeerACL.test_directional_rule_enforcement)",
+      "id": "tests.e2e.tier1_features.test_f26_dynamic_acl.TestFeature26DynamicPeerACL.test_directional_rule_enforcement",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_disabled_policy_ignored (tests.e2e.tier1_features.test_f26_dynamic_acl.TestFeature26DynamicPeerACL.test_disabled_policy_ignored)",
+      "id": "tests.e2e.tier1_features.test_f26_dynamic_acl.TestFeature26DynamicPeerACL.test_disabled_policy_ignored",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_port_range_boundary_matching (tests.e2e.tier1_features.test_f26_dynamic_acl.TestFeature26DynamicPeerACL.test_port_range_boundary_matching)",
+      "id": "tests.e2e.tier1_features.test_f26_dynamic_acl.TestFeature26DynamicPeerACL.test_port_range_boundary_matching",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_active_passive_failover_on_primary_down (tests.e2e.tier1_features.test_f27_subnet_routes.TestFeature27SubnetRoutes.test_active_passive_failover_on_primary_down)",
+      "id": "tests.e2e.tier1_features.test_f27_subnet_routes.TestFeature27SubnetRoutes.test_active_passive_failover_on_primary_down",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_all_gateways_down_returns_none (tests.e2e.tier1_features.test_f27_subnet_routes.TestFeature27SubnetRoutes.test_all_gateways_down_returns_none)",
+      "id": "tests.e2e.tier1_features.test_f27_subnet_routes.TestFeature27SubnetRoutes.test_all_gateways_down_returns_none",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_cidr_prefix_route_registration (tests.e2e.tier1_features.test_f27_subnet_routes.TestFeature27SubnetRoutes.test_cidr_prefix_route_registration)",
+      "id": "tests.e2e.tier1_features.test_f27_subnet_routes.TestFeature27SubnetRoutes.test_cidr_prefix_route_registration",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_ecmp_gateway_list (tests.e2e.tier1_features.test_f27_subnet_routes.TestFeature27SubnetRoutes.test_ecmp_gateway_list)",
+      "id": "tests.e2e.tier1_features.test_f27_subnet_routes.TestFeature27SubnetRoutes.test_ecmp_gateway_list",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_longest_prefix_matching (tests.e2e.tier1_features.test_f27_subnet_routes.TestFeature27SubnetRoutes.test_longest_prefix_matching)",
+      "id": "tests.e2e.tier1_features.test_f27_subnet_routes.TestFeature27SubnetRoutes.test_longest_prefix_matching",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_client_semver_posture_evaluation (tests.e2e.tier1_features.test_f28_peer_posture.TestFeature28PeerPosture.test_client_semver_posture_evaluation)",
+      "id": "tests.e2e.tier1_features.test_f28_peer_posture.TestFeature28PeerPosture.test_client_semver_posture_evaluation",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_default_allow_for_censored_countries (tests.e2e.tier1_features.test_f28_peer_posture.TestFeature28PeerPosture.test_default_allow_for_censored_countries)",
+      "id": "tests.e2e.tier1_features.test_f28_peer_posture.TestFeature28PeerPosture.test_default_allow_for_censored_countries",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_explicit_blacklist_and_whitelist_enforcement (tests.e2e.tier1_features.test_f28_peer_posture.TestFeature28PeerPosture.test_explicit_blacklist_and_whitelist_enforcement)",
+      "id": "tests.e2e.tier1_features.test_f28_peer_posture.TestFeature28PeerPosture.test_explicit_blacklist_and_whitelist_enforcement",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_host_security_state_checks (tests.e2e.tier1_features.test_f28_peer_posture.TestFeature28PeerPosture.test_host_security_state_checks)",
+      "id": "tests.e2e.tier1_features.test_f28_peer_posture.TestFeature28PeerPosture.test_host_security_state_checks",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_os_minimum_version_check (tests.e2e.tier1_features.test_f28_peer_posture.TestFeature28PeerPosture.test_os_minimum_version_check)",
+      "id": "tests.e2e.tier1_features.test_f28_peer_posture.TestFeature28PeerPosture.test_os_minimum_version_check",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_empty_topology_edge_case (tests.e2e.tier1_features.test_f29_management_api.TestFeature29ManagementAPI.test_empty_topology_edge_case)",
+      "id": "tests.e2e.tier1_features.test_f29_management_api.TestFeature29ManagementAPI.test_empty_topology_edge_case",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_latency_matrix_generation (tests.e2e.tier1_features.test_f29_management_api.TestFeature29ManagementAPI.test_latency_matrix_generation)",
+      "id": "tests.e2e.tier1_features.test_f29_management_api.TestFeature29ManagementAPI.test_latency_matrix_generation",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_list_peers_endpoint (tests.e2e.tier1_features.test_f29_management_api.TestFeature29ManagementAPI.test_list_peers_endpoint)",
+      "id": "tests.e2e.tier1_features.test_f29_management_api.TestFeature29ManagementAPI.test_list_peers_endpoint",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_prometheus_metrics_export (tests.e2e.tier1_features.test_f29_management_api.TestFeature29ManagementAPI.test_prometheus_metrics_export)",
+      "id": "tests.e2e.tier1_features.test_f29_management_api.TestFeature29ManagementAPI.test_prometheus_metrics_export",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_topology_graph_generation (tests.e2e.tier1_features.test_f29_management_api.TestFeature29ManagementAPI.test_topology_graph_generation)",
+      "id": "tests.e2e.tier1_features.test_f29_management_api.TestFeature29ManagementAPI.test_topology_graph_generation",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_federated_zero_trust_governance_pillar (tests.e2e.tier1_features.test_f30_future_roadmap.TestFeature30FutureRoadmap.test_federated_zero_trust_governance_pillar)",
+      "id": "tests.e2e.tier1_features.test_f30_future_roadmap.TestFeature30FutureRoadmap.test_federated_zero_trust_governance_pillar",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_future_plans_file_exists (tests.e2e.tier1_features.test_f30_future_roadmap.TestFeature30FutureRoadmap.test_future_plans_file_exists)",
+      "id": "tests.e2e.tier1_features.test_f30_future_roadmap.TestFeature30FutureRoadmap.test_future_plans_file_exists",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_kernel_and_transport_innovations_pillar (tests.e2e.tier1_features.test_f30_future_roadmap.TestFeature30FutureRoadmap.test_kernel_and_transport_innovations_pillar)",
+      "id": "tests.e2e.tier1_features.test_f30_future_roadmap.TestFeature30FutureRoadmap.test_kernel_and_transport_innovations_pillar",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_native_client_apps_architecture_pillar (tests.e2e.tier1_features.test_f30_future_roadmap.TestFeature30FutureRoadmap.test_native_client_apps_architecture_pillar)",
+      "id": "tests.e2e.tier1_features.test_f30_future_roadmap.TestFeature30FutureRoadmap.test_native_client_apps_architecture_pillar",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_post_quantum_cryptography_pillar (tests.e2e.tier1_features.test_f30_future_roadmap.TestFeature30FutureRoadmap.test_post_quantum_cryptography_pillar)",
+      "id": "tests.e2e.tier1_features.test_f30_future_roadmap.TestFeature30FutureRoadmap.test_post_quantum_cryptography_pillar",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_20point_validation_on_missing_network_interfaces (tests.e2e.tier2_boundaries.test_b01_legacy_boundaries.TestBoundary01LegacyRestoration.test_20point_validation_on_missing_network_interfaces)",
+      "id": "tests.e2e.tier2_boundaries.test_b01_legacy_boundaries.TestBoundary01LegacyRestoration.test_20point_validation_on_missing_network_interfaces",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_corrupted_sysctl_tcp_buffer_limits (tests.e2e.tier2_boundaries.test_b01_legacy_boundaries.TestBoundary01LegacyRestoration.test_corrupted_sysctl_tcp_buffer_limits)",
+      "id": "tests.e2e.tier2_boundaries.test_b01_legacy_boundaries.TestBoundary01LegacyRestoration.test_corrupted_sysctl_tcp_buffer_limits",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_empty_and_truncated_legacy_configs (tests.e2e.tier2_boundaries.test_b01_legacy_boundaries.TestBoundary01LegacyRestoration.test_empty_and_truncated_legacy_configs)",
+      "id": "tests.e2e.tier2_boundaries.test_b01_legacy_boundaries.TestBoundary01LegacyRestoration.test_empty_and_truncated_legacy_configs",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_legacy_script_permission_bits (tests.e2e.tier2_boundaries.test_b01_legacy_boundaries.TestBoundary01LegacyRestoration.test_legacy_script_permission_bits)",
+      "id": "tests.e2e.tier2_boundaries.test_b01_legacy_boundaries.TestBoundary01LegacyRestoration.test_legacy_script_permission_bits",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_missing_fallback_certificate_handling (tests.e2e.tier2_boundaries.test_b01_legacy_boundaries.TestBoundary01LegacyRestoration.test_missing_fallback_certificate_handling)",
+      "id": "tests.e2e.tier2_boundaries.test_b01_legacy_boundaries.TestBoundary01LegacyRestoration.test_missing_fallback_certificate_handling",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_concurrent_status_query_under_lock (tests.e2e.tier2_boundaries.test_b02_honeypot_boundaries.TestBoundary02HoneypotDoS.test_concurrent_status_query_under_lock)",
+      "id": "tests.e2e.tier2_boundaries.test_b02_honeypot_boundaries.TestBoundary02HoneypotDoS.test_concurrent_status_query_under_lock",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_event_queue_backpressure_burst (tests.e2e.tier2_boundaries.test_b02_honeypot_boundaries.TestBoundary02HoneypotDoS.test_event_queue_backpressure_burst)",
+      "id": "tests.e2e.tier2_boundaries.test_b02_honeypot_boundaries.TestBoundary02HoneypotDoS.test_event_queue_backpressure_burst",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_loopback_and_control_ip_ban_immunity (tests.e2e.tier2_boundaries.test_b02_honeypot_boundaries.TestBoundary02HoneypotDoS.test_loopback_and_control_ip_ban_immunity)",
+      "id": "tests.e2e.tier2_boundaries.test_b02_honeypot_boundaries.TestBoundary02HoneypotDoS.test_loopback_and_control_ip_ban_immunity",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_rate_limiter_zero_and_negative_capacity (tests.e2e.tier2_boundaries.test_b02_honeypot_boundaries.TestBoundary02HoneypotDoS.test_rate_limiter_zero_and_negative_capacity)",
+      "id": "tests.e2e.tier2_boundaries.test_b02_honeypot_boundaries.TestBoundary02HoneypotDoS.test_rate_limiter_zero_and_negative_capacity",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_threshold_exact_boundary_99_vs_100 (tests.e2e.tier2_boundaries.test_b02_honeypot_boundaries.TestBoundary02HoneypotDoS.test_threshold_exact_boundary_99_vs_100)",
+      "id": "tests.e2e.tier2_boundaries.test_b02_honeypot_boundaries.TestBoundary02HoneypotDoS.test_threshold_exact_boundary_99_vs_100",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_duplicate_user_collision_rejection (tests.e2e.tier2_boundaries.test_b03_user_mgmt_boundaries.TestBoundary03UserManagement.test_duplicate_user_collision_rejection)",
+      "id": "tests.e2e.tier2_boundaries.test_b03_user_mgmt_boundaries.TestBoundary03UserManagement.test_duplicate_user_collision_rejection",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_malformed_and_nil_uuid_validation (tests.e2e.tier2_boundaries.test_b03_user_mgmt_boundaries.TestBoundary03UserManagement.test_malformed_and_nil_uuid_validation)",
+      "id": "tests.e2e.tier2_boundaries.test_b03_user_mgmt_boundaries.TestBoundary03UserManagement.test_malformed_and_nil_uuid_validation",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_max_length_username_and_unicode (tests.e2e.tier2_boundaries.test_b03_user_mgmt_boundaries.TestBoundary03UserManagement.test_max_length_username_and_unicode)",
+      "id": "tests.e2e.tier2_boundaries.test_b03_user_mgmt_boundaries.TestBoundary03UserManagement.test_max_length_username_and_unicode",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_negative_and_zero_quota_boundaries (tests.e2e.tier2_boundaries.test_b03_user_mgmt_boundaries.TestBoundary03UserManagement.test_negative_and_zero_quota_boundaries)",
+      "id": "tests.e2e.tier2_boundaries.test_b03_user_mgmt_boundaries.TestBoundary03UserManagement.test_negative_and_zero_quota_boundaries",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_transaction_rollback_on_batch_failure (tests.e2e.tier2_boundaries.test_b03_user_mgmt_boundaries.TestBoundary03UserManagement.test_transaction_rollback_on_batch_failure)",
+      "id": "tests.e2e.tier2_boundaries.test_b03_user_mgmt_boundaries.TestBoundary03UserManagement.test_transaction_rollback_on_batch_failure",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_buffer_memory_scrub_boundary (tests.e2e.tier2_boundaries.test_b04_secret_boundaries.TestBoundary04SecretManagement.test_buffer_memory_scrub_boundary)",
+      "id": "tests.e2e.tier2_boundaries.test_b04_secret_boundaries.TestBoundary04SecretManagement.test_buffer_memory_scrub_boundary",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_empty_salt_and_empty_info_hkdf (tests.e2e.tier2_boundaries.test_b04_secret_boundaries.TestBoundary04SecretManagement.test_empty_salt_and_empty_info_hkdf)",
+      "id": "tests.e2e.tier2_boundaries.test_b04_secret_boundaries.TestBoundary04SecretManagement.test_empty_salt_and_empty_info_hkdf",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_epoch_number_boundary_wraparound (tests.e2e.tier2_boundaries.test_b04_secret_boundaries.TestBoundary04SecretManagement.test_epoch_number_boundary_wraparound)",
+      "id": "tests.e2e.tier2_boundaries.test_b04_secret_boundaries.TestBoundary04SecretManagement.test_epoch_number_boundary_wraparound",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_multiline_and_control_chars_in_env_secrets (tests.e2e.tier2_boundaries.test_b04_secret_boundaries.TestBoundary04SecretManagement.test_multiline_and_control_chars_in_env_secrets)",
+      "id": "tests.e2e.tier2_boundaries.test_b04_secret_boundaries.TestBoundary04SecretManagement.test_multiline_and_control_chars_in_env_secrets",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_zero_length_and_1byte_secrets (tests.e2e.tier2_boundaries.test_b04_secret_boundaries.TestBoundary04SecretManagement.test_zero_length_and_1byte_secrets)",
+      "id": "tests.e2e.tier2_boundaries.test_b04_secret_boundaries.TestBoundary04SecretManagement.test_zero_length_and_1byte_secrets",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_dangerous_capabilities_rejection (tests.e2e.tier2_boundaries.test_b05_container_boundaries.TestBoundary05ContainerHardening.test_dangerous_capabilities_rejection)",
+      "id": "tests.e2e.tier2_boundaries.test_b05_container_boundaries.TestBoundary05ContainerHardening.test_dangerous_capabilities_rejection",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_ephemeral_storage_limits_boundary (tests.e2e.tier2_boundaries.test_b05_container_boundaries.TestBoundary05ContainerHardening.test_ephemeral_storage_limits_boundary)",
+      "id": "tests.e2e.tier2_boundaries.test_b05_container_boundaries.TestBoundary05ContainerHardening.test_ephemeral_storage_limits_boundary",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_missing_readonly_rootfs_detection (tests.e2e.tier2_boundaries.test_b05_container_boundaries.TestBoundary05ContainerHardening.test_missing_readonly_rootfs_detection)",
+      "id": "tests.e2e.tier2_boundaries.test_b05_container_boundaries.TestBoundary05ContainerHardening.test_missing_readonly_rootfs_detection",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_privilege_escalation_attempt_rejection (tests.e2e.tier2_boundaries.test_b05_container_boundaries.TestBoundary05ContainerHardening.test_privilege_escalation_attempt_rejection)",
+      "id": "tests.e2e.tier2_boundaries.test_b05_container_boundaries.TestBoundary05ContainerHardening.test_privilege_escalation_attempt_rejection",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_root_uid_zero_rejection (tests.e2e.tier2_boundaries.test_b05_container_boundaries.TestBoundary05ContainerHardening.test_root_uid_zero_rejection)",
+      "id": "tests.e2e.tier2_boundaries.test_b05_container_boundaries.TestBoundary05ContainerHardening.test_root_uid_zero_rejection",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_extreme_sni_lengths_and_null_bytes (tests.e2e.tier2_boundaries.test_b06_vless_boundaries.TestBoundary06VLESSReality.test_extreme_sni_lengths_and_null_bytes)",
+      "id": "tests.e2e.tier2_boundaries.test_b06_vless_boundaries.TestBoundary06VLESSReality.test_extreme_sni_lengths_and_null_bytes",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_invalid_vless_protocol_versions (tests.e2e.tier2_boundaries.test_b06_vless_boundaries.TestBoundary06VLESSReality.test_invalid_vless_protocol_versions)",
+      "id": "tests.e2e.tier2_boundaries.test_b06_vless_boundaries.TestBoundary06VLESSReality.test_invalid_vless_protocol_versions",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_short_id_length_boundaries (tests.e2e.tier2_boundaries.test_b06_vless_boundaries.TestBoundary06VLESSReality.test_short_id_length_boundaries)",
+      "id": "tests.e2e.tier2_boundaries.test_b06_vless_boundaries.TestBoundary06VLESSReality.test_short_id_length_boundaries",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_truncated_header_lengths_0_to_17_bytes (tests.e2e.tier2_boundaries.test_b06_vless_boundaries.TestBoundary06VLESSReality.test_truncated_header_lengths_0_to_17_bytes)",
+      "id": "tests.e2e.tier2_boundaries.test_b06_vless_boundaries.TestBoundary06VLESSReality.test_truncated_header_lengths_0_to_17_bytes",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_zero_byte_tcp_stream_handling (tests.e2e.tier2_boundaries.test_b06_vless_boundaries.TestBoundary06VLESSReality.test_zero_byte_tcp_stream_handling)",
+      "id": "tests.e2e.tier2_boundaries.test_b06_vless_boundaries.TestBoundary06VLESSReality.test_zero_byte_tcp_stream_handling",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_decoy_port_binding_collision (tests.e2e.tier2_boundaries.test_b07_nginx_boundaries.TestBoundary07NginxDecoy.test_decoy_port_binding_collision)",
+      "id": "tests.e2e.tier2_boundaries.test_b07_nginx_boundaries.TestBoundary07NginxDecoy.test_decoy_port_binding_collision",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_oversized_http_headers_64kb (tests.e2e.tier2_boundaries.test_b07_nginx_boundaries.TestBoundary07NginxDecoy.test_oversized_http_headers_64kb)",
+      "id": "tests.e2e.tier2_boundaries.test_b07_nginx_boundaries.TestBoundary07NginxDecoy.test_oversized_http_headers_64kb",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_partial_http_slowloris_timeout (tests.e2e.tier2_boundaries.test_b07_nginx_boundaries.TestBoundary07NginxDecoy.test_partial_http_slowloris_timeout)",
+      "id": "tests.e2e.tier2_boundaries.test_b07_nginx_boundaries.TestBoundary07NginxDecoy.test_partial_http_slowloris_timeout",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_sub_proxy_path_traversal_attack (tests.e2e.tier2_boundaries.test_b07_nginx_boundaries.TestBoundary07NginxDecoy.test_sub_proxy_path_traversal_attack)",
+      "id": "tests.e2e.tier2_boundaries.test_b07_nginx_boundaries.TestBoundary07NginxDecoy.test_sub_proxy_path_traversal_attack",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_unsupported_and_dangerous_http_methods (tests.e2e.tier2_boundaries.test_b07_nginx_boundaries.TestBoundary07NginxDecoy.test_unsupported_and_dangerous_http_methods)",
+      "id": "tests.e2e.tier2_boundaries.test_b07_nginx_boundaries.TestBoundary07NginxDecoy.test_unsupported_and_dangerous_http_methods",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_all_doh_upstreams_exhaustion_servfail (tests.e2e.tier2_boundaries.test_b08_doh_boundaries.TestBoundary08DoHResolver.test_all_doh_upstreams_exhaustion_servfail)",
+      "id": "tests.e2e.tier2_boundaries.test_b08_doh_boundaries.TestBoundary08DoHResolver.test_all_doh_upstreams_exhaustion_servfail",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_corrupted_dns_wire_packet (tests.e2e.tier2_boundaries.test_b08_doh_boundaries.TestBoundary08DoHResolver.test_corrupted_dns_wire_packet)",
+      "id": "tests.e2e.tier2_boundaries.test_b08_doh_boundaries.TestBoundary08DoHResolver.test_corrupted_dns_wire_packet",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_edns0_buffer_size_boundaries (tests.e2e.tier2_boundaries.test_b08_doh_boundaries.TestBoundary08DoHResolver.test_edns0_buffer_size_boundaries)",
+      "id": "tests.e2e.tier2_boundaries.test_b08_doh_boundaries.TestBoundary08DoHResolver.test_edns0_buffer_size_boundaries",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_max_domain_name_length_255_chars (tests.e2e.tier2_boundaries.test_b08_doh_boundaries.TestBoundary08DoHResolver.test_max_domain_name_length_255_chars)",
+      "id": "tests.e2e.tier2_boundaries.test_b08_doh_boundaries.TestBoundary08DoHResolver.test_max_domain_name_length_255_chars",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_upstream_dns_rebind_bogon_response_filter (tests.e2e.tier2_boundaries.test_b08_doh_boundaries.TestBoundary08DoHResolver.test_upstream_dns_rebind_bogon_response_filter)",
+      "id": "tests.e2e.tier2_boundaries.test_b08_doh_boundaries.TestBoundary08DoHResolver.test_upstream_dns_rebind_bogon_response_filter",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_invalid_magic_number_rejection (tests.e2e.tier2_boundaries.test_b09_crypto_boundaries.TestBoundary09CryptoOverlay.test_invalid_magic_number_rejection)",
+      "id": "tests.e2e.tier2_boundaries.test_b09_crypto_boundaries.TestBoundary09CryptoOverlay.test_invalid_magic_number_rejection",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_nonce_boundary_rollover (tests.e2e.tier2_boundaries.test_b09_crypto_boundaries.TestBoundary09CryptoOverlay.test_nonce_boundary_rollover)",
+      "id": "tests.e2e.tier2_boundaries.test_b09_crypto_boundaries.TestBoundary09CryptoOverlay.test_nonce_boundary_rollover",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_payload_overflow_65536_bytes (tests.e2e.tier2_boundaries.test_b09_crypto_boundaries.TestBoundary09CryptoOverlay.test_payload_overflow_65536_bytes)",
+      "id": "tests.e2e.tier2_boundaries.test_b09_crypto_boundaries.TestBoundary09CryptoOverlay.test_payload_overflow_65536_bytes",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_payload_size_boundary_65535_bytes (tests.e2e.tier2_boundaries.test_b09_crypto_boundaries.TestBoundary09CryptoOverlay.test_payload_size_boundary_65535_bytes)",
+      "id": "tests.e2e.tier2_boundaries.test_b09_crypto_boundaries.TestBoundary09CryptoOverlay.test_payload_size_boundary_65535_bytes",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_truncated_direct_frame_header_rejection (tests.e2e.tier2_boundaries.test_b09_crypto_boundaries.TestBoundary09CryptoOverlay.test_truncated_direct_frame_header_rejection)",
+      "id": "tests.e2e.tier2_boundaries.test_b09_crypto_boundaries.TestBoundary09CryptoOverlay.test_truncated_direct_frame_header_rejection",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_extreme_packet_loss_100_pct_fallback (tests.e2e.tier2_boundaries.test_b10_nat_boundaries.TestBoundary10NATTraversal.test_extreme_packet_loss_100_pct_fallback)",
+      "id": "tests.e2e.tier2_boundaries.test_b10_nat_boundaries.TestBoundary10NATTraversal.test_extreme_packet_loss_100_pct_fallback",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_high_jitter_50ms_tolerance (tests.e2e.tier2_boundaries.test_b10_nat_boundaries.TestBoundary10NATTraversal.test_high_jitter_50ms_tolerance)",
+      "id": "tests.e2e.tier2_boundaries.test_b10_nat_boundaries.TestBoundary10NATTraversal.test_high_jitter_50ms_tolerance",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_nat_mapping_table_overflow_handling (tests.e2e.tier2_boundaries.test_b10_nat_boundaries.TestBoundary10NATTraversal.test_nat_mapping_table_overflow_handling)",
+      "id": "tests.e2e.tier2_boundaries.test_b10_nat_boundaries.TestBoundary10NATTraversal.test_nat_mapping_table_overflow_handling",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_sequential_port_wraparound_65535 (tests.e2e.tier2_boundaries.test_b10_nat_boundaries.TestBoundary10NATTraversal.test_sequential_port_wraparound_65535)",
+      "id": "tests.e2e.tier2_boundaries.test_b10_nat_boundaries.TestBoundary10NATTraversal.test_sequential_port_wraparound_65535",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_symmetric_random_collision_instant_derp (tests.e2e.tier2_boundaries.test_b10_nat_boundaries.TestBoundary10NATTraversal.test_symmetric_random_collision_instant_derp)",
+      "id": "tests.e2e.tier2_boundaries.test_b10_nat_boundaries.TestBoundary10NATTraversal.test_symmetric_random_collision_instant_derp",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_invalid_destination_pubkey_length (tests.e2e.tier2_boundaries.test_b11_derp_boundaries.TestBoundary11DERPRelay.test_invalid_destination_pubkey_length)",
+      "id": "tests.e2e.tier2_boundaries.test_b11_derp_boundaries.TestBoundary11DERPRelay.test_invalid_destination_pubkey_length",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_oversized_frame_length_declaration (tests.e2e.tier2_boundaries.test_b11_derp_boundaries.TestBoundary11DERPRelay.test_oversized_frame_length_declaration)",
+      "id": "tests.e2e.tier2_boundaries.test_b11_derp_boundaries.TestBoundary11DERPRelay.test_oversized_frame_length_declaration",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_relay_shutdown_during_active_traffic (tests.e2e.tier2_boundaries.test_b11_derp_boundaries.TestBoundary11DERPRelay.test_relay_shutdown_during_active_traffic)",
+      "id": "tests.e2e.tier2_boundaries.test_b11_derp_boundaries.TestBoundary11DERPRelay.test_relay_shutdown_during_active_traffic",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_truncated_derp_frame_header (tests.e2e.tier2_boundaries.test_b11_derp_boundaries.TestBoundary11DERPRelay.test_truncated_derp_frame_header)",
+      "id": "tests.e2e.tier2_boundaries.test_b11_derp_boundaries.TestBoundary11DERPRelay.test_truncated_derp_frame_header",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_unregistered_destination_relay_drop (tests.e2e.tier2_boundaries.test_b11_derp_boundaries.TestBoundary11DERPRelay.test_unregistered_destination_relay_drop)",
+      "id": "tests.e2e.tier2_boundaries.test_b11_derp_boundaries.TestBoundary11DERPRelay.test_unregistered_destination_relay_drop",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_bandwidth_quota_exact_boundary (tests.e2e.tier2_boundaries.test_b12_client_bridge_boundaries.TestBoundary12ClientBridge.test_bandwidth_quota_exact_boundary)",
+      "id": "tests.e2e.tier2_boundaries.test_b12_client_bridge_boundaries.TestBoundary12ClientBridge.test_bandwidth_quota_exact_boundary",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_battery_exact_boundary_15pct_vs_14_9pct (tests.e2e.tier2_boundaries.test_b12_client_bridge_boundaries.TestBoundary12ClientBridge.test_battery_exact_boundary_15pct_vs_14_9pct)",
+      "id": "tests.e2e.tier2_boundaries.test_b12_client_bridge_boundaries.TestBoundary12ClientBridge.test_battery_exact_boundary_15pct_vs_14_9pct",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_invalid_egress_ports_0_and_negative (tests.e2e.tier2_boundaries.test_b12_client_bridge_boundaries.TestBoundary12ClientBridge.test_invalid_egress_ports_0_and_negative)",
+      "id": "tests.e2e.tier2_boundaries.test_b12_client_bridge_boundaries.TestBoundary12ClientBridge.test_invalid_egress_ports_0_and_negative",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_massive_payload_bandwidth_calculation (tests.e2e.tier2_boundaries.test_b12_client_bridge_boundaries.TestBoundary12ClientBridge.test_massive_payload_bandwidth_calculation)",
+      "id": "tests.e2e.tier2_boundaries.test_b12_client_bridge_boundaries.TestBoundary12ClientBridge.test_massive_payload_bandwidth_calculation",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_zero_byte_egress_payload (tests.e2e.tier2_boundaries.test_b12_client_bridge_boundaries.TestBoundary12ClientBridge.test_zero_byte_egress_payload)",
+      "id": "tests.e2e.tier2_boundaries.test_b12_client_bridge_boundaries.TestBoundary12ClientBridge.test_zero_byte_egress_payload",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_class_a_10_0_0_0_8_boundaries (tests.e2e.tier2_boundaries.test_b13_rfc1918_boundaries.TestBoundary13RFC1918Isolation.test_class_a_10_0_0_0_8_boundaries)",
+      "id": "tests.e2e.tier2_boundaries.test_b13_rfc1918_boundaries.TestBoundary13RFC1918Isolation.test_class_a_10_0_0_0_8_boundaries",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_class_b_172_16_0_0_12_boundaries (tests.e2e.tier2_boundaries.test_b13_rfc1918_boundaries.TestBoundary13RFC1918Isolation.test_class_b_172_16_0_0_12_boundaries)",
+      "id": "tests.e2e.tier2_boundaries.test_b13_rfc1918_boundaries.TestBoundary13RFC1918Isolation.test_class_b_172_16_0_0_12_boundaries",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_class_c_192_168_0_0_16_boundaries (tests.e2e.tier2_boundaries.test_b13_rfc1918_boundaries.TestBoundary13RFC1918Isolation.test_class_c_192_168_0_0_16_boundaries)",
+      "id": "tests.e2e.tier2_boundaries.test_b13_rfc1918_boundaries.TestBoundary13RFC1918Isolation.test_class_c_192_168_0_0_16_boundaries",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_high_port_boundaries_65534_and_65535 (tests.e2e.tier2_boundaries.test_b13_rfc1918_boundaries.TestBoundary13RFC1918Isolation.test_high_port_boundaries_65534_and_65535)",
+      "id": "tests.e2e.tier2_boundaries.test_b13_rfc1918_boundaries.TestBoundary13RFC1918Isolation.test_high_port_boundaries_65534_and_65535",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_multicast_and_bogon_edges_223_vs_224_and_239_vs_240 (tests.e2e.tier2_boundaries.test_b13_rfc1918_boundaries.TestBoundary13RFC1918Isolation.test_multicast_and_bogon_edges_223_vs_224_and_239_vs_240)",
+      "id": "tests.e2e.tier2_boundaries.test_b13_rfc1918_boundaries.TestBoundary13RFC1918Isolation.test_multicast_and_bogon_edges_223_vs_224_and_239_vs_240",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_all_nodes_offline_empty_mesh (tests.e2e.tier2_boundaries.test_b14_geo_boundaries.TestBoundary14GeoRouting.test_all_nodes_offline_empty_mesh)",
+      "id": "tests.e2e.tier2_boundaries.test_b14_geo_boundaries.TestBoundary14GeoRouting.test_all_nodes_offline_empty_mesh",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_case_insensitive_country_code_normalization (tests.e2e.tier2_boundaries.test_b14_geo_boundaries.TestBoundary14GeoRouting.test_case_insensitive_country_code_normalization)",
+      "id": "tests.e2e.tier2_boundaries.test_b14_geo_boundaries.TestBoundary14GeoRouting.test_case_insensitive_country_code_normalization",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_empty_string_country_code (tests.e2e.tier2_boundaries.test_b14_geo_boundaries.TestBoundary14GeoRouting.test_empty_string_country_code)",
+      "id": "tests.e2e.tier2_boundaries.test_b14_geo_boundaries.TestBoundary14GeoRouting.test_empty_string_country_code",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_host_id_path_traversal_and_special_chars (tests.e2e.tier2_boundaries.test_b14_geo_boundaries.TestBoundary14GeoRouting.test_host_id_path_traversal_and_special_chars)",
+      "id": "tests.e2e.tier2_boundaries.test_b14_geo_boundaries.TestBoundary14GeoRouting.test_host_id_path_traversal_and_special_chars",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_invalid_alpha3_and_numeric_codes (tests.e2e.tier2_boundaries.test_b14_geo_boundaries.TestBoundary14GeoRouting.test_invalid_alpha3_and_numeric_codes)",
+      "id": "tests.e2e.tier2_boundaries.test_b14_geo_boundaries.TestBoundary14GeoRouting.test_invalid_alpha3_and_numeric_codes",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_circuit_id_zero_and_uint32_max (tests.e2e.tier2_boundaries.test_b15_onion_boundaries.TestBoundary15OnionRouting.test_circuit_id_zero_and_uint32_max)",
+      "id": "tests.e2e.tier2_boundaries.test_b15_onion_boundaries.TestBoundary15OnionRouting.test_circuit_id_zero_and_uint32_max",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_invalid_layer_crypto_header_length (tests.e2e.tier2_boundaries.test_b15_onion_boundaries.TestBoundary15OnionRouting.test_invalid_layer_crypto_header_length)",
+      "id": "tests.e2e.tier2_boundaries.test_b15_onion_boundaries.TestBoundary15OnionRouting.test_invalid_layer_crypto_header_length",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_non_1420_byte_cell_size_rejection (tests.e2e.tier2_boundaries.test_b15_onion_boundaries.TestBoundary15OnionRouting.test_non_1420_byte_cell_size_rejection)",
+      "id": "tests.e2e.tier2_boundaries.test_b15_onion_boundaries.TestBoundary15OnionRouting.test_non_1420_byte_cell_size_rejection",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_payload_truncation_to_1335_bytes (tests.e2e.tier2_boundaries.test_b15_onion_boundaries.TestBoundary15OnionRouting.test_payload_truncation_to_1335_bytes)",
+      "id": "tests.e2e.tier2_boundaries.test_b15_onion_boundaries.TestBoundary15OnionRouting.test_payload_truncation_to_1335_bytes",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_unknown_command_byte_preservation (tests.e2e.tier2_boundaries.test_b15_onion_boundaries.TestBoundary15OnionRouting.test_unknown_command_byte_preservation)",
+      "id": "tests.e2e.tier2_boundaries.test_b15_onion_boundaries.TestBoundary15OnionRouting.test_unknown_command_byte_preservation",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_duplicate_registration_reuses_vip (tests.e2e.tier2_boundaries.test_b16_control_boundaries.TestBoundary16ControlPlane.test_duplicate_registration_reuses_vip)",
+      "id": "tests.e2e.tier2_boundaries.test_b16_control_boundaries.TestBoundary16ControlPlane.test_duplicate_registration_reuses_vip",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_health_report_unregistered_node (tests.e2e.tier2_boundaries.test_b16_control_boundaries.TestBoundary16ControlPlane.test_health_report_unregistered_node)",
+      "id": "tests.e2e.tier2_boundaries.test_b16_control_boundaries.TestBoundary16ControlPlane.test_health_report_unregistered_node",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_invalid_pubkey_length_rejection (tests.e2e.tier2_boundaries.test_b16_control_boundaries.TestBoundary16ControlPlane.test_invalid_pubkey_length_rejection)",
+      "id": "tests.e2e.tier2_boundaries.test_b16_control_boundaries.TestBoundary16ControlPlane.test_invalid_pubkey_length_rejection",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_rapid_registration_storm_100_nodes (tests.e2e.tier2_boundaries.test_b16_control_boundaries.TestBoundary16ControlPlane.test_rapid_registration_storm_100_nodes)",
+      "id": "tests.e2e.tier2_boundaries.test_b16_control_boundaries.TestBoundary16ControlPlane.test_rapid_registration_storm_100_nodes",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_topology_sync_unregistered_node_id (tests.e2e.tier2_boundaries.test_b16_control_boundaries.TestBoundary16ControlPlane.test_topology_sync_unregistered_node_id)",
+      "id": "tests.e2e.tier2_boundaries.test_b16_control_boundaries.TestBoundary16ControlPlane.test_topology_sync_unregistered_node_id",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_empty_config_dictionary (tests.e2e.tier2_boundaries.test_b17_config_boundaries.TestBoundary17ConfigParser.test_empty_config_dictionary)",
+      "id": "tests.e2e.tier2_boundaries.test_b17_config_boundaries.TestBoundary17ConfigParser.test_empty_config_dictionary",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_invalid_overlay_cidr_notation (tests.e2e.tier2_boundaries.test_b17_config_boundaries.TestBoundary17ConfigParser.test_invalid_overlay_cidr_notation)",
+      "id": "tests.e2e.tier2_boundaries.test_b17_config_boundaries.TestBoundary17ConfigParser.test_invalid_overlay_cidr_notation",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_missing_provider_region_or_nodes (tests.e2e.tier2_boundaries.test_b17_config_boundaries.TestBoundary17ConfigParser.test_missing_provider_region_or_nodes)",
+      "id": "tests.e2e.tier2_boundaries.test_b17_config_boundaries.TestBoundary17ConfigParser.test_missing_provider_region_or_nodes",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_tfvars_query_nonexistent_provider (tests.e2e.tier2_boundaries.test_b17_config_boundaries.TestBoundary17ConfigParser.test_tfvars_query_nonexistent_provider)",
+      "id": "tests.e2e.tier2_boundaries.test_b17_config_boundaries.TestBoundary17ConfigParser.test_tfvars_query_nonexistent_provider",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_unsupported_cloud_provider_rejection (tests.e2e.tier2_boundaries.test_b17_config_boundaries.TestBoundary17ConfigParser.test_unsupported_cloud_provider_rejection)",
+      "id": "tests.e2e.tier2_boundaries.test_b17_config_boundaries.TestBoundary17ConfigParser.test_unsupported_cloud_provider_rejection",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_cross_cloud_cidr_overlap_detection (tests.e2e.tier2_boundaries.test_b18_terraform_boundaries.TestBoundary18TerraformProvisioning.test_cross_cloud_cidr_overlap_detection)",
+      "id": "tests.e2e.tier2_boundaries.test_b18_terraform_boundaries.TestBoundary18TerraformProvisioning.test_cross_cloud_cidr_overlap_detection",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_missing_required_terraform_variables (tests.e2e.tier2_boundaries.test_b18_terraform_boundaries.TestBoundary18TerraformProvisioning.test_missing_required_terraform_variables)",
+      "id": "tests.e2e.tier2_boundaries.test_b18_terraform_boundaries.TestBoundary18TerraformProvisioning.test_missing_required_terraform_variables",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_provider_region_string_validation (tests.e2e.tier2_boundaries.test_b18_terraform_boundaries.TestBoundary18TerraformProvisioning.test_provider_region_string_validation)",
+      "id": "tests.e2e.tier2_boundaries.test_b18_terraform_boundaries.TestBoundary18TerraformProvisioning.test_provider_region_string_validation",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_terraform_state_backend_s3_gcs_spec (tests.e2e.tier2_boundaries.test_b18_terraform_boundaries.TestBoundary18TerraformProvisioning.test_terraform_state_backend_s3_gcs_spec)",
+      "id": "tests.e2e.tier2_boundaries.test_b18_terraform_boundaries.TestBoundary18TerraformProvisioning.test_terraform_state_backend_s3_gcs_spec",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_zero_and_negative_node_count_boundary (tests.e2e.tier2_boundaries.test_b18_terraform_boundaries.TestBoundary18TerraformProvisioning.test_zero_and_negative_node_count_boundary)",
+      "id": "tests.e2e.tier2_boundaries.test_b18_terraform_boundaries.TestBoundary18TerraformProvisioning.test_zero_and_negative_node_count_boundary",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_cloud_init_size_within_64kb_limit (tests.e2e.tier2_boundaries.test_b19_cloud_init_boundaries.TestBoundary19CloudInit.test_cloud_init_size_within_64kb_limit)",
+      "id": "tests.e2e.tier2_boundaries.test_b19_cloud_init_boundaries.TestBoundary19CloudInit.test_cloud_init_size_within_64kb_limit",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_empty_role_userdata_generation (tests.e2e.tier2_boundaries.test_b19_cloud_init_boundaries.TestBoundary19CloudInit.test_empty_role_userdata_generation)",
+      "id": "tests.e2e.tier2_boundaries.test_b19_cloud_init_boundaries.TestBoundary19CloudInit.test_empty_role_userdata_generation",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_unsupported_init_system_fallback (tests.e2e.tier2_boundaries.test_b19_cloud_init_boundaries.TestBoundary19CloudInit.test_unsupported_init_system_fallback)",
+      "id": "tests.e2e.tier2_boundaries.test_b19_cloud_init_boundaries.TestBoundary19CloudInit.test_unsupported_init_system_fallback",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_watchdog_idempotent_restart_interval (tests.e2e.tier2_boundaries.test_b19_cloud_init_boundaries.TestBoundary19CloudInit.test_watchdog_idempotent_restart_interval)",
+      "id": "tests.e2e.tier2_boundaries.test_b19_cloud_init_boundaries.TestBoundary19CloudInit.test_watchdog_idempotent_restart_interval",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_write_files_octal_permissions_format (tests.e2e.tier2_boundaries.test_b19_cloud_init_boundaries.TestBoundary19CloudInit.test_write_files_octal_permissions_format)",
+      "id": "tests.e2e.tier2_boundaries.test_b19_cloud_init_boundaries.TestBoundary19CloudInit.test_write_files_octal_permissions_format",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_empty_pod_selector_network_policy (tests.e2e.tier2_boundaries.test_b20_helm_boundaries.TestBoundary20K8sHelm.test_empty_pod_selector_network_policy)",
+      "id": "tests.e2e.tier2_boundaries.test_b20_helm_boundaries.TestBoundary20K8sHelm.test_empty_pod_selector_network_policy",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_invalid_container_port_limits (tests.e2e.tier2_boundaries.test_b20_helm_boundaries.TestBoundary20K8sHelm.test_invalid_container_port_limits)",
+      "id": "tests.e2e.tier2_boundaries.test_b20_helm_boundaries.TestBoundary20K8sHelm.test_invalid_container_port_limits",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_malformed_cpu_memory_units (tests.e2e.tier2_boundaries.test_b20_helm_boundaries.TestBoundary20K8sHelm.test_malformed_cpu_memory_units)",
+      "id": "tests.e2e.tier2_boundaries.test_b20_helm_boundaries.TestBoundary20K8sHelm.test_malformed_cpu_memory_units",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_pod_anti_affinity_topology_key (tests.e2e.tier2_boundaries.test_b20_helm_boundaries.TestBoundary20K8sHelm.test_pod_anti_affinity_topology_key)",
+      "id": "tests.e2e.tier2_boundaries.test_b20_helm_boundaries.TestBoundary20K8sHelm.test_pod_anti_affinity_topology_key",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_zero_and_excessive_replicas_boundary (tests.e2e.tier2_boundaries.test_b20_helm_boundaries.TestBoundary20K8sHelm.test_zero_and_excessive_replicas_boundary)",
+      "id": "tests.e2e.tier2_boundaries.test_b20_helm_boundaries.TestBoundary20K8sHelm.test_zero_and_excessive_replicas_boundary",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_duplicate_resource_names_in_overlay (tests.e2e.tier2_boundaries.test_b21_kustomize_boundaries.TestBoundary21KustomizeOverlays.test_duplicate_resource_names_in_overlay)",
+      "id": "tests.e2e.tier2_boundaries.test_b21_kustomize_boundaries.TestBoundary21KustomizeOverlays.test_duplicate_resource_names_in_overlay",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_images_name_and_tag_override (tests.e2e.tier2_boundaries.test_b21_kustomize_boundaries.TestBoundary21KustomizeOverlays.test_images_name_and_tag_override)",
+      "id": "tests.e2e.tier2_boundaries.test_b21_kustomize_boundaries.TestBoundary21KustomizeOverlays.test_images_name_and_tag_override",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_json6902_patch_operation_verbs (tests.e2e.tier2_boundaries.test_b21_kustomize_boundaries.TestBoundary21KustomizeOverlays.test_json6902_patch_operation_verbs)",
+      "id": "tests.e2e.tier2_boundaries.test_b21_kustomize_boundaries.TestBoundary21KustomizeOverlays.test_json6902_patch_operation_verbs",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_missing_base_directory_reference (tests.e2e.tier2_boundaries.test_b21_kustomize_boundaries.TestBoundary21KustomizeOverlays.test_missing_base_directory_reference)",
+      "id": "tests.e2e.tier2_boundaries.test_b21_kustomize_boundaries.TestBoundary21KustomizeOverlays.test_missing_base_directory_reference",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_provider_overlay_namespace_customization (tests.e2e.tier2_boundaries.test_b21_kustomize_boundaries.TestBoundary21KustomizeOverlays.test_provider_overlay_namespace_customization)",
+      "id": "tests.e2e.tier2_boundaries.test_b21_kustomize_boundaries.TestBoundary21KustomizeOverlays.test_provider_overlay_namespace_customization",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_branch_name_conflict_resolution (tests.e2e.tier2_boundaries.test_b22_gitops_boundaries.TestBoundary22GitOpsMigration.test_branch_name_conflict_resolution)",
+      "id": "tests.e2e.tier2_boundaries.test_b22_gitops_boundaries.TestBoundary22GitOpsMigration.test_branch_name_conflict_resolution",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_commit_message_audit_trail (tests.e2e.tier2_boundaries.test_b22_gitops_boundaries.TestBoundary22GitOpsMigration.test_commit_message_audit_trail)",
+      "id": "tests.e2e.tier2_boundaries.test_b22_gitops_boundaries.TestBoundary22GitOpsMigration.test_commit_message_audit_trail",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_detached_head_pre_check (tests.e2e.tier2_boundaries.test_b22_gitops_boundaries.TestBoundary22GitOpsMigration.test_detached_head_pre_check)",
+      "id": "tests.e2e.tier2_boundaries.test_b22_gitops_boundaries.TestBoundary22GitOpsMigration.test_detached_head_pre_check",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_dirty_working_tree_safety_guard (tests.e2e.tier2_boundaries.test_b22_gitops_boundaries.TestBoundary22GitOpsMigration.test_dirty_working_tree_safety_guard)",
+      "id": "tests.e2e.tier2_boundaries.test_b22_gitops_boundaries.TestBoundary22GitOpsMigration.test_dirty_working_tree_safety_guard",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_tag_collision_detection (tests.e2e.tier2_boundaries.test_b22_gitops_boundaries.TestBoundary22GitOpsMigration.test_tag_collision_detection)",
+      "id": "tests.e2e.tier2_boundaries.test_b22_gitops_boundaries.TestBoundary22GitOpsMigration.test_tag_collision_detection",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_circular_needs_dependency_prevention (tests.e2e.tier2_boundaries.test_b23_ci_boundaries.TestBoundary23GitHubActions.test_circular_needs_dependency_prevention)",
+      "id": "tests.e2e.tier2_boundaries.test_b23_ci_boundaries.TestBoundary23GitHubActions.test_circular_needs_dependency_prevention",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_environment_secrets_concurrency_group (tests.e2e.tier2_boundaries.test_b23_ci_boundaries.TestBoundary23GitHubActions.test_environment_secrets_concurrency_group)",
+      "id": "tests.e2e.tier2_boundaries.test_b23_ci_boundaries.TestBoundary23GitHubActions.test_environment_secrets_concurrency_group",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_job_timeout_minutes_specification (tests.e2e.tier2_boundaries.test_b23_ci_boundaries.TestBoundary23GitHubActions.test_job_timeout_minutes_specification)",
+      "id": "tests.e2e.tier2_boundaries.test_b23_ci_boundaries.TestBoundary23GitHubActions.test_job_timeout_minutes_specification",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_missing_on_trigger_block_detection (tests.e2e.tier2_boundaries.test_b23_ci_boundaries.TestBoundary23GitHubActions.test_missing_on_trigger_block_detection)",
+      "id": "tests.e2e.tier2_boundaries.test_b23_ci_boundaries.TestBoundary23GitHubActions.test_missing_on_trigger_block_detection",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_runner_os_compatibility_matrix (tests.e2e.tier2_boundaries.test_b23_ci_boundaries.TestBoundary23GitHubActions.test_runner_os_compatibility_matrix)",
+      "id": "tests.e2e.tier2_boundaries.test_b23_ci_boundaries.TestBoundary23GitHubActions.test_runner_os_compatibility_matrix",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_vless_connection_encapsulation_and_derp_relay (tests.e2e.tier3_combinations.test_c01_vless_to_mesh_relay.TestScenario01VLESSToMeshRelay.test_vless_connection_encapsulation_and_derp_relay)",
+      "id": "tests.e2e.tier3_combinations.test_c01_vless_to_mesh_relay.TestScenario01VLESSToMeshRelay.test_vless_connection_encapsulation_and_derp_relay",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_nat_traversal_to_country_exit_egress (tests.e2e.tier3_combinations.test_c02_nat_to_geo_exit.TestScenario02NATToGeoExit.test_nat_traversal_to_country_exit_egress)",
+      "id": "tests.e2e.tier3_combinations.test_c02_nat_to_geo_exit.TestScenario02NATToGeoExit.test_nat_traversal_to_country_exit_egress",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_onion_cell_forwarding_and_exit_isolation (tests.e2e.tier3_combinations.test_c03_onion_via_relays.TestScenario03OnionViaRelays.test_onion_cell_forwarding_and_exit_isolation)",
+      "id": "tests.e2e.tier3_combinations.test_c03_onion_via_relays.TestScenario03OnionViaRelays.test_onion_cell_forwarding_and_exit_isolation",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_epoch_rotation_and_rekeying (tests.e2e.tier3_combinations.test_c04_control_plane_rekey.TestScenario04ControlPlaneRekey.test_epoch_rotation_and_rekeying)",
+      "id": "tests.e2e.tier3_combinations.test_c04_control_plane_rekey.TestScenario04ControlPlaneRekey.test_epoch_rotation_and_rekeying",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_scanner_detection_triggers_async_ban (tests.e2e.tier3_combinations.test_c05_honeypot_with_decoy.TestScenario05HoneypotWithDecoy.test_scanner_detection_triggers_async_ban)",
+      "id": "tests.e2e.tier3_combinations.test_c05_honeypot_with_decoy.TestScenario05HoneypotWithDecoy.test_scanner_detection_triggers_async_ban",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_remote_doh_resolution_inside_egress_bridge (tests.e2e.tier3_combinations.test_c06_doh_in_sandboxed_bridge.TestScenario06DoHInSandboxedBridge.test_remote_doh_resolution_inside_egress_bridge)",
+      "id": "tests.e2e.tier3_combinations.test_c06_doh_in_sandboxed_bridge.TestScenario06DoHInSandboxedBridge.test_remote_doh_resolution_inside_egress_bridge",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_pipeline_transforms_yaml_to_tf_and_helm (tests.e2e.tier3_combinations.test_c07_config_to_terraform_k8s.TestScenario07ConfigToTerraformK8s.test_pipeline_transforms_yaml_to_tf_and_helm)",
+      "id": "tests.e2e.tier3_combinations.test_c07_config_to_terraform_k8s.TestScenario07ConfigToTerraformK8s.test_pipeline_transforms_yaml_to_tf_and_helm",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_cloud_init_with_zero_plaintext_token_derivation (tests.e2e.tier3_combinations.test_c08_cloud_init_with_secrets.TestScenario08CloudInitWithSecrets.test_cloud_init_with_zero_plaintext_token_derivation)",
+      "id": "tests.e2e.tier3_combinations.test_c08_cloud_init_with_secrets.TestScenario08CloudInitWithSecrets.test_cloud_init_with_zero_plaintext_token_derivation",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_migration_staged_repo_passes_ci_validation (tests.e2e.tier3_combinations.test_c09_gitops_with_ci_pipeline.TestScenario09GitOpsWithCIPipeline.test_migration_staged_repo_passes_ci_validation)",
+      "id": "tests.e2e.tier3_combinations.test_c09_gitops_with_ci_pipeline.TestScenario09GitOpsWithCIPipeline.test_migration_staged_repo_passes_ci_validation",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_user_revocation_invalidates_node_session (tests.e2e.tier3_combinations.test_c10_user_mgmt_with_control_plane.TestScenario10UserMgmtWithControlPlane.test_user_revocation_invalidates_node_session)",
+      "id": "tests.e2e.tier3_combinations.test_c10_user_mgmt_with_control_plane.TestScenario10UserMgmtWithControlPlane.test_user_revocation_invalidates_node_session",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_cross_provider_nat_traversal_matrix (tests.e2e.tier3_combinations.test_c11_multi_cloud_nat_matrix.TestScenario11MultiCloudNATMatrix.test_cross_provider_nat_traversal_matrix)",
+      "id": "tests.e2e.tier3_combinations.test_c11_multi_cloud_nat_matrix.TestScenario11MultiCloudNATMatrix.test_cross_provider_nat_traversal_matrix",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_automatic_failover_on_battery_drain (tests.e2e.tier3_combinations.test_c12_battery_quota_failover.TestScenario12BatteryQuotaFailover.test_automatic_failover_on_battery_drain)",
+      "id": "tests.e2e.tier3_combinations.test_c12_battery_quota_failover.TestScenario12BatteryQuotaFailover.test_automatic_failover_on_battery_drain",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_daemon_operates_under_rootless_constraints (tests.e2e.tier3_combinations.test_c13_container_with_security_daemon.TestScenario13ContainerWithSecurityDaemon.test_daemon_operates_under_rootless_constraints)",
+      "id": "tests.e2e.tier3_combinations.test_c13_container_with_security_daemon.TestScenario13ContainerWithSecurityDaemon.test_daemon_operates_under_rootless_constraints",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_onion_circuit_zero_leak_audit (tests.e2e.tier3_combinations.test_c14_onion_cell_jitter_leak.TestScenario14OnionCellJitterLeak.test_onion_circuit_zero_leak_audit)",
+      "id": "tests.e2e.tier3_combinations.test_c14_onion_cell_jitter_leak.TestScenario14OnionCellJitterLeak.test_onion_circuit_zero_leak_audit",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_helm_values_overlay_composition (tests.e2e.tier3_combinations.test_c15_kustomize_helm_overlay.TestScenario15KustomizeHelmOverlay.test_helm_values_overlay_composition)",
+      "id": "tests.e2e.tier3_combinations.test_c15_kustomize_helm_overlay.TestScenario15KustomizeHelmOverlay.test_helm_values_overlay_composition",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_seamless_relay_to_direct_p2p_upgrade (tests.e2e.tier3_combinations.test_c16_derp_failover_to_direct.TestScenario16DERPFailoverToDirect.test_seamless_relay_to_direct_p2p_upgrade)",
+      "id": "tests.e2e.tier3_combinations.test_c16_derp_failover_to_direct.TestScenario16DERPFailoverToDirect.test_seamless_relay_to_direct_p2p_upgrade",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_legacy_20point_checks_preserved_in_v2 (tests.e2e.tier3_combinations.test_c17_legacy_audit_parity.TestScenario17LegacyAuditParity.test_legacy_20point_checks_preserved_in_v2)",
+      "id": "tests.e2e.tier3_combinations.test_c17_legacy_audit_parity.TestScenario17LegacyAuditParity.test_legacy_20point_checks_preserved_in_v2",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_live_secret_rotation_during_active_stream (tests.e2e.tier3_combinations.test_c18_secret_rotation_under_load.TestScenario18SecretRotationUnderLoad.test_live_secret_rotation_during_active_stream)",
+      "id": "tests.e2e.tier3_combinations.test_c18_secret_rotation_under_load.TestScenario18SecretRotationUnderLoad.test_live_secret_rotation_during_active_stream",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_dpi_probe_falls_back_to_hardened_decoy (tests.e2e.tier3_combinations.test_c19_decoy_dpi_mimicry.TestScenario19DecoyDPIMimicry.test_dpi_probe_falls_back_to_hardened_decoy)",
+      "id": "tests.e2e.tier3_combinations.test_c19_decoy_dpi_mimicry.TestScenario19DecoyDPIMimicry.test_dpi_probe_falls_back_to_hardened_decoy",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_pinned_host_routing_and_encryption (tests.e2e.tier3_combinations.test_c20_host_routing_specific_peer.TestScenario20HostRoutingSpecificPeer.test_pinned_host_routing_and_encryption)",
+      "id": "tests.e2e.tier3_combinations.test_c20_host_routing_specific_peer.TestScenario20HostRoutingSpecificPeer.test_pinned_host_routing_and_encryption",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_exhaustive_bogon_matrix_across_all_nodes (tests.e2e.tier3_combinations.test_c21_rfc1918_bogon_netstack_matrix.TestScenario21RFC1918BogonNetstackMatrix.test_exhaustive_bogon_matrix_across_all_nodes)",
+      "id": "tests.e2e.tier3_combinations.test_c21_rfc1918_bogon_netstack_matrix.TestScenario21RFC1918BogonNetstackMatrix.test_exhaustive_bogon_matrix_across_all_nodes",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_relay_swarm_multi_region_availability (tests.e2e.tier3_combinations.test_c22_multi_region_relay_swarm.TestScenario22MultiRegionRelaySwarm.test_relay_swarm_multi_region_availability)",
+      "id": "tests.e2e.tier3_combinations.test_c22_multi_region_relay_swarm.TestScenario22MultiRegionRelaySwarm.test_relay_swarm_multi_region_availability",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_watchdog_auto_heals_failed_derp_relay (tests.e2e.tier3_combinations.test_c23_cloud_init_healing_derp.TestScenario23CloudInitHealingDERP.test_watchdog_auto_heals_failed_derp_relay)",
+      "id": "tests.e2e.tier3_combinations.test_c23_cloud_init_healing_derp.TestScenario23CloudInitHealingDERP.test_watchdog_auto_heals_failed_derp_relay",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_sqli_attack_triggers_threat_ban (tests.e2e.tier3_combinations.test_c24_user_api_sql_injection_defense.TestScenario24UserAPISQLiDefense.test_sqli_attack_triggers_threat_ban)",
+      "id": "tests.e2e.tier3_combinations.test_c24_user_api_sql_injection_defense.TestScenario24UserAPISQLiDefense.test_sqli_attack_triggers_threat_ban",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_complete_mesh_proxy_lifecycle (tests.e2e.tier3_combinations.test_c25_full_mesh_end_to_end.TestScenario25FullMeshEndToEnd.test_complete_mesh_proxy_lifecycle)",
+      "id": "tests.e2e.tier3_combinations.test_c25_full_mesh_end_to_end.TestScenario25FullMeshEndToEnd.test_complete_mesh_proxy_lifecycle",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_multi_region_censorship_circumvention_full_flow (tests.e2e.tier4_scenarios.test_s01_global_censorship_circumvention.TestScenario01GlobalCensorshipCircumvention.test_multi_region_censorship_circumvention_full_flow)",
+      "id": "tests.e2e.tier4_scenarios.test_s01_global_censorship_circumvention.TestScenario01GlobalCensorshipCircumvention.test_multi_region_censorship_circumvention_full_flow",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_3hop_onion_circuit_anonymity_workload (tests.e2e.tier4_scenarios.test_s02_onion_circuit_anonymity.TestScenario02OnionCircuitAnonymity.test_3hop_onion_circuit_anonymity_workload)",
+      "id": "tests.e2e.tier4_scenarios.test_s02_onion_circuit_anonymity.TestScenario02OnionCircuitAnonymity.test_3hop_onion_circuit_anonymity_workload",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_symmetric_nat_traversal_and_relay_fallback_workload (tests.e2e.tier4_scenarios.test_s03_symmetric_nat_hole_punching.TestScenario03SymmetricNATHolePunching.test_symmetric_nat_traversal_and_relay_fallback_workload)",
+      "id": "tests.e2e.tier4_scenarios.test_s03_symmetric_nat_hole_punching.TestScenario03SymmetricNATHolePunching.test_symmetric_nat_traversal_and_relay_fallback_workload",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_untrusted_client_penetration_containment (tests.e2e.tier4_scenarios.test_s04_untrusted_client_exit_containment.TestScenario04UntrustedClientExitContainment.test_untrusted_client_penetration_containment)",
+      "id": "tests.e2e.tier4_scenarios.test_s04_untrusted_client_exit_containment.TestScenario04UntrustedClientExitContainment.test_untrusted_client_penetration_containment",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_6provider_deployment_and_failover (tests.e2e.tier4_scenarios.test_s05_multicloud_6provider_failover.TestScenario05MultiCloud6ProviderFailover.test_6provider_deployment_and_failover)",
+      "id": "tests.e2e.tier4_scenarios.test_s05_multicloud_6provider_failover.TestScenario05MultiCloud6ProviderFailover.test_6provider_deployment_and_failover",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_full_gitops_migration_and_release_lifecycle (tests.e2e.tier4_scenarios.test_s06_gitops_release_migration_rollout.TestScenario06GitOpsReleaseMigrationRollout.test_full_gitops_migration_and_release_lifecycle)",
+      "id": "tests.e2e.tier4_scenarios.test_s06_gitops_release_migration_rollout.TestScenario06GitOpsReleaseMigrationRollout.test_full_gitops_migration_and_release_lifecycle",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_mobile_battery_drain_and_quota_limit_failover (tests.e2e.tier4_scenarios.test_s07_mobile_client_battery_and_quota.TestScenario07MobileClientBatteryAndQuota.test_mobile_battery_drain_and_quota_limit_failover)",
+      "id": "tests.e2e.tier4_scenarios.test_s07_mobile_client_battery_and_quota.TestScenario07MobileClientBatteryAndQuota.test_mobile_battery_drain_and_quota_limit_failover",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_honeypot_attack_detection_and_upstream_immunity (tests.e2e.tier4_scenarios.test_s08_active_threat_honeypot_mitigation.TestScenario08ActiveThreatHoneypotMitigation.test_honeypot_attack_detection_and_upstream_immunity)",
+      "id": "tests.e2e.tier4_scenarios.test_s08_active_threat_honeypot_mitigation.TestScenario08ActiveThreatHoneypotMitigation.test_honeypot_attack_detection_and_upstream_immunity",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_doh_multi_provider_race_and_leak_isolation (tests.e2e.tier4_scenarios.test_s09_zero_leak_doh_dns_multi_resolver.TestScenario09ZeroLeakDoHDNSMultiResolver.test_doh_multi_provider_race_and_leak_isolation)",
+      "id": "tests.e2e.tier4_scenarios.test_s09_zero_leak_doh_dns_multi_resolver.TestScenario09ZeroLeakDoHDNSMultiResolver.test_doh_multi_provider_race_and_leak_isolation",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_helm_statefulset_ha_configuration (tests.e2e.tier4_scenarios.test_s10_kubernetes_helm_statefulset_ha.TestScenario10KubernetesHelmStatefulSetHA.test_helm_statefulset_ha_configuration)",
+      "id": "tests.e2e.tier4_scenarios.test_s10_kubernetes_helm_statefulset_ha.TestScenario10KubernetesHelmStatefulSetHA.test_helm_statefulset_ha_configuration",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_noise_session_rekeying_flow (tests.e2e.tier4_scenarios.test_s11_noise_rekey_under_high_throughput.TestScenario11NoiseRekeyUnderHighThroughput.test_noise_session_rekeying_flow)",
+      "id": "tests.e2e.tier4_scenarios.test_s11_noise_rekey_under_high_throughput.TestScenario11NoiseRekeyUnderHighThroughput.test_noise_session_rekeying_flow",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_concurrent_safe_revocation (tests.e2e.tier4_scenarios.test_s12_parameterized_user_revocation_under_load.TestScenario12ParameterizedUserRevocationUnderLoad.test_concurrent_safe_revocation)",
+      "id": "tests.e2e.tier4_scenarios.test_s12_parameterized_user_revocation_under_load.TestScenario12ParameterizedUserRevocationUnderLoad.test_concurrent_safe_revocation",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_dynamic_dns_ip_change_and_duckdns_update (tests.e2e.tier4_scenarios.test_s13_dynamic_dns_duckdns_recovery.TestScenario13DynamicDNSDuckDNSRecovery.test_dynamic_dns_ip_change_and_duckdns_update)",
+      "id": "tests.e2e.tier4_scenarios.test_s13_dynamic_dns_duckdns_recovery.TestScenario13DynamicDNSDuckDNSRecovery.test_dynamic_dns_ip_change_and_duckdns_update",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_rootless_container_privilege_drop_and_isolation (tests.e2e.tier4_scenarios.test_s14_rootless_container_privilege_boundary.TestScenario14RootlessContainerPrivilegeBoundary.test_rootless_container_privilege_drop_and_isolation)",
+      "id": "tests.e2e.tier4_scenarios.test_s14_rootless_container_privilege_boundary.TestScenario14RootlessContainerPrivilegeBoundary.test_rootless_container_privilege_drop_and_isolation",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_complete_end_to_end_mesh_pipeline (tests.e2e.tier4_scenarios.test_s15_end_to_end_mesh_data_pipeline.TestScenario15EndToEndMeshDataPipeline.test_complete_end_to_end_mesh_pipeline)",
+      "id": "tests.e2e.tier4_scenarios.test_s15_end_to_end_mesh_data_pipeline.TestScenario15EndToEndMeshDataPipeline.test_complete_end_to_end_mesh_pipeline",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_multi_region_censorship_circumvention_full_flow (tests.e2e.tier4_workloads.test_w01_censorship_circumvention.TestWorkload01CensorshipCircumvention.test_multi_region_censorship_circumvention_full_flow)",
+      "id": "tests.e2e.tier4_workloads.test_w01_censorship_circumvention.TestWorkload01CensorshipCircumvention.test_multi_region_censorship_circumvention_full_flow",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_3hop_onion_circuit_anonymity_workload (tests.e2e.tier4_workloads.test_w02_onion_circuit_anonymity.TestWorkload02OnionCircuitAnonymity.test_3hop_onion_circuit_anonymity_workload)",
+      "id": "tests.e2e.tier4_workloads.test_w02_onion_circuit_anonymity.TestWorkload02OnionCircuitAnonymity.test_3hop_onion_circuit_anonymity_workload",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_symmetric_nat_traversal_and_relay_fallback_workload (tests.e2e.tier4_workloads.test_w03_symmetric_nat_hole_punch.TestWorkload03SymmetricNATHolePunch.test_symmetric_nat_traversal_and_relay_fallback_workload)",
+      "id": "tests.e2e.tier4_workloads.test_w03_symmetric_nat_hole_punch.TestWorkload03SymmetricNATHolePunch.test_symmetric_nat_traversal_and_relay_fallback_workload",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_untrusted_client_penetration_containment (tests.e2e.tier4_workloads.test_w04_client_exit_penetration.TestWorkload04ClientExitPenetration.test_untrusted_client_penetration_containment)",
+      "id": "tests.e2e.tier4_workloads.test_w04_client_exit_penetration.TestWorkload04ClientExitPenetration.test_untrusted_client_penetration_containment",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_6provider_deployment_and_failover (tests.e2e.tier4_workloads.test_w05_multicloud_6provider_failover.TestWorkload05MultiCloud6ProviderFailover.test_6provider_deployment_and_failover)",
+      "id": "tests.e2e.tier4_workloads.test_w05_multicloud_6provider_failover.TestWorkload05MultiCloud6ProviderFailover.test_6provider_deployment_and_failover",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_full_gitops_migration_and_release_lifecycle (tests.e2e.tier4_workloads.test_w06_gitops_migration_rollout.TestWorkload06GitOpsMigrationRollout.test_full_gitops_migration_and_release_lifecycle)",
+      "id": "tests.e2e.tier4_workloads.test_w06_gitops_migration_rollout.TestWorkload06GitOpsMigrationRollout.test_full_gitops_migration_and_release_lifecycle",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_large_gap_leap_forward (tests.e2e.tier5_adversarial.test_adv_01_anti_replay_window.TestAdversarial01AntiReplayWindow.test_large_gap_leap_forward)",
+      "id": "tests.e2e.tier5_adversarial.test_adv_01_anti_replay_window.TestAdversarial01AntiReplayWindow.test_large_gap_leap_forward",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_monotonic_sequence_and_duplicate_rejection (tests.e2e.tier5_adversarial.test_adv_01_anti_replay_window.TestAdversarial01AntiReplayWindow.test_monotonic_sequence_and_duplicate_rejection)",
+      "id": "tests.e2e.tier5_adversarial.test_adv_01_anti_replay_window.TestAdversarial01AntiReplayWindow.test_monotonic_sequence_and_duplicate_rejection",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_out_of_order_within_window (tests.e2e.tier5_adversarial.test_adv_01_anti_replay_window.TestAdversarial01AntiReplayWindow.test_out_of_order_within_window)",
+      "id": "tests.e2e.tier5_adversarial.test_adv_01_anti_replay_window.TestAdversarial01AntiReplayWindow.test_out_of_order_within_window",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_stale_packet_beyond_window_rejection (tests.e2e.tier5_adversarial.test_adv_01_anti_replay_window.TestAdversarial01AntiReplayWindow.test_stale_packet_beyond_window_rejection)",
+      "id": "tests.e2e.tier5_adversarial.test_adv_01_anti_replay_window.TestAdversarial01AntiReplayWindow.test_stale_packet_beyond_window_rejection",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_sqli_payload_immunity (tests.e2e.tier5_adversarial.test_adv_02_sqli_and_command_injection.TestAdversarial02SQLiAndCommandInjection.test_sqli_payload_immunity)",
+      "id": "tests.e2e.tier5_adversarial.test_adv_02_sqli_and_command_injection.TestAdversarial02SQLiAndCommandInjection.test_sqli_payload_immunity",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_threat_scorer_mass_evaluation_and_decay (tests.e2e.tier5_adversarial.test_adv_03_dos_flood_and_threat_scoring.TestAdversarial03DoSFloodAndThreatScoring.test_threat_scorer_mass_evaluation_and_decay)",
+      "id": "tests.e2e.tier5_adversarial.test_adv_03_dos_flood_and_threat_scoring.TestAdversarial03DoSFloodAndThreatScoring.test_threat_scorer_mass_evaluation_and_decay",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_token_bucket_saturation_under_flood (tests.e2e.tier5_adversarial.test_adv_03_dos_flood_and_threat_scoring.TestAdversarial03DoSFloodAndThreatScoring.test_token_bucket_saturation_under_flood)",
+      "id": "tests.e2e.tier5_adversarial.test_adv_03_dos_flood_and_threat_scoring.TestAdversarial03DoSFloodAndThreatScoring.test_token_bucket_saturation_under_flood",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_direct_frame_mac_authentication_tamper (tests.e2e.tier5_adversarial.test_adv_04_crypto_tampering_and_bitflips.TestAdversarial04CryptoTamperingAndBitflips.test_direct_frame_mac_authentication_tamper)",
+      "id": "tests.e2e.tier5_adversarial.test_adv_04_crypto_tampering_and_bitflips.TestAdversarial04CryptoTamperingAndBitflips.test_direct_frame_mac_authentication_tamper",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_direct_frame_magic_and_header_corruption (tests.e2e.tier5_adversarial.test_adv_04_crypto_tampering_and_bitflips.TestAdversarial04CryptoTamperingAndBitflips.test_direct_frame_magic_and_header_corruption)",
+      "id": "tests.e2e.tier5_adversarial.test_adv_04_crypto_tampering_and_bitflips.TestAdversarial04CryptoTamperingAndBitflips.test_direct_frame_magic_and_header_corruption",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_onion_cell_tampering_all_hops (tests.e2e.tier5_adversarial.test_adv_04_crypto_tampering_and_bitflips.TestAdversarial04CryptoTamperingAndBitflips.test_onion_cell_tampering_all_hops)",
+      "id": "tests.e2e.tier5_adversarial.test_adv_04_crypto_tampering_and_bitflips.TestAdversarial04CryptoTamperingAndBitflips.test_onion_cell_tampering_all_hops",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_packet_corruption_detection (tests.e2e.tier5_adversarial.test_adv_05_wan_chaos_and_packet_degradation.TestAdversarial05WANChaosAndPacketDegradation.test_packet_corruption_detection)",
+      "id": "tests.e2e.tier5_adversarial.test_adv_05_wan_chaos_and_packet_degradation.TestAdversarial05WANChaosAndPacketDegradation.test_packet_corruption_detection",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_packet_loss_drop_accounting (tests.e2e.tier5_adversarial.test_adv_05_wan_chaos_and_packet_degradation.TestAdversarial05WANChaosAndPacketDegradation.test_packet_loss_drop_accounting)",
+      "id": "tests.e2e.tier5_adversarial.test_adv_05_wan_chaos_and_packet_degradation.TestAdversarial05WANChaosAndPacketDegradation.test_packet_loss_drop_accounting",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_adversarial_egress_blocking_matrix (tests.e2e.tier5_adversarial.test_adv_06_bogon_and_metadata_exfiltration.TestAdversarial06BogonAndMetadataExfiltration.test_adversarial_egress_blocking_matrix)",
+      "id": "tests.e2e.tier5_adversarial.test_adv_06_bogon_and_metadata_exfiltration.TestAdversarial06BogonAndMetadataExfiltration.test_adversarial_egress_blocking_matrix",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_01_real_mesh_cluster_yaml_integrity (tests.e2e.tier5_adversarial.test_adv_07_multicloud_config_and_bootstrap.TestAdv07MultiCloudConfigAndBootstrap.test_01_real_mesh_cluster_yaml_integrity)",
+      "id": "tests.e2e.tier5_adversarial.test_adv_07_multicloud_config_and_bootstrap.TestAdv07MultiCloudConfigAndBootstrap.test_01_real_mesh_cluster_yaml_integrity",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_02_terraform_modules_and_variables_parity (tests.e2e.tier5_adversarial.test_adv_07_multicloud_config_and_bootstrap.TestAdv07MultiCloudConfigAndBootstrap.test_02_terraform_modules_and_variables_parity)",
+      "id": "tests.e2e.tier5_adversarial.test_adv_07_multicloud_config_and_bootstrap.TestAdv07MultiCloudConfigAndBootstrap.test_02_terraform_modules_and_variables_parity",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_03_bootstrap_shell_static_security_analysis (tests.e2e.tier5_adversarial.test_adv_07_multicloud_config_and_bootstrap.TestAdv07MultiCloudConfigAndBootstrap.test_03_bootstrap_shell_static_security_analysis)",
+      "id": "tests.e2e.tier5_adversarial.test_adv_07_multicloud_config_and_bootstrap.TestAdv07MultiCloudConfigAndBootstrap.test_03_bootstrap_shell_static_security_analysis",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_04_bootstrap_registration_injection_simulation (tests.e2e.tier5_adversarial.test_adv_07_multicloud_config_and_bootstrap.TestAdv07MultiCloudConfigAndBootstrap.test_04_bootstrap_registration_injection_simulation)",
+      "id": "tests.e2e.tier5_adversarial.test_adv_07_multicloud_config_and_bootstrap.TestAdv07MultiCloudConfigAndBootstrap.test_04_bootstrap_registration_injection_simulation",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_05_cloud_init_sysctl_bbr_and_buffer_parameters (tests.e2e.tier5_adversarial.test_adv_07_multicloud_config_and_bootstrap.TestAdv07MultiCloudConfigAndBootstrap.test_05_cloud_init_sysctl_bbr_and_buffer_parameters)",
+      "id": "tests.e2e.tier5_adversarial.test_adv_07_multicloud_config_and_bootstrap.TestAdv07MultiCloudConfigAndBootstrap.test_05_cloud_init_sysctl_bbr_and_buffer_parameters",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "name": "test_06_helm_chart_values_and_manifest_security (tests.e2e.tier5_adversarial.test_adv_07_multicloud_config_and_bootstrap.TestAdv07MultiCloudConfigAndBootstrap.test_06_helm_chart_values_and_manifest_security)",
+      "id": "tests.e2e.tier5_adversarial.test_adv_07_multicloud_config_and_bootstrap.TestAdv07MultiCloudConfigAndBootstrap.test_06_helm_chart_values_and_manifest_security",
+      "status": "PASS",
+      "error": null
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{{- if .Values.relay.enabled -}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "sovereign.fullname" . }}-relay
+  labels:
+    {{- include "sovereign.labels" . | nindent 4 }}
+    app.kubernetes.io/component: relay
+spec:
+  serviceName: {{ include "sovereign.fullname" . }}-relay
+  replicas: {{ .Values.relay.replicas }}
+  selector:
+    matchLabels:
+      {{- include "sovereign.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: relay
+  template:
+    metadata:
+      labels:
+        {{- include "sovereign.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: relay
+    spec:
+      serviceAccountName: {{ include "sovereign.serviceAccountName" . }}
+      hostNetwork: {{ .Values.relay.hostNetwork }}
+      dnsPolicy: {{ .Values.relay.dnsPolicy }}
+      containers:
+        - name: relay
+          image: "{{ .Values.global.imageRegistry }}/{{ .Values.relay.image.repository }}:{{ .Values.relay.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+                - NET_RAW
+          ports:
+            - name: https-derp
+              containerPort: 443
+              protocol: TCP
+            - name: stun
+              containerPort: 3478
+              protocol: UDP
+            - name: metrics
+              containerPort: 9091
+              protocol: TCP
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: DECOY_DOMAIN
+              value: {{ .Values.relay.antiCensorship.decoyDomain | quote }}
+            - name: CLUSTER_NAME
+              value: {{ .Values.global.clusterName | quote }}
+          resources:
+            {{- toYaml .Values.relay.resources | nindent 12 }}
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/sovereign
+        - name: honeypot
+          image: "{{ .Values.global.imageRegistry }}/sovereign-honeypot:{{ .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+          ports:
+            - name: honeypot
+              containerPort: {{ .Values.relay.antiCensorship.honeypotPort }}
+              protocol: TCP
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+          resources:
+            limits:
+              cpu: "250m"
+              memory: "128Mi"
+            requests:
+              cpu: "50m"
+              memory: "32Mi"
+      volumes:
+        - name: data
+          emptyDir: {}
+{{- end }}

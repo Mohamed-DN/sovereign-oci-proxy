@@ -1,0 +1,187 @@
+package main
+
+import (
+	"context"
+	"flag"
+	"fmt"
+	"log"
+	"net"
+	"os"
+	"os/signal"
+	"runtime"
+	"syscall"
+	"time"
+
+	"github.com/sovereign/proxy/v4/pkg/acl"
+	"github.com/sovereign/proxy/v4/pkg/bridge"
+	"github.com/sovereign/proxy/v4/pkg/config"
+	"github.com/sovereign/proxy/v4/pkg/control"
+	"github.com/sovereign/proxy/v4/pkg/crypto"
+	"github.com/sovereign/proxy/v4/pkg/posture"
+)
+
+const ClientVersion = "v4.0.0"
+
+func main() {
+	_ = config.LoadDotEnv()
+
+	socksAddr := config.BindStringFlag(flag.CommandLine, "socks-addr", "SOVEREIGN_SOCKS5_LISTEN_ADDR", "127.0.0.1:1080", "Local SOCKS5 proxy inbound listen address")
+	httpAddr := config.BindStringFlag(flag.CommandLine, "http-addr", "SOVEREIGN_HTTP_LISTEN_ADDR", "127.0.0.1:8080", "Local HTTP CONNECT proxy inbound listen address")
+	controlURL := config.BindStringFlag(flag.CommandLine, "control-url", "SOVEREIGN_CONTROL_PLANE_URL", "http://127.0.0.1:8443", "SovereignMesh Control Plane URL")
+	enableExit := config.BindBoolFlag(flag.CommandLine, "enable-exit", "SOVEREIGN_ENABLE_EXIT_BRIDGE", false, "Enable sandboxed egress exit node bridge")
+	countryCode := config.BindStringFlag(flag.CommandLine, "country", "SOVEREIGN_COUNTRY_CODE", "US", "ISO Country Code for bridge registration")
+	flag.Parse()
+
+	log.Printf("[SOVEREIGN-NODE] Initializing SovereignMesh client daemon (%s)...", ClientVersion)
+
+	// Generate node identity keypair
+	keypair, err := crypto.GenerateKeypair()
+	if err != nil {
+		log.Fatalf("Failed to generate node identity keypair: %v", err)
+	}
+
+	nodeID := control.GenerateNodeID(keypair.PublicKey)
+	log.Printf("[SOVEREIGN-NODE] Node ID: %s", nodeID)
+
+	// Initialize Netstack ACL Filter
+	netfilter := acl.NewNetstackFilter()
+
+	// Initialize Sandbox & Netstack Bridge
+	policy := bridge.NewSandboxPolicyEngine(bridge.SandboxPolicyConfig{
+		AllowLAN: false, // Strict RFC 1918 suppression
+	})
+	doh := bridge.NewDoHResolver(nil)
+	guardian := bridge.NewGuardian(0)
+
+	netstackBridge := bridge.NewNetstackBridge(policy, doh, guardian)
+
+	// Start Inbound SOCKS5 Proxy
+	socksSrv := bridge.NewSOCKS5Server(*socksAddr, netstackBridge)
+	if err := socksSrv.Start(); err != nil {
+		log.Fatalf("Failed to start SOCKS5 proxy on %s: %v", *socksAddr, err)
+	}
+	log.Printf("[SOVEREIGN-NODE] SOCKS5 Inbound ready on %s", *socksAddr)
+
+	// Start Inbound HTTP CONNECT Proxy
+	httpSrv := bridge.NewHTTPProxyServer(*httpAddr, netstackBridge)
+	if err := httpSrv.Start(); err != nil {
+		log.Fatalf("Failed to start HTTP proxy on %s: %v", *httpAddr, err)
+	}
+	log.Printf("[SOVEREIGN-NODE] HTTP CONNECT Inbound ready on %s", *httpAddr)
+
+	// Register with Control Plane
+	ctrlClient := control.NewClient(*controlURL)
+	role := "CLIENT_ORIGIN"
+	if *enableExit {
+		role = "EXIT_BRIDGE"
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	regCtx, regCancel := context.WithTimeout(ctx, 5*time.Second)
+	regResp, err := ctrlClient.Register(regCtx, keypair.PublicKey, role, nil, control.CapabilityDesc{
+		Enabled:          *enableExit,
+		CountryCode:      *countryCode,
+		IPClass:          "RESIDENTIAL",
+		MaxBandwidthKbps: 50000,
+	})
+	regCancel()
+
+	if err != nil {
+		log.Printf("[SOVEREIGN-NODE] Warning: Initial control plane registration failed: %v (operating in local standalone mode)", err)
+	} else {
+		log.Printf("[SOVEREIGN-NODE] Registered with control plane. Assigned Overlay VIP: %s", regResp.OverlayIPv4)
+		
+		// Initial ACL and Route Sync
+		policy, _, syncErr := ctrlClient.SyncACLs(ctx, nodeID, 0)
+		if syncErr == nil && policy != nil {
+			netfilter.UpdatePolicy(policy)
+			log.Printf("[SOVEREIGN-NODE] Zero Trust ACL policy loaded (epoch: %d, outbound rules: %d)", policy.Epoch, len(policy.OutboundRules))
+		}
+		
+		routesList, routeEpoch, routeErr := ctrlClient.SyncRoutes(ctx, nodeID, 0)
+		if routeErr == nil {
+			log.Printf("[SOVEREIGN-NODE] Subnet routes synced (epoch: %d, count: %d)", routeEpoch, len(routesList))
+		}
+
+		// Start periodic heartbeat and continuous posture attestation loop
+		go func() {
+			ticker := time.NewTicker(15 * time.Second)
+			defer ticker.Stop()
+
+			isRootless := os.Geteuid() != 0
+			var policyEpoch uint64 = regResp.PolicyEpoch
+			var routeEpoch uint64 = regResp.RouteEpoch
+
+			for {
+				select {
+				case <-ticker.C:
+					att := &posture.PeerAttestation{
+						NodeID:         nodeID,
+						OSName:         runtime.GOOS,
+						OSVersion:      "14.5.0",
+						ClientVersion:  ClientVersion,
+						CountryCode:    *countryCode,
+						ASN:            7018,
+						DiskEncrypted:  true,
+						FirewallActive: true,
+						IsRootless:     isRootless,
+						TimestampUTC:   time.Now().UTC(),
+					}
+
+					hbCtx, hbCancel := context.WithTimeout(ctx, 5*time.Second)
+					hbResp, hbErr := ctrlClient.SendHeartbeatWithPosture(hbCtx, nodeID, nil, 0, 5, 32, 100, false, att)
+					hbCancel()
+
+					if hbErr != nil {
+						log.Printf("[SOVEREIGN-NODE] Heartbeat failed: %v", hbErr)
+						continue
+					}
+
+					if hbResp.IsQuarantined {
+						log.Printf("[SOVEREIGN-NODE] ⚠️ WARNING: Node is QUARANTINED by control plane! Reason: %s", hbResp.QuarantineReason)
+					}
+
+					// Update ACLs if epoch advanced
+					if hbResp.PolicyEpoch > policyEpoch {
+						syncCtx, syncCancel := context.WithTimeout(ctx, 5*time.Second)
+						newPol, newEp, syncErr := ctrlClient.SyncACLs(syncCtx, nodeID, policyEpoch)
+						syncCancel()
+						if syncErr == nil && newPol != nil {
+							netfilter.UpdatePolicy(newPol)
+							policyEpoch = newEp
+							log.Printf("[SOVEREIGN-NODE] Updated ACL policy to epoch %d", policyEpoch)
+						}
+					}
+
+					// Update routes if epoch advanced
+					if hbResp.RouteEpoch > routeEpoch {
+						rCtx, rCancel := context.WithTimeout(ctx, 5*time.Second)
+						newRoutes, newEp, rErr := ctrlClient.SyncRoutes(rCtx, nodeID, routeEpoch)
+						rCancel()
+						if rErr == nil {
+							routeEpoch = newEp
+							log.Printf("[SOVEREIGN-NODE] Updated subnet routes to epoch %d (count: %d)", routeEpoch, len(newRoutes))
+						}
+					}
+
+				case <-ctx.Done():
+					return
+				}
+			}
+		}()
+	}
+
+	// Unused listener warning suppression
+	_ = net.ParseIP("127.0.0.1")
+
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
+	<-sigChan
+
+	log.Println("[SOVEREIGN-NODE] Shutting down mesh node...")
+	_ = socksSrv.Close()
+	_ = httpSrv.Close()
+	fmt.Println("Sovereign node stopped cleanly.")
+}

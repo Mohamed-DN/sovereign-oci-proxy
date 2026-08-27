@@ -1,0 +1,63 @@
+{
+  "Crypto Overlay Frames": {
+    "Total Frames": 10000,
+    "Payload Size": "1024 bytes",
+    "Serialization Duration": "0.0949s (102.95 MB/s)",
+    "Parse/Auth Duration": "0.0496s (196.77 MB/s)",
+    "Auth Tag Success Rate": "100.00%"
+  },
+  "Anti-Replay Window": {
+    "Total Ingested": 50000,
+    "Accepted Fresh Monotonic": 50000,
+    "Duplicates Rejected": 50000,
+    "Out-of-Order Accepted (in-window)": "499/500",
+    "Old Packet Beyond 1024 Rejected": true,
+    "Throughput": "32969.77 checks/sec"
+  },
+  "NAT Traversal & DERP Relay": {
+    "Symmetric Sequential Traversal Strategy": "SYMMETRIC_PORT_SPRAY",
+    "Symmetric Random Fallback Strategy": "DERP_RELAY_FALLBACK",
+    "DERP Fallback Triggered": true,
+    "DERP Fallback Transition Latency": "0.0333 ms",
+    "DERP Relay Throughput": "439820.22 pkts/sec (20000/20000)"
+  },
+  "3-Hop Onion Routing": {
+    "Circuits Built": 1000,
+    "Fixed 1420-Byte Cell Invariant": "VERIFIED (100% compliant)",
+    "Circuit Build Throughput": "37934.53 circuits/sec",
+    "Tamper/Bit-Flip Detection Rate": "100.00% (3/3 layers rejected)"
+  },
+  "Egress Sandbox Containment": {
+    "Total Malicious Probes": 18,
+    "Malicious Probes Blocked": "18/18 (100% blocked)",
+    "Legitimate Public Egress Allowed": "PASS",
+    "Cloud Metadata (169.254.169.254) Blocked": "PASS",
+    "SMTP/SMB Port Lockout": "PASS"
+  },
+  "WAN Degradation Resilience": {
+    "Loss Rate 0%": {
+      "Delivered": 1970,
+      "Corrupted (Detected)": 30,
+      "Dropped": 0,
+      "Delivery Ratio": "98.50%"
+    },
+    "Loss Rate 5%": {
+      "Delivered": 1881,
+      "Corrupted (Detected)": 36,
+      "Dropped": 83,
+      "Delivery Ratio": "94.05%"
+    },
+    "Loss Rate 10%": {
+      "Delivered": 1776,
+      "Corrupted (Detected)": 28,
+      "Dropped": 196,
+      "Delivery Ratio": "88.80%"
+    },
+    "Loss Rate 25%": {
+      "Delivered": 1493,
+      "Corrupted (Detected)": 26,
+      "Dropped": 481,
+      "Delivery Ratio": "74.65%"
+    }
+  }
+}

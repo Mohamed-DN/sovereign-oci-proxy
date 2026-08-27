@@ -1,0 +1,21 @@
+# AI Agent Metadata & Logs (Internal Development)
+.agents/
+*.log
+.system_generated/
+__pycache__/
+*.pyc
+.DS_Store
+
+# Go Binaries & Artifacts
+bin/
+*.exe
+*.test
+*.out
+
+# Environment Local Overrides
+.env
+.env.local
+
+# Test & Coverage Outputs
+coverage.out
+coverage.html

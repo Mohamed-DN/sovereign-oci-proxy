@@ -1,0 +1,61 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: sovereign-zero-trust
+  labels:
+    app.kubernetes.io/name: sovereign-mesh
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: sovereign-mesh
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # 1. Inbound to Relay (443, 3478, 8080)
+    - ports:
+        - protocol: TCP
+          port: 443
+        - protocol: UDP
+          port: 3478
+        - protocol: TCP
+          port: 8080
+        - protocol: TCP
+          port: 80
+
+    # 2. Control Plane API from internal pods
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: sovereign-mesh
+      ports:
+        - protocol: TCP
+          port: 8443
+        - protocol: TCP
+          port: 9443
+
+  egress:
+    # DNS resolution
+    - to:
+        - namespaceSelector: {}
+          podSelector:
+            matchExpressions:
+              - key: k8s-app
+                operator: In
+                values: ["kube-dns", "coredns"]
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+
+    # Outbound proxy routing
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8
+              - 172.16.0.0/12
+              - 192.168.0.0/16
+              - 169.254.0.0/16
+              - 127.0.0.0/8

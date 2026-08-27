@@ -1,0 +1,25 @@
+{{- if and .Values.relay.enabled .Values.relay.keda .Values.relay.keda.enabled -}}
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ include "sovereign.fullname" . }}-relay-keda
+  labels:
+    {{- include "sovereign.labels" . | nindent 4 }}
+    app.kubernetes.io/component: relay
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: StatefulSet
+    name: {{ include "sovereign.fullname" . }}-relay
+  minReplicaCount: {{ .Values.relay.keda.minReplicaCount | default .Values.relay.autoscaling.minReplicas | default 4 }}
+  maxReplicaCount: {{ .Values.relay.keda.maxReplicaCount | default .Values.relay.autoscaling.maxReplicas | default 32 }}
+  pollingInterval: {{ .Values.relay.keda.pollingInterval | default 15 }}
+  cooldownPeriod: {{ .Values.relay.keda.cooldownPeriod | default 300 }}
+  triggers:
+    - type: prometheus
+      metadata:
+        serverAddress: {{ .Values.relay.keda.serverAddress | quote }}
+        metricName: {{ .Values.relay.keda.metricName | quote }}
+        query: {{ .Values.relay.keda.query | quote }}
+        threshold: {{ .Values.relay.keda.threshold | quote }}
+{{- end }}

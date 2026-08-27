@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - control-plane-deployment.yaml
+  - control-plane-service.yaml
+  - relay-statefulset.yaml
+  - relay-service.yaml
+  - edge-gateway-daemonset.yaml
+  - decoy-nginx.yaml
+  - networkpolicy.yaml
+
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: sovereign-mesh

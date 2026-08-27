@@ -1,0 +1,27 @@
+{{- if .Values.controlPlane.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "sovereign.fullname" . }}-control-plane
+  labels:
+    {{- include "sovereign.labels" . | nindent 4 }}
+    app.kubernetes.io/component: control-plane
+spec:
+  type: {{ .Values.controlPlane.service.type }}
+  ports:
+    - name: http-api
+      port: {{ .Values.controlPlane.service.port }}
+      targetPort: http-api
+      protocol: TCP
+    - name: grpc-api
+      port: {{ .Values.controlPlane.service.grpcPort }}
+      targetPort: grpc-api
+      protocol: TCP
+    - name: metrics
+      port: 9090
+      targetPort: metrics
+      protocol: TCP
+  selector:
+    {{- include "sovereign.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: control-plane
+{{- end }}

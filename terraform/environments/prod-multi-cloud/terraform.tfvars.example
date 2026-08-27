@@ -1,0 +1,81 @@
+cluster_name = "neronet-global-mesh-prod"
+domain       = "neronet.darknero.com"
+ssh_port     = 2222
+
+# OCI Settings
+enable_oci         = true
+oci_compartment_id = "ocid1.compartment.oc1..your_compartment_ocid_here"
+oci_nodes = [
+  {
+    id                  = "relay-eu-fra-oci"
+    availability_domain = "FRA-AD-1"
+    shape               = "VM.Standard.A1.Flex"
+    ocpus               = 2
+    memory_in_gbs       = 12
+    decoy_domain        = "aws.amazon.com"
+    honeypot_port       = 8080
+  }
+]
+
+# AWS Settings
+enable_aws = true
+aws_region = "us-east-1"
+aws_nodes = [
+  {
+    id                = "relay-us-east-aws"
+    availability_zone = "us-east-1a"
+    instance_type     = "t4g.small"
+    decoy_domain      = "www.microsoft.com"
+    honeypot_port     = 8080
+  }
+]
+
+# GCP Settings
+enable_gcp     = true
+gcp_project_id = "your-gcp-project-id"
+gcp_region     = "europe-west3"
+gcp_nodes = [
+  {
+    id            = "relay-sg-sin-gcp"
+    zone          = "europe-west3-a"
+    machine_type  = "e2-standard-2"
+    decoy_domain  = "cloud.google.com"
+    honeypot_port = 8080
+  }
+]
+
+# DigitalOcean Settings
+enable_digitalocean = true
+do_region           = "nyc3"
+do_nodes = [
+  {
+    id            = "relay-us-nyc-do"
+    size          = "s-2vcpu-4gb"
+    decoy_domain  = "www.cloudflare.com"
+    honeypot_port = 8080
+  }
+]
+
+# Hetzner Settings
+enable_hetzner   = true
+hetzner_location = "nbg1"
+hetzner_nodes = [
+  {
+    id            = "relay-de-nbg-hetzner"
+    server_type   = "CAX21"
+    decoy_domain  = "www.apple.com"
+    honeypot_port = 8080
+  }
+]
+
+# Vultr Settings
+enable_vultr = true
+vultr_region = "nrt"
+vultr_nodes = [
+  {
+    id            = "relay-jp-nrt-vultr"
+    plan          = "vc2-2c-4gb"
+    decoy_domain  = "www.oracle.com"
+    honeypot_port = 8080
+  }
+]

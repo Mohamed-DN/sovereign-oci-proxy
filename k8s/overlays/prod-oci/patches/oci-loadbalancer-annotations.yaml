@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: sovereign-relay
+  annotations:
+    oci.oraclecloud.com/load-balancer-type: "nlb"
+    oci.oraclecloud.com/oci-network-security-groups: "ocid1.networksecuritygroup.oc1..sovereign"

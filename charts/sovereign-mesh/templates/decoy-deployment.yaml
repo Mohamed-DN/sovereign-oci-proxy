@@ -1,0 +1,58 @@
+{{- if .Values.decoy.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "sovereign.fullname" . }}-decoy
+  labels:
+    {{- include "sovereign.labels" . | nindent 4 }}
+    app.kubernetes.io/component: decoy
+spec:
+  replicas: {{ .Values.decoy.replicas }}
+  selector:
+    matchLabels:
+      {{- include "sovereign.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: decoy
+  template:
+    metadata:
+      labels:
+        {{- include "sovereign.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: decoy
+    spec:
+      containers:
+        - name: nginx-decoy
+          image: "{{ .Values.decoy.image.repository }}:{{ .Values.decoy.image.tag }}"
+          ports:
+            - name: http-decoy
+              containerPort: 80
+              protocol: TCP
+            - name: https-decoy
+              containerPort: 8443
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.decoy.resources | nindent 12 }}
+          securityContext:
+            readOnlyRootFilesystem: false
+            allowPrivilegeEscalation: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "sovereign.fullname" . }}-decoy
+  labels:
+    {{- include "sovereign.labels" . | nindent 4 }}
+    app.kubernetes.io/component: decoy
+spec:
+  type: {{ .Values.decoy.service.type }}
+  ports:
+    - name: http
+      port: 80
+      targetPort: http-decoy
+      protocol: TCP
+    - name: https
+      port: 8443
+      targetPort: https-decoy
+      protocol: TCP
+  selector:
+    {{- include "sovereign.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: decoy
+{{- end }}

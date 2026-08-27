@@ -1,0 +1,104 @@
+#cloud-config
+# ==============================================================================
+# Sovereign Proxy v4.0 — Universal Distro-Agnostic Cloud-Init Bootstrap Engine
+# Supported OS: Ubuntu 22.04/24.04, Debian 12, Oracle Linux 8/9, RHEL/Rocky 9, Alpine 3.20
+# ==============================================================================
+
+package_update: true
+package_upgrade: false
+
+packages:
+  - curl
+  - wget
+  - jq
+  - iptables
+  - ufw
+  - fail2ban
+  - ca-certificates
+  - gnupg
+  - wireguard-tools
+  - qrencode
+  - net-tools
+  - git
+
+write_files:
+  - path: /etc/sysctl.d/99-sovereign-proxy.conf
+    permissions: '0644'
+    owner: root:root
+    content: |
+      # Network Performance & Kernel Hardening for Sovereign Proxy v4.0
+      net.core.default_qdisc = fq
+      net.ipv4.tcp_congestion_control = bbr
+      net.ipv4.ip_forward = 1
+      net.ipv6.conf.all.forwarding = 1
+
+      # Socket Buffer Sizes for High-Throughput Relays (10Gbps+)
+      net.core.rmem_max = 67108864
+      net.core.wmem_max = 67108864
+      net.core.rmem_default = 33554432
+      net.core.wmem_default = 33554432
+      net.core.optmem_max = 2048576
+      net.ipv4.tcp_rmem = 4096 87380 33554432
+      net.ipv4.tcp_wmem = 4096 65536 33554432
+      net.ipv4.udp_rmem_min = 8192
+      net.ipv4.udp_wmem_min = 8192
+
+      # TCP Window Scaling, Fast Open, and Resiliency
+      net.ipv4.tcp_window_scaling = 1
+      net.ipv4.tcp_timestamps = 1
+      net.ipv4.tcp_sack = 1
+      net.ipv4.tcp_fastopen = 3
+      net.ipv4.tcp_max_syn_backlog = 3240000
+      net.core.somaxconn = 65535
+      net.core.netdev_max_backlog = 300000
+      net.ipv4.tcp_tw_reuse = 1
+      net.ipv4.tcp_fin_timeout = 15
+
+      # Security & SynFlood Protection
+      net.ipv4.tcp_syncookies = 1
+      net.ipv4.conf.all.rp_filter = 1
+      net.ipv4.conf.default.rp_filter = 1
+      net.ipv4.conf.all.accept_source_route = 0
+      net.ipv4.conf.default.accept_source_route = 0
+      net.ipv4.conf.all.accept_redirects = 0
+      net.ipv4.conf.default.accept_redirects = 0
+      net.ipv4.conf.all.send_redirects = 0
+      net.ipv4.conf.default.send_redirects = 0
+
+  - path: /opt/sovereign/config/node.env
+    permissions: '0600'
+    owner: root:root
+    content: |
+      NODE_ID=${NODE_ID:-sovereign-node-auto}
+      CLUSTER_DOMAIN=${CLUSTER_DOMAIN:-neronet.darknero.com}
+      NODE_ROLE=${NODE_ROLE:-relay}
+      CONTROL_PLANE_ENDPOINT=${CONTROL_PLANE_ENDPOINT:-https://cp.darknero.com:8443}
+      REGISTRATION_TOKEN=${REGISTRATION_TOKEN:-""}
+      NOISE_PRIVATE_KEY=${NOISE_PRIVATE_KEY:-""}
+      DECOY_TARGET=${DECOY_TARGET:-aws.amazon.com}
+      HONEYPOT_PORT=8080
+      SSH_PORT=2222
+
+  - path: /etc/systemd/system/sovereign-node.service
+    permissions: '0644'
+    owner: root:root
+    content: |
+      [Unit]
+      Description=Sovereign Proxy Mesh Node Service
+      After=docker.service network-online.target
+      Wants=docker.service network-online.target
+
+      [Service]
+      Type=oneshot
+      RemainAfterExit=yes
+      WorkingDirectory=/opt/sovereign
+      ExecStart=/usr/bin/docker compose -f /opt/sovereign/docker-compose.yml up -d
+      ExecStop=/usr/bin/docker compose -f /opt/sovereign/docker-compose.yml down
+      TimeoutStartSec=0
+
+      [Install]
+      WantedBy=multi-user.target
+
+runcmd:
+  - mkdir -p /opt/sovereign/scripts /opt/sovereign/config /opt/sovereign/data /opt/sovereign/certs
+  - bash /opt/sovereign/scripts/bootstrap.sh
