@@ -1,0 +1,16 @@
+apiVersion: v2
+name: sovereign-mesh
+description: Enterprise Anti-Censorship Decentralized Mesh & Proxy Infrastructure
+type: application
+version: 4.0.0
+appVersion: "4.0.0"
+keywords:
+  - anti-censorship
+  - mesh-vpn
+  - proxy
+  - noise-protocol
+  - derp-relay
+  - kubernetes
+maintainers:
+  - name: NeroNet Architecture Team
+    email: ops@darknero.com

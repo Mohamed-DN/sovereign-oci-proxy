@@ -1,0 +1,212 @@
+const bcrypt = require('bcryptjs');
+const logger = require('../utils/logger');
+const config = require('../config/env');
+
+function seedDatabase(db) {
+  logger.info('Checking database seed data...');
+
+  const insertUser = db.prepare(`
+    INSERT OR IGNORE INTO users (
+      id, username, email, password_hash, role, tier, status,
+      bandwidth_quota_gb, bandwidth_used_bytes, max_nodes
+    ) VALUES (
+      @id, @username, @email, @password_hash, @role, @tier, @status,
+      @bandwidth_quota_gb, @bandwidth_used_bytes, @max_nodes
+    )
+  `);
+
+  const insertNode = db.prepare(`
+    INSERT OR IGNORE INTO nodes (
+      id, user_id, name, public_key, overlay_ipv4, overlay_ipv6,
+      role, ip_class, country_code, city, asn, endpoints,
+      onion_routing_enabled, is_healthy, is_quarantined, latency_ms
+    ) VALUES (
+      @id, @user_id, @name, @public_key, @overlay_ipv4, @overlay_ipv6,
+      @role, @ip_class, @country_code, @city, @asn, @endpoints,
+      COALESCE(@onion_routing_enabled, 0), @is_healthy, @is_quarantined, @latency_ms
+    )
+  `);
+
+  const insertApp = db.prepare(`
+    INSERT OR IGNORE INTO app_bundles (
+      id, user_id, name, type, tier, status,
+      endpoint_url, internal_port, cpu_cores, memory_mb, storage_gb,
+      scale_to_zero
+    ) VALUES (
+      @id, @user_id, @name, @type, @tier, @status,
+      @endpoint_url, @internal_port, @cpu_cores, @memory_mb, @storage_gb,
+      @scale_to_zero
+    )
+  `);
+
+  const insertAudit = db.prepare(`
+    INSERT INTO audit_events (
+      event_type, severity, actor_user_id, actor_username,
+      target_id, target_type, message, ip_address
+    ) VALUES (
+      @event_type, @severity, @actor_user_id, @actor_username,
+      @target_id, @target_type, @message, @ip_address
+    )
+  `);
+
+  const insertMetric = db.prepare(`
+    INSERT INTO system_metrics (
+      active_nodes, active_users, total_bandwidth_rx, total_bandwidth_tx,
+      cpu_usage_pct, memory_usage_mb, active_circuits, network_health_score
+    ) VALUES (
+      @active_nodes, @active_users, @total_bandwidth_rx, @total_bandwidth_tx,
+      @cpu_usage_pct, @memory_usage_mb, @active_circuits, @network_health_score
+    )
+  `);
+
+  const salt = bcrypt.genSaltSync(10);
+  const adminPassHash = bcrypt.hashSync(config.ADMIN_PASSWORD || 'admin_password', salt);
+  const demoPassHash = bcrypt.hashSync('Password123!', salt);
+
+  db.transaction(() => {
+    // 1. Super-Admin
+    insertUser.run({
+      id: 'usr-admin',
+      username: config.ADMIN_USERNAME || 'admin',
+      email: config.ADMIN_EMAIL || 'admin@darknero.com',
+      password_hash: adminPassHash,
+      role: 'super-admin',
+      tier: 'managed_cloud',
+      status: 'active',
+      bandwidth_quota_gb: 1000,
+      bandwidth_used_bytes: 0,
+      max_nodes: 50
+    });
+
+    // 2. Demo Users
+    insertUser.run({
+      id: 'usr-alice',
+      username: 'alice_homelab',
+      email: 'alice@homelab.local',
+      password_hash: demoPassHash,
+      role: 'user',
+      tier: 'hybrid_byos',
+      status: 'active',
+      bandwidth_quota_gb: 250,
+      bandwidth_used_bytes: 0,
+      max_nodes: 10
+    });
+
+    insertUser.run({
+      id: 'usr-bob',
+      username: 'bob_cloud',
+      email: 'bob@cloud.internal',
+      password_hash: demoPassHash,
+      role: 'user',
+      tier: 'cloud_managed',
+      status: 'active',
+      bandwidth_quota_gb: 500,
+      bandwidth_used_bytes: 0,
+      max_nodes: 25
+    });
+
+    // 3. Seed Nodes
+    insertNode.run({
+      id: 'svrn-node-seed1',
+      user_id: 'usr-admin',
+      name: 'US-East-Relay',
+      public_key: 'v1eXAmPLePuBL1cKeY1111111111111111111111111=',
+      overlay_ipv4: '100.64.0.1',
+      overlay_ipv6: 'fd7a:115c:a1e0::1',
+      role: 'EXIT_BRIDGE',
+      ip_class: 'DATACENTER',
+      country_code: 'US',
+      city: 'Ashburn',
+      asn: 13335,
+      endpoints: JSON.stringify(['198.51.100.1:51820', '198.51.100.1:443']),
+      onion_routing_enabled: 0,
+      is_healthy: 1,
+      is_quarantined: 0,
+      latency_ms: 12.4
+    });
+
+    insertNode.run({
+      id: 'svrn-node-seed2',
+      user_id: 'usr-alice',
+      name: 'Alice-MacBook-Pro',
+      public_key: 'a2eXAmPLePuBL1cKeY2222222222222222222222222=',
+      overlay_ipv4: '100.64.0.2',
+      overlay_ipv6: 'fd7a:115c:a1e0::2',
+      role: 'CLIENT_ORIGIN',
+      ip_class: 'RESIDENTIAL',
+      country_code: 'DE',
+      city: 'Frankfurt',
+      asn: 24940,
+      endpoints: JSON.stringify(['203.0.113.42:51820']),
+      onion_routing_enabled: 0,
+      is_healthy: 1,
+      is_quarantined: 0,
+      latency_ms: 24.1
+    });
+
+    // 4. Seed Apps
+    insertApp.run({
+      id: 'app-seed-guac',
+      user_id: 'usr-admin',
+      name: 'Guacamole Bastion',
+      type: 'guacamole',
+      tier: 'managed_cloud',
+      status: 'running',
+      endpoint_url: 'https://guacamole.internal.darknero.com',
+      internal_port: 8080,
+      cpu_cores: 2.0,
+      memory_mb: 4096,
+      storage_gb: 50,
+      scale_to_zero: 0
+    });
+
+    insertApp.run({
+      id: 'app-seed-nextcloud',
+      user_id: 'usr-alice',
+      name: 'Alice Private Cloud',
+      type: 'nextcloud',
+      tier: 'self_hosted_byos',
+      status: 'stopped',
+      endpoint_url: 'https://nextcloud.internal.darknero.com',
+      internal_port: 8080,
+      cpu_cores: 4.0,
+      memory_mb: 8192,
+      storage_gb: 500,
+      scale_to_zero: 1
+    });
+
+    // 5. Initial Audit Log if empty
+    const auditCount = db.prepare('SELECT count(*) as count FROM audit_events').get().count;
+    if (auditCount === 0) {
+      insertAudit.run({
+        event_type: 'SYSTEM_INIT',
+        severity: 'info',
+        actor_user_id: 'usr-admin',
+        actor_username: 'system',
+        target_id: 'database',
+        target_type: 'system',
+        message: 'NeroNet Enterprise Management Console database initialized.',
+        ip_address: '127.0.0.1'
+      });
+    }
+
+    // 6. Initial Metrics if empty
+    const metricCount = db.prepare('SELECT count(*) as count FROM system_metrics').get().count;
+    if (metricCount === 0) {
+      insertMetric.run({
+        active_nodes: 2,
+        active_users: 3,
+        total_bandwidth_rx: 104857600,
+        total_bandwidth_tx: 52428800,
+        cpu_usage_pct: 12.5,
+        memory_usage_mb: 512.0,
+        active_circuits: 5,
+        network_health_score: 98
+      });
+    }
+  })();
+
+  logger.info('Database seeding completed successfully.');
+}
+
+module.exports = { seedDatabase };

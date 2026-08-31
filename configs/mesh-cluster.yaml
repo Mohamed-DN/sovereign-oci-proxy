@@ -1,0 +1,230 @@
+# Sovereign Proxy v4.0 — Unified Multi-Cloud Cluster & Topology Specification
+# Standard: apiVersion sovereign.mesh/v4alpha1
+apiVersion: sovereign.mesh/v4alpha1
+kind: SovereignCluster
+metadata:
+  clusterName: neronet-global-mesh-prod
+  environment: production
+  owner: operations@darknero.com
+  version: "4.0.0"
+  description: "Enterprise multi-cloud decentralized mesh network spanning 6 global cloud providers"
+
+global:
+  domain: neronet.darknero.com
+  acmeEmail: admin@darknero.com
+  dnsProvider: cloudflare # cloudflare | route53 | custom
+  overlayCidr: "100.64.0.0/10"
+  encryption:
+    noiseSuite: Noise_IKpsk2_25519_ChaChaPoly_BLAKE2s
+    keyRotationHours: 24
+    handshakeTimeoutSec: 5
+    rekeyIntervalSec: 3600
+  telemetry:
+    prometheusEnabled: true
+    scrapeInterval: "15s"
+    metricsPort: 9090
+    lokiEndpoint: "https://loki.darknero.com/loki/api/v1/push"
+  security:
+    honeypotBanThreshold: 2
+    honeypotBanDurationHours: 72
+    sshPort: 2222
+    strictRfc1918Filter: true
+
+controlPlane:
+  replicas: 3
+  listenPort: 8443
+  grpcPort: 9443
+  distribution:
+    - provider: oci
+      region: eu-frankfurt-1
+      zone: FRA-AD-1
+      shape: VM.Standard.A1.Flex # ARM 4 OCPU / 24GB RAM
+      vcpu: 4
+      ramGb: 24
+    - provider: aws
+      region: eu-central-1
+      zone: eu-central-1a
+      shape: t4g.medium          # AWS Graviton2 ARM64
+      vcpu: 2
+      ramGb: 4
+    - provider: gcp
+      region: europe-west3
+      zone: europe-west3-a
+      shape: t2a-standard-2      # GCP Tau ARM64
+      vcpu: 2
+      ramGb: 8
+  stateStore:
+    type: raft-embedded
+    embeddedRaft: true
+    dataDir: /var/lib/sovereign/raft
+    electionTimeoutMs: 1000
+    heartbeatTimeoutMs: 250
+    backup:
+      provider: b2               # Backblaze B2 GPG Asymmetric Backup
+      bucket: sovereign-backups-prod
+      schedule: "0 3 * * *"
+
+relayFleet:
+  defaultPort: 443
+  stunPort: 3478
+  honeypotPort: 8080
+  heartbeatIntervalSec: 10
+  nodes:
+    - id: relay-eu-fra-oci
+      provider: oci
+      region: eu-frankfurt-1
+      zone: FRA-AD-1
+      shape: VM.Standard.A1.Flex
+      vcpu: 2
+      ramGb: 12
+      enableBBR: true
+      antiCensorship:
+        decoyDomain: "aws.amazon.com"
+        honeypotPort: 8080
+        fallbackDecoyPage: "cloud-monitor"
+      network:
+        publicIp: dynamic
+        allowSshPort: 2222
+        allowedInboundPorts: [80, 443, 2222, 3478, 8080]
+
+    - id: relay-us-east-aws
+      provider: aws
+      region: us-east-1
+      zone: us-east-1a
+      shape: t4g.small
+      vcpu: 2
+      ramGb: 2
+      enableBBR: true
+      antiCensorship:
+        decoyDomain: "www.microsoft.com"
+        honeypotPort: 8080
+        fallbackDecoyPage: "status-page"
+      network:
+        publicIp: elastic
+        allowSshPort: 2222
+        allowedInboundPorts: [80, 443, 2222, 3478, 8080]
+
+    - id: relay-sg-sin-gcp
+      provider: gcp
+      region: asia-southeast1
+      zone: asia-southeast1-a
+      shape: e2-standard-2
+      vcpu: 2
+      ramGb: 8
+      enableBBR: true
+      antiCensorship:
+        decoyDomain: "cloud.google.com"
+        honeypotPort: 8080
+        fallbackDecoyPage: "network-status"
+      network:
+        publicIp: static
+        allowSshPort: 2222
+        allowedInboundPorts: [80, 443, 2222, 3478, 8080]
+
+    - id: relay-de-nbg-hetzner
+      provider: hetzner
+      region: nbg1 # Nuremberg
+      zone: nbg1-dc3
+      shape: CAX21 # Ampere ARM64 4 vCPU, 8GB RAM
+      vcpu: 4
+      ramGb: 8
+      enableBBR: true
+      antiCensorship:
+        decoyDomain: "www.apple.com"
+        honeypotPort: 8080
+        fallbackDecoyPage: "cdn-edge"
+      network:
+        publicIp: primary
+        allowSshPort: 2222
+        allowedInboundPorts: [80, 443, 2222, 3478, 8080]
+
+    - id: relay-us-nyc-do
+      provider: digitalocean
+      region: nyc3
+      zone: nyc3-dc1
+      shape: s-2vcpu-4gb
+      vcpu: 2
+      ramGb: 4
+      enableBBR: true
+      antiCensorship:
+        decoyDomain: "www.cloudflare.com"
+        honeypotPort: 8080
+        fallbackDecoyPage: "waf-edge"
+      network:
+        publicIp: floating
+        allowSshPort: 2222
+        allowedInboundPorts: [80, 443, 2222, 3478, 8080]
+
+    - id: relay-jp-nrt-vultr
+      provider: vultr
+      region: nrt # Tokyo
+      zone: nrt-zone1
+      shape: vc2-2c-4gb
+      vcpu: 2
+      ramGb: 4
+      enableBBR: true
+      antiCensorship:
+        decoyDomain: "www.oracle.com"
+        honeypotPort: 8080
+        fallbackDecoyPage: "cloud-proxy"
+      network:
+        publicIp: reserved
+        allowSshPort: 2222
+        allowedInboundPorts: [80, 443, 2222, 3478, 8080]
+
+egressGateways:
+  defaultExitMode: country # country | specific_host | onion_3hop
+  supportedCountries:
+    - US
+    - DE
+    - SG
+    - JP
+    - GB
+    - FR
+    - NL
+  bogonFilter:
+    blockedCidrs:
+      - "10.0.0.0/8"
+      - "172.16.0.0/12"
+      - "192.168.0.0/16"
+      - "127.0.0.0/8"
+      - "169.254.0.0/16"
+      - "224.0.0.0/4"
+    blockedPorts: [25, 445, 137, 138, 139]
+  sandboxing:
+    engine: gvisor_netstack
+    enforceDoh: true
+    dohResolvers:
+      - "https://dns.quad9.net/dns-query"
+      - "https://cloudflare-dns.com/dns-query"
+      - "https://dns.google/dns-query"
+
+providers:
+  oci:
+    compartmentId: "${OCI_COMPARTMENT_ID}"
+    tenancyOcid: "${OCI_TENANCY_OCID}"
+    userOcid: "${OCI_USER_OCID}"
+    fingerprint: "${OCI_FINGERPRINT}"
+    privateKeyPath: "${OCI_KEY_PATH}"
+    vpcCidr: "10.40.0.0/16"
+    subnetCidr: "10.40.1.0/24"
+  aws:
+    region: "us-east-1"
+    vpcCidr: "10.41.0.0/16"
+    subnetCidr: "10.41.1.0/24"
+  gcp:
+    projectId: "${GCP_PROJECT_ID}"
+    region: "europe-west3"
+    vpcCidr: "10.42.0.0/16"
+    subnetCidr: "10.42.1.0/24"
+  digitalocean:
+    region: "nyc3"
+    vpcCidr: "10.43.0.0/16"
+  hetzner:
+    location: "nbg1"
+    networkCidr: "10.44.0.0/16"
+    subnetCidr: "10.44.1.0/24"
+  vultr:
+    region: "nrt"
+    vpcCidr: "10.45.0.0/16"
+    subnetCidr: "10.45.1.0/24"

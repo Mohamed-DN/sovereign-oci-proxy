@@ -1,0 +1,200 @@
+{
+  "log": {
+    "access": "/var/log/xray/access.log",
+    "error": "/var/log/xray/error.log",
+    "loglevel": "warning",
+    "dnsLog": false
+  },
+  "dns": {
+    "servers": [
+      {
+        "address": "https://dns.quad9.net/dns-query",
+        "domains": [
+          "geosite:geolocation-!cn"
+        ],
+        "expectIPs": [
+          "geoip:!cn"
+        ]
+      },
+      {
+        "address": "https://1.1.1.1/dns-query",
+        "domains": [
+          "geosite:openai",
+          "geosite:anthropic",
+          "geosite:netflix"
+        ]
+      },
+      {
+        "address": "https://8.8.8.8/dns-query"
+      },
+      {
+        "address": "9.9.9.9:5053"
+      },
+      "localhost"
+    ],
+    "queryStrategy": "UseIPv4",
+    "disableCache": false,
+    "disableFallback": false
+  },
+  "inbounds": [
+    {
+      "tag": "vless-reality-in",
+      "port": 443,
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "{{CLIENT_UUID}}",
+            "flow": "xtls-rprx-vision",
+            "email": "{{CLIENT_EMAIL}}",
+            "level": 0
+          }
+        ],
+        "decryption": "none",
+        "fallbacks": [
+          {
+            "dest": "127.0.0.1:8443",
+            "xver": 0
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "dest": "aws.amazon.com:443",
+          "xver": 0,
+          "serverNames": [
+            "aws.amazon.com",
+            "www.cisco.com",
+            "www.microsoft.com",
+            "gateway.icloud.com"
+          ],
+          "privateKey": "{{REALITY_PRIVATE_KEY}}",
+          "minClientVer": "1.8.0",
+          "maxClientVer": "",
+          "maxTimeDiff": 60000,
+          "shortIds": [
+            "{{REALITY_SHORT_ID}}"
+          ]
+        }
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [
+          "http",
+          "tls",
+          "quic"
+        ],
+        "metadataOnly": false,
+        "routeOnly": true
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "tag": "direct",
+      "protocol": "freedom",
+      "settings": {
+        "domainStrategy": "UseIPv4"
+      }
+    },
+    {
+      "tag": "warp-out",
+      "protocol": "wireguard",
+      "settings": {
+        "secretKey": "{{WARP_PRIVATE_KEY}}",
+        "address": [
+          "172.16.0.2/32"
+        ],
+        "peers": [
+          {
+            "publicKey": "{{WARP_PUBLIC_KEY}}",
+            "endpoint": "{{WARP_ENDPOINT}}"
+          }
+        ],
+        "mtu": 1280,
+        "reserved": [0, 0, 0]
+      }
+    },
+    {
+      "tag": "mesh-bridge",
+      "protocol": "freedom",
+      "settings": {
+        "domainStrategy": "AsIs"
+      },
+      "streamSettings": {
+        "sockopt": {
+          "mark": 51820
+        }
+      }
+    },
+    {
+      "tag": "blocked",
+      "protocol": "blackhole",
+      "settings": {
+        "response": {
+          "type": "http"
+        }
+      }
+    }
+  ],
+  "routing": {
+    "domainStrategy": "IPIfNonMatch",
+    "rules": [
+      {
+        "type": "field",
+        "outboundTag": "blocked",
+        "domain": [
+          "geosite:category-ads-all"
+        ]
+      },
+      {
+        "type": "field",
+        "outboundTag": "warp-out",
+        "domain": [
+          "geosite:openai",
+          "geosite:anthropic",
+          "geosite:netflix",
+          "geosite:disney",
+          "geosite:spotify"
+        ]
+      },
+      {
+        "type": "field",
+        "outboundTag": "mesh-bridge",
+        "ip": [
+          "10.0.0.0/8",
+          "172.16.0.0/12",
+          "192.168.0.0/16",
+          "100.64.0.0/10"
+        ]
+      },
+      {
+        "type": "field",
+        "outboundTag": "direct",
+        "network": "tcp,udp"
+      }
+    ]
+  },
+  "policy": {
+    "levels": {
+      "0": {
+        "handshake": 4,
+        "connIdle": 300,
+        "uplinkOnly": 2,
+        "downlinkOnly": 5,
+        "statsUserUplink": true,
+        "statsUserDownlink": true,
+        "bufferSize": 10240
+      }
+    },
+    "system": {
+      "statsInboundUplink": true,
+      "statsInboundDownlink": true,
+      "statsOutboundUplink": true,
+      "statsOutboundDownlink": true
+    }
+  }
+}

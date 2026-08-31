@@ -1,0 +1,55 @@
+{{- if .Values.edgeGateway.enabled -}}
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "sovereign.fullname" . }}-edge-gateway
+  labels:
+    {{- include "sovereign.labels" . | nindent 4 }}
+    app.kubernetes.io/component: edge-gateway
+spec:
+  selector:
+    matchLabels:
+      {{- include "sovereign.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: edge-gateway
+  template:
+    metadata:
+      labels:
+        {{- include "sovereign.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: edge-gateway
+    spec:
+      serviceAccountName: {{ include "sovereign.serviceAccountName" . }}
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+        - name: edge-gateway
+          image: "{{ .Values.global.imageRegistry }}/{{ .Values.edgeGateway.image.repository }}:{{ .Values.edgeGateway.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.global.imagePullPolicy }}
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+                - NET_RAW
+          ports:
+            - name: socks5-egress
+              containerPort: 1080
+              protocol: TCP
+            - name: http-egress
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: MESH_DOMAIN
+              value: {{ .Values.global.domain | quote }}
+          resources:
+            {{- toYaml .Values.edgeGateway.resources | nindent 12 }}
+          volumeMounts:
+            - name: dev-net-tun
+              mountPath: /dev/net/tun
+      volumes:
+        - name: dev-net-tun
+          hostPath:
+            path: /dev/net/tun
+{{- end }}

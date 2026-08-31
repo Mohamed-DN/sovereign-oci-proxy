@@ -1,0 +1,196 @@
+# Default values for sovereign-mesh.
+# This is a YAML-formatted file.
+
+global:
+  domain: neronet.darknero.com
+  imageRegistry: ghcr.io/mohamed-dn
+  imagePullPolicy: IfNotPresent
+  imagePullSecrets: []
+  clusterName: sovereign-prod-k8s
+  overlayCidr: "100.64.0.0/10"
+
+serviceAccount:
+  create: true
+  name: ""
+  annotations: {}
+
+controlPlane:
+  enabled: true
+  replicas: 3
+  image:
+    repository: sovereign-control-plane
+    tag: "4.0.0"
+  resources:
+    limits:
+      cpu: "2000m"
+      memory: "4Gi"
+    requests:
+      cpu: "250m"
+      memory: "512Mi"
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage: 80
+    behavior:
+      scaleUp:
+        stabilizationWindowSeconds: 0
+        percentValue: 100
+        podsValue: 2
+      scaleDown:
+        stabilizationWindowSeconds: 300
+        percentValue: 10
+        podsValue: 1
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 2
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/component
+                  operator: In
+                  values:
+                    - control-plane
+            topologyKey: "kubernetes.io/hostname"
+  service:
+    type: ClusterIP
+    port: 8443
+    grpcPort: 9443
+  persistence:
+    enabled: true
+    storageClass: ""
+    size: 20Gi
+
+relay:
+  enabled: true
+  replicas: 4
+  image:
+    repository: sovereign-relay
+    tag: "4.0.0"
+  hostNetwork: true # Line-rate kernel bypass for low-latency STUN & DERP
+  dnsPolicy: ClusterFirstWithHostNet
+  resources:
+    limits:
+      cpu: "4000m"
+      memory: "8Gi"
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+  autoscaling:
+    enabled: false
+    minReplicas: 4
+    maxReplicas: 32
+    targetCPUUtilizationPercentage: 65
+    targetMemoryUtilizationPercentage: 75
+    customMetrics:
+      activeConnections:
+        enabled: true
+        targetAverageValue: "2500"
+      bandwidthBytesPerSec:
+        enabled: false
+        targetAverageValue: "100Mi"
+    behavior:
+      scaleUp:
+        stabilizationWindowSeconds: 0
+        percentValue: 100
+        podsValue: 4
+      scaleDown:
+        stabilizationWindowSeconds: 300
+        percentValue: 10
+        podsValue: 1
+  keda:
+    enabled: false
+    minReplicaCount: 4
+    maxReplicaCount: 32
+    pollingInterval: 15
+    cooldownPeriod: 300
+    serverAddress: "http://prometheus-server.monitoring.svc.cluster.local:9090"
+    metricName: "sovereign_relay_active_connections"
+    query: "sum(rate(sovereign_derp_active_sockets[1m]))"
+    threshold: "2500"
+  antiCensorship:
+    decoyDomain: "aws.amazon.com"
+    honeypotPort: 8080
+  service:
+    type: LoadBalancer
+    annotations: {}
+    ports:
+      - name: https-derp
+        port: 443
+        targetPort: 443
+        protocol: TCP
+      - name: stun
+        port: 3478
+        targetPort: 3478
+        protocol: UDP
+      - name: honeypot
+        port: 8080
+        targetPort: 8080
+        protocol: TCP
+
+edgeGateway:
+  enabled: true
+  image:
+    repository: sovereign-edge-gateway
+    tag: "4.0.0"
+  securityContext:
+    privileged: false
+    capabilities:
+      add:
+        - NET_ADMIN
+        - NET_RAW
+  resources:
+    limits:
+      cpu: "1000m"
+      memory: "2Gi"
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+
+decoy:
+  enabled: true
+  replicas: 2
+  image:
+    repository: nginx
+    tag: "1.27-alpine"
+  resources:
+    limits:
+      cpu: "500m"
+      memory: "256Mi"
+    requests:
+      cpu: "50m"
+      memory: "64Mi"
+  service:
+    type: ClusterIP
+    port: 8443
+
+honeypot:
+  enabled: true
+  replicas: 2
+  image:
+    repository: sovereign-honeypot
+    tag: "4.0.0"
+  banThreshold: 2
+  banDurationHours: 72
+  resources:
+    limits:
+      cpu: "500m"
+      memory: "256Mi"
+    requests:
+      cpu: "50m"
+      memory: "64Mi"
+
+networkPolicy:
+  enabled: true
+
+monitoring:
+  serviceMonitor:
+    enabled: true
+    interval: "15s"
+    labels:
+      release: prometheus-stack

@@ -1,0 +1,55 @@
+{{- if and .Values.relay.enabled .Values.relay.autoscaling.enabled -}}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "sovereign.fullname" . }}-relay
+  labels:
+    {{- include "sovereign.labels" . | nindent 4 }}
+    app.kubernetes.io/component: relay
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: StatefulSet
+    name: {{ include "sovereign.fullname" . }}-relay
+  minReplicas: {{ .Values.relay.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.relay.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.relay.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.relay.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.relay.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.relay.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+    {{- if and .Values.relay.autoscaling.customMetrics .Values.relay.autoscaling.customMetrics.activeConnections.enabled }}
+    - type: Pods
+      pods:
+        metric:
+          name: sovereign_relay_active_connections
+        target:
+          type: AverageValue
+          averageValue: {{ .Values.relay.autoscaling.customMetrics.activeConnections.targetAverageValue | quote }}
+    {{- end }}
+    {{- if and .Values.relay.autoscaling.customMetrics .Values.relay.autoscaling.customMetrics.bandwidthBytesPerSec.enabled }}
+    - type: Pods
+      pods:
+        metric:
+          name: sovereign_relay_bandwidth_bytes_per_sec
+        target:
+          type: AverageValue
+          averageValue: {{ .Values.relay.autoscaling.customMetrics.bandwidthBytesPerSec.targetAverageValue | quote }}
+    {{- end }}
+  {{- if .Values.relay.autoscaling.behavior }}
+  behavior:
+    {{- toYaml .Values.relay.autoscaling.behavior | nindent 4 }}
+  {{- end }}
+{{- end }}

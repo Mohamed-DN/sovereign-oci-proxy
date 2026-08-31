@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: sovereign-control-plane
+  labels:
+    app.kubernetes.io/name: sovereign-mesh
+    app.kubernetes.io/component: control-plane
+spec:
+  type: ClusterIP
+  ports:
+    - name: http-api
+      port: 8443
+      targetPort: http-api
+      protocol: TCP
+    - name: grpc-api
+      port: 9443
+      targetPort: grpc-api
+      protocol: TCP
+    - name: metrics
+      port: 9090
+      targetPort: metrics
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: sovereign-mesh
+    app.kubernetes.io/component: control-plane

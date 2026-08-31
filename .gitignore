@@ -1,0 +1,37 @@
+# AI Agent Metadata & Logs (Internal Development)
+.agents/
+*.log
+.system_generated/
+__pycache__/
+*.pyc
+.DS_Store
+
+# Go Binaries & Artifacts
+bin/
+*.exe
+*.test
+*.out
+
+# Node / Web Artifacts & Dependencies
+node_modules/
+dist/
+.vite/
+.next/
+
+# SQLite & Persistent Data Stores
+*.db
+*.db-journal
+*.db-wal
+*.sqlite
+*.sqlite3
+console/data/*.db
+
+# Environment Local Overrides
+.env
+.env.local
+
+# Test & Coverage Outputs
+coverage.out
+coverage.html
+*.tap
+*e2e_results*.json

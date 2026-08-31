@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sovereign-control-plane
+  labels:
+    app.kubernetes.io/name: sovereign-mesh
+    app.kubernetes.io/component: control-plane
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sovereign-mesh
+      app.kubernetes.io/component: control-plane
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: sovereign-mesh
+        app.kubernetes.io/component: control-plane
+    spec:
+      containers:
+        - name: control-plane
+          image: ghcr.io/mohamed-dn/sovereign-control-plane:4.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http-api
+              containerPort: 8443
+              protocol: TCP
+            - name: grpc-api
+              containerPort: 9443
+              protocol: TCP
+            - name: metrics
+              containerPort: 9090
+              protocol: TCP
+          env:
+            - name: MESH_DOMAIN
+              value: "neronet.darknero.com"
+            - name: CLUSTER_NAME
+              value: "neronet-global-mesh-prod"
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http-api
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http-api
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "2000m"
+              memory: "4Gi"
+          volumeMounts:
+            - name: raft-storage
+              mountPath: /var/lib/sovereign/raft
+      volumes:
+        - name: raft-storage
+          emptyDir: {}
