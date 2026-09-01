@@ -14,6 +14,7 @@ export const MOCK_USERS = [
     bandwidth_quota_gb: 5000,
     bandwidth_used_bytes: 1428571428571, // ~1.42 TB
     max_nodes: 50,
+    bypass_apps: ["com.apple.Music", "com.spotify.client", "192.168.1.0/24"],
     created_at: "2026-01-15T08:00:00Z",
     updated_at: "2026-08-31T09:30:00Z"
   },
@@ -27,6 +28,7 @@ export const MOCK_USERS = [
     bandwidth_quota_gb: 500,
     bandwidth_used_bytes: 184560000000, // ~184 GB
     max_nodes: 5,
+    bypass_apps: ["com.apple.Music", "com.spotify.client", "10.0.0.0/8"],
     created_at: "2026-03-10T12:00:00Z",
     updated_at: "2026-08-31T10:15:00Z"
   },
@@ -40,6 +42,7 @@ export const MOCK_USERS = [
     bandwidth_quota_gb: 1000,
     bandwidth_used_bytes: 412000000000, // ~412 GB
     max_nodes: 10,
+    bypass_apps: ["com.slack.Slack", "com.zoom.Zoom"],
     created_at: "2026-04-01T14:30:00Z",
     updated_at: "2026-08-30T16:00:00Z"
   },
@@ -53,6 +56,7 @@ export const MOCK_USERS = [
     bandwidth_quota_gb: 300,
     bandwidth_used_bytes: 98000000000,
     max_nodes: 5,
+    bypass_apps: ["com.steam.client"],
     created_at: "2026-05-12T09:15:00Z",
     updated_at: "2026-08-29T11:45:00Z"
   },
@@ -66,6 +70,7 @@ export const MOCK_USERS = [
     bandwidth_quota_gb: 1000,
     bandwidth_used_bytes: 998000000000,
     max_nodes: 8,
+    bypass_apps: [],
     created_at: "2026-06-20T17:00:00Z",
     updated_at: "2026-08-28T08:00:00Z"
   }
@@ -427,6 +432,10 @@ export const MOCK_NODES = [
     cpu_usage_pct: 98.4,
     memory_usage_pct: 92.1,
     battery_pct: 12.0,
+    kill_switch_enabled: true,
+    risk_score: 95,
+    risk_factors: ["KERNEL_INTEGRITY", "IMPOSSIBLE_TRAVEL"],
+    is_peered: false,
     os_type: "linux",
     created_at: "2026-04-10T08:00:00Z"
   },
@@ -455,6 +464,10 @@ export const MOCK_NODES = [
     cpu_usage_pct: 55.3,
     memory_usage_pct: 78.4,
     battery_pct: 14.0,
+    kill_switch_enabled: false,
+    risk_score: 62,
+    risk_factors: ["RTT_DRIFT"],
+    is_peered: false,
     os_type: "android",
     created_at: "2026-05-15T11:00:00Z"
   },
@@ -509,8 +522,145 @@ export const MOCK_NODES = [
     cpu_usage_pct: 31.2,
     memory_usage_pct: 49.0,
     battery_pct: 100.0,
+    kill_switch_enabled: true,
+    risk_score: 18,
+    risk_factors: [],
+    is_peered: false,
     os_type: "linux",
     created_at: "2026-06-20T17:30:00Z"
+  },
+  // Cross-Mesh Peered Nodes (Purple Ingress Nodes)
+  {
+    id: "node_peered_apex_01",
+    user_id: "usr_admin_01",
+    name: "apex-mesh-gw-fra",
+    public_key: "k9V+q32M4r1Z4w9v9G5e1bL3mN7oP9qR2sT4uV8wK7l=",
+    preshared_key: "p9qR2sT4uV8wK7lF8X+q32M4r1Z4w9v9G5e1bL3mN7o=",
+    overlay_ipv4: "100.64.120.10",
+    overlay_ipv6: "fd7a:115c:a1e0::120:10",
+    role: "PEERED",
+    ip_class: "DATACENTER",
+    country_code: "DE",
+    city: "Frankfurt",
+    asn: 24940,
+    endpoints: ["198.51.100.220:51820"],
+    is_healthy: 1,
+    is_quarantined: 0,
+    quarantine_reason: null,
+    last_heartbeat: new Date().toISOString(),
+    latency_ms: 22.4,
+    tx_bytes: 142000000000,
+    rx_bytes: 189000000000,
+    cpu_usage_pct: 21.5,
+    memory_usage_pct: 42.0,
+    battery_pct: 100.0,
+    kill_switch_enabled: true,
+    risk_score: 12,
+    risk_factors: [],
+    is_peered: true,
+    peering_id: "peer_ag_01",
+    peering_mesh_name: "Apex-Cyber-Europe",
+    os_type: "linux",
+    created_at: "2026-08-20T10:00:00Z"
+  },
+  {
+    id: "node_peered_apex_02",
+    user_id: "usr_admin_01",
+    name: "apex-node-par-02",
+    public_key: "j8W+q32M4r1Z4w9v9G5e1bL3mN7oP9qR2sT4uV8wK7l=",
+    preshared_key: "q9rR2sT4uV8wK7lF8X+q32M4r1Z4w9v9G5e1bL3mN7o=",
+    overlay_ipv4: "100.64.120.11",
+    overlay_ipv6: "fd7a:115c:a1e0::120:11",
+    role: "PEERED",
+    ip_class: "RESIDENTIAL",
+    country_code: "FR",
+    city: "Paris",
+    asn: 12322,
+    endpoints: ["198.51.100.221:51820"],
+    is_healthy: 1,
+    is_quarantined: 0,
+    quarantine_reason: null,
+    last_heartbeat: new Date().toISOString(),
+    latency_ms: 26.8,
+    tx_bytes: 78000000000,
+    rx_bytes: 94000000000,
+    cpu_usage_pct: 18.0,
+    memory_usage_pct: 36.5,
+    battery_pct: 100.0,
+    kill_switch_enabled: false,
+    risk_score: 15,
+    risk_factors: [],
+    is_peered: true,
+    peering_id: "peer_ag_01",
+    peering_mesh_name: "Apex-Cyber-Europe",
+    os_type: "linux",
+    created_at: "2026-08-20T10:00:00Z"
+  },
+  {
+    id: "node_peered_nordic_01",
+    user_id: "usr_admin_01",
+    name: "nordic-sovereign-hel-01",
+    public_key: "h7U+q32M4r1Z4w9v9G5e1bL3mN7oP9qR2sT4uV8wK7l=",
+    preshared_key: "r9sR2sT4uV8wK7lF8X+q32M4r1Z4w9v9G5e1bL3mN7o=",
+    overlay_ipv4: "100.64.130.20",
+    overlay_ipv6: "fd7a:115c:a1e0::130:20",
+    role: "PEERED",
+    ip_class: "DATACENTER",
+    country_code: "FI",
+    city: "Helsinki",
+    asn: 16125,
+    endpoints: ["198.51.100.230:51820"],
+    is_healthy: 1,
+    is_quarantined: 0,
+    quarantine_reason: null,
+    last_heartbeat: new Date().toISOString(),
+    latency_ms: 31.8,
+    tx_bytes: 210000000000,
+    rx_bytes: 245000000000,
+    cpu_usage_pct: 25.0,
+    memory_usage_pct: 48.0,
+    battery_pct: 100.0,
+    kill_switch_enabled: true,
+    risk_score: 8,
+    risk_factors: [],
+    is_peered: true,
+    peering_id: "peer_ag_02",
+    peering_mesh_name: "Nordic-Sovereign-Net",
+    os_type: "linux",
+    created_at: "2026-08-25T14:00:00Z"
+  },
+  {
+    id: "node_peered_tokyo_01",
+    user_id: "usr_admin_01",
+    name: "tokyo-redteam-canary",
+    public_key: "g6T+q32M4r1Z4w9v9G5e1bL3mN7oP9qR2sT4uV8wK7l=",
+    preshared_key: "s9tR2sT4uV8wK7lF8X+q32M4r1Z4w9v9G5e1bL3mN7o=",
+    overlay_ipv4: "100.64.200.5",
+    overlay_ipv6: "fd7a:115c:a1e0::200:5",
+    role: "PEERED",
+    ip_class: "RESIDENTIAL",
+    country_code: "JP",
+    city: "Tokyo",
+    asn: 2516,
+    endpoints: ["198.51.100.240:51820"],
+    is_healthy: 0,
+    is_quarantined: 1,
+    quarantine_reason: "High Risk Score (78/100): Geolocation drift anomaly detected",
+    last_heartbeat: new Date().toISOString(),
+    latency_ms: 184.2,
+    tx_bytes: 34000000,
+    rx_bytes: 18000000,
+    cpu_usage_pct: 88.0,
+    memory_usage_pct: 84.0,
+    battery_pct: 45.0,
+    kill_switch_enabled: true,
+    risk_score: 78,
+    risk_factors: ["IMPOSSIBLE_TRAVEL", "GEO_DRIFT"],
+    is_peered: true,
+    peering_id: "peer_ag_03",
+    peering_mesh_name: "Tokyo-RedTeam-Lab",
+    os_type: "linux",
+    created_at: "2026-08-31T08:00:00Z"
   }
 ];
 
@@ -795,3 +945,232 @@ export const MOCK_NERODROP_HISTORY = [
     timestamp: new Date(Date.now() - 86400000).toISOString()
   }
 ];
+
+export const MOCK_PEERING_AGREEMENTS = [
+  {
+    id: "peer_ag_01",
+    remote_mesh_name: "Apex-Cyber-Europe",
+    remote_endpoint: "https://mesh.apex-cyber.de:8443",
+    remote_public_key: "ed25519_apex_9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b",
+    scope_mode: "SPECIFIC_SUBNETS",
+    shared_subnets: ["100.64.120.0/24"],
+    shared_devices_count: 2,
+    latency_ms: 22.4,
+    status: "active",
+    expires_at: "2026-10-01T00:00:00Z",
+    created_at: "2026-08-20T10:00:00Z"
+  },
+  {
+    id: "peer_ag_02",
+    remote_mesh_name: "Nordic-Sovereign-Net",
+    remote_endpoint: "https://mesh.nordic-sec.fi:8443",
+    remote_public_key: "ed25519_nordic_1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a",
+    scope_mode: "ALL",
+    shared_subnets: ["100.64.130.0/24"],
+    shared_devices_count: 1,
+    latency_ms: 31.8,
+    status: "active",
+    expires_at: "2026-09-30T00:00:00Z",
+    created_at: "2026-08-25T14:00:00Z"
+  },
+  {
+    id: "peer_ag_03",
+    remote_mesh_name: "Tokyo-RedTeam-Lab",
+    remote_endpoint: "https://tokyo.mesh.darknero.jp:8443",
+    remote_public_key: "ed25519_tokyo_3c2e1d0f9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d",
+    scope_mode: "SPECIFIC_DEVICES",
+    shared_subnets: ["100.64.200.0/24"],
+    shared_devices_count: 1,
+    latency_ms: 184.2,
+    status: "pending",
+    expires_at: "2026-09-07T00:00:00Z",
+    created_at: "2026-08-31T08:00:00Z"
+  }
+];
+
+export const MOCK_RISK_EVENTS = [
+  {
+    id: "risk_ev_01",
+    node_id: "node_quarantined_test",
+    node_name: "compromised-kali-box",
+    user_id: "usr_bob_02",
+    event_type: "IMPOSSIBLE_TRAVEL",
+    velocity_km_h: 1840.5,
+    geo_from: "Frankfurt, DE",
+    geo_to: "Tokyo, JP",
+    time_delta_min: 14,
+    risk_delta: 50,
+    current_score: 95,
+    severity: "critical",
+    auto_quarantined: true,
+    details: "Device IP geolocation jumped 9,330 km in 14 minutes (>1000 km/h threshold). Auto-quarantine activated.",
+    timestamp: new Date(Date.now() - 600000).toISOString()
+  },
+  {
+    id: "risk_ev_02",
+    node_id: "node_peered_tokyo_01",
+    node_name: "tokyo-redteam-canary",
+    user_id: "usr_admin_01",
+    event_type: "GEO_DRIFT",
+    velocity_km_h: 1220.0,
+    geo_from: "Tokyo, JP",
+    geo_to: "Sydney, AU",
+    time_delta_min: 25,
+    risk_delta: 50,
+    current_score: 78,
+    severity: "critical",
+    auto_quarantined: true,
+    details: "Peered node crossed international routing boundaries with sudden ASN flip (ASN 2516 -> ASN 13335).",
+    timestamp: new Date(Date.now() - 1200000).toISOString()
+  },
+  {
+    id: "risk_ev_03",
+    node_id: "node_degraded_carol",
+    node_name: "carols-galaxy-s24-ultra",
+    user_id: "usr_carol_03",
+    event_type: "RTT_ANOMALY",
+    rtt_variance_ms: 185.4,
+    risk_delta: 25,
+    current_score: 62,
+    severity: "warning",
+    auto_quarantined: false,
+    details: "High latency variance detected: RTT increased from 18ms to 185ms over 3 successive keepalive probes.",
+    timestamp: new Date(Date.now() - 1800000).toISOString()
+  },
+  {
+    id: "risk_ev_04",
+    node_id: "node_quarantined_test",
+    node_name: "compromised-kali-box",
+    user_id: "usr_bob_02",
+    event_type: "KERNEL_INTEGRITY",
+    risk_delta: 45,
+    current_score: 95,
+    severity: "critical",
+    auto_quarantined: true,
+    details: "Unsigned kernel module loaded in WireGuard namespace (SIG_SEC_0x9A).",
+    timestamp: new Date(Date.now() - 3600000).toISOString()
+  }
+];
+
+export const MOCK_GEOFENCING_POLICIES = [
+  { country_code: "US", country_name: "United States", action: "ALLOW", node_count: 6, egress_allowed: true, updated_at: "2026-08-30T10:00:00Z" },
+  { country_code: "DE", country_name: "Germany", action: "ALLOW", node_count: 4, egress_allowed: true, updated_at: "2026-08-30T10:00:00Z" },
+  { country_code: "JP", country_name: "Japan", action: "ALLOW", node_count: 4, egress_allowed: true, updated_at: "2026-08-30T10:00:00Z" },
+  { country_code: "CH", country_name: "Switzerland", action: "ALLOW", node_count: 2, egress_allowed: true, updated_at: "2026-08-30T10:00:00Z" },
+  { country_code: "NL", country_name: "Netherlands", action: "QUARANTINE", node_count: 2, egress_allowed: false, updated_at: "2026-08-31T06:00:00Z" },
+  { country_code: "SG", country_name: "Singapore", action: "ALLOW", node_count: 2, egress_allowed: true, updated_at: "2026-08-30T10:00:00Z" },
+  { country_code: "FR", country_name: "France", action: "ALLOW", node_count: 1, egress_allowed: true, updated_at: "2026-08-30T10:00:00Z" },
+  { country_code: "FI", country_name: "Finland", action: "ALLOW", node_count: 1, egress_allowed: true, updated_at: "2026-08-30T10:00:00Z" },
+  { country_code: "GB", country_name: "United Kingdom", action: "ALLOW", node_count: 1, egress_allowed: true, updated_at: "2026-08-30T10:00:00Z" },
+  { country_code: "CA", country_name: "Canada", action: "ALLOW", node_count: 0, egress_allowed: true, updated_at: "2026-08-30T10:00:00Z" },
+  { country_code: "AU", country_name: "Australia", action: "ALLOW", node_count: 0, egress_allowed: true, updated_at: "2026-08-30T10:00:00Z" },
+  { country_code: "RU", country_name: "Russian Federation", action: "BLOCK", node_count: 0, egress_allowed: false, updated_at: "2026-08-28T00:00:00Z" },
+  { country_code: "CN", country_name: "China", action: "BLOCK", node_count: 0, egress_allowed: false, updated_at: "2026-08-28T00:00:00Z" },
+  { country_code: "KP", country_name: "North Korea", action: "BLOCK", node_count: 0, egress_allowed: false, updated_at: "2026-08-28T00:00:00Z" },
+  { country_code: "IR", country_name: "Iran", action: "BLOCK", node_count: 0, egress_allowed: false, updated_at: "2026-08-28T00:00:00Z" }
+];
+
+export const MOCK_SOVEREIGN_CLOUD_PC = [
+  {
+    id: "cpc_selkies_01",
+    user_id: "usr_admin_01",
+    name: "Sovereign Cloud PC Ultra (Selkies-GStreamer)",
+    tier: "managed_cloud",
+    status: "running",
+    gpu_model: "NVIDIA RTX A6000 (vGPU Passthrough)",
+    vcpus: 8,
+    ram_gb: 32,
+    storage_gb: 500,
+    resolution: "3840x2160@120Hz",
+    codec: "AV1 / H.264 WebRTC Low Latency",
+    fps: 120,
+    latency_ms: 6.4,
+    active_sessions: 1,
+    custom_domain: "desktop.darknero.net",
+    sso_enforced: true,
+    webrtc_signaling_url: "wss://webrtc.neronet.darknero.com/ws/selkies/cpc_selkies_01",
+    stun_turn_servers: [
+      { urls: "stun:stun.neronet.darknero.com:3478" },
+      { urls: "turn:turn.neronet.darknero.com:3478", username: "svrn_turn_user", credential: "svrn_turn_password_2026" }
+    ],
+    last_accessed_at: new Date().toISOString(),
+    created_at: "2026-02-10T10:00:00Z"
+  },
+  {
+    id: "cpc_selkies_02",
+    user_id: "usr_alice_01",
+    name: "Alices Dev Station (Selkies GPU)",
+    tier: "hybrid_byos",
+    status: "running",
+    gpu_model: "NVIDIA T4 Tensor Core",
+    vcpus: 4,
+    ram_gb: 16,
+    storage_gb: 250,
+    resolution: "2560x1440@60Hz",
+    codec: "H.264 WebRTC Hardware Accelerated",
+    fps: 60,
+    latency_ms: 12.8,
+    active_sessions: 0,
+    custom_domain: "alice-workstation.darknero.net",
+    sso_enforced: true,
+    webrtc_signaling_url: "wss://webrtc.neronet.darknero.com/ws/selkies/cpc_selkies_02",
+    stun_turn_servers: [
+      { urls: "stun:stun.neronet.darknero.com:3478" }
+    ],
+    last_accessed_at: new Date(Date.now() - 3600000).toISOString(),
+    created_at: "2026-03-20T14:00:00Z"
+  }
+];
+
+export const MOCK_CUSTOM_DOMAINS = [
+  {
+    domain: "desktop.company.com",
+    cpc_id: "cpc_selkies_01",
+    cpc_name: "Sovereign Cloud PC Ultra",
+    dns_status: "verified",
+    ssl_status: "active",
+    sso_enforced: true,
+    otp_gateway_required: true,
+    cname_target: "cpc-ingress.neronet.darknero.com",
+    created_at: "2026-08-15T00:00:00Z"
+  },
+  {
+    domain: "workstation.darknero.net",
+    cpc_id: "cpc_selkies_02",
+    cpc_name: "Alices Dev Station",
+    dns_status: "verified",
+    ssl_status: "active",
+    sso_enforced: true,
+    otp_gateway_required: false,
+    cname_target: "cpc-ingress.neronet.darknero.com",
+    created_at: "2026-08-20T00:00:00Z"
+  }
+];
+
+export const MOCK_NERONUKE_CONFIG = {
+  tier1_scheduled_kill: {
+    armed: false,
+    scheduled_at: null,
+    phrase: "DELETE MY ACCOUNT"
+  },
+  tier1b_personal_dms: {
+    armed: true,
+    heartbeat_interval_seconds: 2592000, // 30 days
+    last_heartbeat_at: new Date(Date.now() - 3600000 * 48).toISOString(),
+    steganography_mode: "shadow_password"
+  },
+  tier2_owner_dms: {
+    armed: false,
+    heartbeat_interval_seconds: 604800, // 7 days
+    last_heartbeat_at: new Date().toISOString(),
+    webhook_url: "https://matrix.secure.darknero.net/_matrix/hook/canary-alert"
+  },
+  tier3_warrant_canary: {
+    canary_url: "/.well-known/canary.txt",
+    last_signed_at: "2026-08-31T00:00:00Z",
+    signature_valid: true,
+    public_key_fingerprint: "ED25519:9A8B7C6D5E4F3A2B1C0D9E8F7A6B5C4D3E2F1A0B",
+    content: "As of August 31, 2026, the NeroNet Sovereign Mesh Enterprise Management Console has NOT received any National Security Letters, FISA court orders, secret gag orders, or undisclosed government warrants. All data remains encrypted under sovereign keys."
+  }
+};
+

@@ -1,23 +1,37 @@
 const express = require('express');
 const router = express.Router();
-const { getDatabase } = require('../db/index');
+const { checkHealth } = require('../db/index');
+const { checkValkeyHealth } = require('../db/valkey');
 
-router.get('/health', (req, res) => {
-  let dbStatus = 'connected';
+router.get('/health', async (req, res) => {
+  let dbHealth = { status: 'disconnected', type: 'unknown' };
+  let valkeyHealth = { status: 'disconnected', type: 'unknown' };
   let isHealthy = true;
 
   try {
-    const db = getDatabase();
-    db.prepare('SELECT 1').get();
+    dbHealth = await checkHealth();
+    if (dbHealth.status === 'disconnected') {
+      isHealthy = false;
+    }
   } catch (err) {
-    dbStatus = 'disconnected';
+    dbHealth = { status: 'disconnected', type: 'unknown', error: err.message };
     isHealthy = false;
+  }
+
+  try {
+    valkeyHealth = await checkValkeyHealth();
+  } catch (err) {
+    valkeyHealth = { status: 'disconnected', type: 'unknown', error: err.message };
   }
 
   const responseData = {
     status: isHealthy ? 'ok' : 'degraded',
     version: '4.0.0',
-    database: dbStatus,
+    database: dbHealth.status,
+    database_type: dbHealth.type,
+    postgis: dbHealth.postgis || 'inactive',
+    valkey: valkeyHealth.status,
+    valkey_type: valkeyHealth.type,
     uptime_seconds: Math.floor(process.uptime()),
     timestamp: new Date().toISOString()
   };

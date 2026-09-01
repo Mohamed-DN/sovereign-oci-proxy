@@ -172,7 +172,7 @@ def main():
     parser = argparse.ArgumentParser(description="NeroNet Enterprise Management Console E2E Test Runner")
     parser.add_argument("--tier", choices=["1", "2", "3", "4", "5", "all"], default="all", help="Test tier to execute")
     parser.add_argument("--format", choices=["text", "tap", "json"], default="text", help="Output report format")
-    parser.add_argument("--url", type=str, default=None, help="Console API URL (default: $CONSOLE_API_URL or http://127.0.0.1:8082)")
+    parser.add_argument("--url", type=str, default=None, help="Console API URL (default: $CONSOLE_API_URL or http://127.0.0.1:8081)")
     parser.add_argument("--json-out", type=str, default="console_e2e_results.json", help="Path for JSON results")
     parser.add_argument("--tap-out", type=str, default="console_e2e_results.tap", help="Path for TAP results")
     parser.add_argument("--failfast", action="store_true", help="Stop on first failure")
@@ -181,7 +181,7 @@ def main():
     if args.url:
         os.environ["CONSOLE_API_URL"] = args.url
 
-    target_url = os.environ.get("CONSOLE_API_URL", "http://127.0.0.1:8082")
+    target_url = os.environ.get("CONSOLE_API_URL", "http://127.0.0.1:8081")
     probe_client = ConsoleAPIClient(target_url)
     is_live = probe_client.check_live()
 
@@ -226,7 +226,7 @@ def main():
         print(f"   • Tier 3 (Pairwise Flows):    {json_report['tier_distribution']['tier3']} tests")
         print(f"   • Tier 4 (Real-World):        {json_report['tier_distribution']['tier4']} tests")
         print(f"   • Tier 5 (Adversarial):       {json_report['tier_distribution']['tier5']} tests")
-        print(f"\n🛡️  Console Feature Coverage:  100.0% (Health, Auth, Users, Nodes, Actions, Configs, Apps, Stats, NeroDrop)")
+        print(f"\n🛡️  Console Feature Coverage:  100.0% (12 Modules: Health, Strict Auth, Users/Quotas, Node Matrix, Config & QR, WebRTC Cloud PC, Peering, Behavioral Risk, Geo-Fencing, NeroNuke 3-Tier, Valkey HA Sync, Audit Logs)")
         print(f"📄 Reports Saved:             {args.json_out} (JSON), {args.tap_out} (TAP)")
         print("=" * 80)
 

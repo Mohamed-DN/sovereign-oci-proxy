@@ -16,6 +16,16 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: false
+    sourcemap: false,
+    chunkSizeWarningLimit: 1500,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          three_vendor: ['three', 'react-force-graph-3d', 'three-spritetext'],
+          recharts_vendor: ['recharts'],
+          lucide_vendor: ['lucide-react']
+        }
+      }
+    }
   }
 });

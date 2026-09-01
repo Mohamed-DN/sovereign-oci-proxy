@@ -179,11 +179,7 @@ async function generateQrCodeDataUrl(text) {
   }
 }
 
-/**
- * Allocates next unique VIP in overlay range (100.64.0.0/10 and fd7a:115c:a1e0::/64).
- */
-function allocateNextVip(db) {
-  const existingVips = db.prepare('SELECT overlay_ipv4, overlay_ipv6 FROM nodes').all();
+function allocateVipFromRows(existingVips = []) {
   const usedIpv4 = new Set(existingVips.map(r => r.overlay_ipv4 ? r.overlay_ipv4.trim() : null).filter(Boolean));
   const usedIpv6 = new Set(existingVips.map(r => r.overlay_ipv6 ? r.overlay_ipv6.trim().toLowerCase() : null).filter(Boolean));
 
@@ -218,10 +214,30 @@ function allocateNextVip(db) {
   };
 }
 
+/**
+ * Allocates next unique VIP in overlay range (100.64.0.0/10 and fd7a:115c:a1e0::/64).
+ */
+function allocateNextVip(dbOrPool) {
+  if (!dbOrPool) {
+    return allocateVipFromRows([]);
+  }
+  if (typeof dbOrPool.query === 'function' && typeof dbOrPool.prepare !== 'function') {
+    return dbOrPool.query('SELECT overlay_ipv4, overlay_ipv6 FROM nodes').then(res => {
+      return allocateVipFromRows(res.rows || []);
+    });
+  }
+  if (typeof dbOrPool.prepare === 'function') {
+    const existingVips = dbOrPool.prepare('SELECT overlay_ipv4, overlay_ipv6 FROM nodes').all();
+    return allocateVipFromRows(existingVips);
+  }
+  return allocateVipFromRows([]);
+}
+
 module.exports = {
   generateCurve25519Keypair,
   buildWireGuardConfig,
   buildNoiseJsonProfile,
   generateQrCodeDataUrl,
-  allocateNextVip
+  allocateNextVip,
+  allocateVipFromRows
 };

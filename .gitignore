@@ -1,10 +1,12 @@
 # AI Agent Metadata & Logs (Internal Development)
 .agents/
+**/.agents/
 *.log
 .system_generated/
 __pycache__/
 *.pyc
 .DS_Store
+**/.DS_Store
 
 # Go Binaries & Artifacts
 bin/
@@ -14,24 +16,43 @@ bin/
 
 # Node / Web Artifacts & Dependencies
 node_modules/
+**/node_modules/
 dist/
+**/dist/
 .vite/
+**/.vite/
 .next/
+**/.next/
 
 # SQLite & Persistent Data Stores
 *.db
 *.db-journal
 *.db-wal
+*.db-shm
 *.sqlite
 *.sqlite3
-console/data/*.db
+data/*.db
+data/*.db-wal
+data/*.db-shm
+**/data/*.db
+**/data/*.db-wal
+**/data/*.db-shm
+!**/data/.gitkeep
 
 # Environment Local Overrides
 .env
 .env.local
+**/.env
+**/.env.local
+!.env.example
+!**/.env.example
 
 # Test & Coverage Outputs
 coverage.out
 coverage.html
 *.tap
+**/*.tap
 *e2e_results*.json
+**/*e2e_results*.json
+adversarial_metrics.json
+**/adversarial_metrics.json

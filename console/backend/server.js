@@ -1,3 +1,4 @@
+const http = require('http');
 const express = require('express');
 const config = require('./config/env');
 const logger = require('./utils/logger');
@@ -5,9 +6,12 @@ const corsMiddleware = require('./middleware/cors');
 const requestLogger = require('./middleware/logger');
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 
-const { getDatabase } = require('./db/index');
+const { getDatabase, isPostgres, getPgPool, closeDatabase } = require('./db/index');
 const { runMigrations } = require('./db/migrator');
 const { seedDatabase } = require('./db/seed');
+const { initValkey, closeValkey } = require('./db/valkey');
+const { initTopologySync } = require('./services/TopologySync');
+const { initTopologyWebSocket } = require('./ws/topologyServer');
 
 // Import Route Handlers
 const healthRoutes = require('./routes/health');
@@ -18,6 +22,10 @@ const configsRoutes = require('./routes/configs');
 const appsRoutes = require('./routes/apps');
 const nerodropRoutes = require('./routes/nerodrop');
 const statsRoutes = require('./routes/stats');
+const peeringRoutes = require('./routes/peering');
+const riskRoutes = require('./routes/risk');
+const geofencingRoutes = require('./routes/geofencing');
+const cloudPcRoutes = require('./routes/cloudPc');
 
 function createApp() {
   const app = express();
@@ -33,11 +41,16 @@ function createApp() {
   app.use('/api/auth', authRoutes);
   app.use('/api/users', usersRoutes);
   app.use('/api/nodes', nodesRoutes);
+  app.use('/api/nodes', riskRoutes);
   app.use('/api/configs', configsRoutes);
   app.use('/api/apps', appsRoutes);
   app.use('/api/nerodrop', nerodropRoutes);
   app.use('/api/stats', statsRoutes);
-  app.use('/api/audit', statsRoutes); // Support /api/audit/logs
+  app.use('/api/audit', statsRoutes);
+  app.use('/api/peering', peeringRoutes);
+  app.use('/api/risk', riskRoutes);
+  app.use('/api/geofencing', geofencingRoutes);
+  app.use('/api/cloud-pc', cloudPcRoutes);
 
   // 404 & Global Error Handling
   app.use(notFoundHandler);
@@ -46,41 +59,59 @@ function createApp() {
   return app;
 }
 
-function initDatabase() {
+async function initDatabase() {
   try {
-    const db = getDatabase();
-    runMigrations(db);
-    seedDatabase(db);
-    logger.info('Database initialized and verified ready.');
+    initValkey();
+    initTopologySync();
+
+    if (isPostgres()) {
+      const pool = getPgPool();
+      await runMigrations(pool);
+    } else {
+      const db = getDatabase();
+      runMigrations(db);
+      seedDatabase(db);
+    }
+    logger.info('Database and services initialized and ready.');
   } catch (err) {
-    logger.error('Database initialization failed:', err);
+    logger.error('Database initialization error:', err);
     throw err;
   }
 }
 
 const app = createApp();
-
 let server = null;
+let wss = null;
 
 if (require.main === module) {
-  initDatabase();
-  server = app.listen(config.PORT, config.HOST, () => {
-    logger.info(`=======================================================`);
-    logger.info(`🚀 NeroNet Management Console Control Plane API running`);
-    logger.info(`📡 URL: http://${config.HOST}:${config.PORT}`);
-    logger.info(`🔒 Environment: ${config.NODE_ENV}`);
-    logger.info(`=======================================================`);
+  initDatabase().then(() => {
+    server = http.createServer(app);
+    wss = initTopologyWebSocket(server);
+
+    server.listen(config.PORT, config.HOST, () => {
+      logger.info(`=======================================================`);
+      logger.info(`🚀 NeroNet Management Console Control Plane API running`);
+      logger.info(`📡 HTTP: http://${config.HOST}:${config.PORT}`);
+      logger.info(`🔌 WebSocket: ws://${config.HOST}:${config.PORT}/ws/topology`);
+      logger.info(`🔒 Environment: ${config.NODE_ENV}`);
+      logger.info(`=======================================================`);
+    });
+  }).catch((err) => {
+    logger.error('Fatal startup error:', err);
+    process.exit(1);
   });
 
   const shutdown = () => {
     logger.info('Gracefully stopping NeroNet Console Control Plane...');
     if (server) {
       server.close(() => {
-        const { closeDatabase } = require('./db/index');
         closeDatabase();
+        closeValkey();
         process.exit(0);
       });
     } else {
+      closeDatabase();
+      closeValkey();
       process.exit(0);
     }
   };

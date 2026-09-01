@@ -175,7 +175,30 @@ function seedDatabase(db) {
       scale_to_zero: 1
     });
 
-    // 5. Initial Audit Log if empty
+    // 5. Initial Cloud PC and Custom Domain if empty and table exists
+    const cloudPcTable = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='cloud_pcs'").all();
+    if (cloudPcTable.length > 0) {
+      const cpcCount = db.prepare('SELECT count(*) as count FROM cloud_pcs').get().count;
+      if (cpcCount === 0) {
+        db.prepare(`
+          INSERT OR IGNORE INTO cloud_pcs (id, name, user_id, device_id, specs, status, signaling_url, custom_domain)
+          VALUES ('cpc-0001', 'Admin GPU Workstation', 'usr-admin', 'svrn-node-seed1', '{"vcpus": 8, "ram_gb": 32, "gpu": "RTX 4090"}', 'active', 'wss://signal.internal.darknero.com/ws/selkies', 'desktop.admin.darknero.com')
+        `).run();
+      }
+    }
+
+    const domainTable = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='custom_domains'").all();
+    if (domainTable.length > 0) {
+      const domCount = db.prepare('SELECT count(*) as count FROM custom_domains').get().count;
+      if (domCount === 0) {
+        db.prepare(`
+          INSERT OR IGNORE INTO custom_domains (id, domain_name, cloud_pc_id, user_id, sso_gateway_enabled, otp_secret)
+          VALUES ('cdom-0001', 'desktop.admin.darknero.com', 'cpc-0001', 'usr-admin', 1, 'OTP123456')
+        `).run();
+      }
+    }
+
+    // 6. Initial Audit Log if empty
     const auditCount = db.prepare('SELECT count(*) as count FROM audit_events').get().count;
     if (auditCount === 0) {
       insertAudit.run({
@@ -190,7 +213,7 @@ function seedDatabase(db) {
       });
     }
 
-    // 6. Initial Metrics if empty
+    // 7. Initial Metrics if empty
     const metricCount = db.prepare('SELECT count(*) as count FROM system_metrics').get().count;
     if (metricCount === 0) {
       insertMetric.run({

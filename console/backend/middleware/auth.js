@@ -1,9 +1,10 @@
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const config = require('../config/env');
-const { getDatabase } = require('../db/index');
+const { isTokenBlacklisted } = require('../db/valkey');
+const { getDatabase, isPostgres, getPgPool } = require('../db/index');
 
-function signToken(payload, expiresIn = config.JWT_EXPIRES_IN || '1h') {
+function signToken(payload, expiresIn = config.JWT_EXPIRES_IN || '15m') {
   const cleanPayload = {
     sub: payload.id || payload.sub,
     id: payload.id || payload.sub,
@@ -42,7 +43,7 @@ function verifyRefreshToken(token) {
   }
 }
 
-function authenticateToken(req, res, next) {
+async function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'] || req.headers['Authorization'] || '';
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Missing or malformed Authorization header' });
@@ -53,13 +54,32 @@ function authenticateToken(req, res, next) {
     return res.status(401).json({ error: 'Missing token' });
   }
 
-  // Check if token was revoked (in-memory or db refresh token check)
-  const db = getDatabase();
-  const revoked = db.prepare('SELECT id FROM refresh_tokens WHERE token_hash = ? AND revoked = 1').get(token);
-  if (revoked) {
+  // 1. Fast O(1) Valkey revocation blacklist check
+  const blacklisted = await isTokenBlacklisted(token);
+  if (blacklisted) {
     return res.status(401).json({ error: 'Token has been revoked' });
   }
 
+  // 2. Database revocation check (fallback / persistent)
+  try {
+    if (isPostgres()) {
+      const pool = getPgPool();
+      const checkRes = await pool.query('SELECT id FROM refresh_tokens WHERE token_hash = $1 AND revoked = TRUE', [token]);
+      if (checkRes.rows.length > 0) {
+        return res.status(401).json({ error: 'Token has been revoked' });
+      }
+    } else {
+      const db = getDatabase();
+      const revoked = db.prepare('SELECT id FROM refresh_tokens WHERE token_hash = ? AND revoked = 1').get(token);
+      if (revoked) {
+        return res.status(401).json({ error: 'Token has been revoked' });
+      }
+    }
+  } catch (e) {
+    // Continue if DB check fails or table absent
+  }
+
+  // 3. Cryptographic JWT verification
   try {
     const decoded = jwt.verify(token, config.JWT_SECRET);
     req.user = {

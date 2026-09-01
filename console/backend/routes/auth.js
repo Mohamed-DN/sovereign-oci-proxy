@@ -2,229 +2,313 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
-const { getDatabase } = require('../db/index');
-const { signToken, signRefreshToken, authenticateToken } = require('../middleware/auth');
+const { getDatabase, isPostgres, getPgPool } = require('../db/index');
+const { signToken, signRefreshToken, authenticateToken, verifyToken, verifyRefreshToken } = require('../middleware/auth');
+const { blacklistToken, isTokenBlacklisted } = require('../db/valkey');
 const { logAuditEvent } = require('../utils/audit');
 
+// Pre-computed constant-time dummy bcrypt hash to prevent timing side-channel attacks on non-existent usernames
+const DUMMY_BCRYPT_HASH = '$2a$10$wN3t8gX1ZkGkR0e2M8t0y.9gZ0n4p7s2e6u1v8w5x9y2z3a4b5c6d';
+
 // 1. Register User (Public)
-router.post('/register', (req, res) => {
-  const { username, password, email, role, tier } = req.body || {};
+router.post('/register', async (req, res, next) => {
+  try {
+    const { username, password, email, role, tier } = req.body || {};
 
-  if (!username || !password) {
-    return res.status(400).json({ error: 'Missing required registration fields' });
-  }
-
-  const db = getDatabase();
-  const existing = db.prepare('SELECT id FROM users WHERE username = ?').get(username);
-  if (existing) {
-    return res.status(409).json({ error: 'Username already exists' });
-  }
-
-  const userId = `usr-${uuidv4().substring(0, 8)}`;
-  const userRole = role === 'super-admin' ? 'super-admin' : 'user';
-  const userTier = tier || 'hybrid_byos';
-  const userEmail = email || `${username}@sovereign.local`;
-  const salt = bcrypt.genSaltSync(10);
-  const passwordHash = bcrypt.hashSync(password, salt);
-
-  const maxNodes = userTier === 'cloud_managed' || userTier === 'managed_cloud' ? 50 : 5;
-  const maxBwGb = userTier === 'cloud_managed' || userTier === 'managed_cloud' ? 1000 : 100;
-
-  db.prepare(`
-    INSERT INTO users (
-      id, username, email, password_hash, role, tier, status,
-      bandwidth_quota_gb, bandwidth_used_bytes, max_nodes
-    ) VALUES (
-      ?, ?, ?, ?, ?, ?, 'active', ?, 0, ?
-    )
-  `).run(userId, username, userEmail, passwordHash, userRole, userTier, maxBwGb, maxNodes);
-
-  logAuditEvent({
-    eventType: 'USER_REGISTER',
-    severity: 'info',
-    actorUserId: userId,
-    actorUsername: username,
-    targetId: userId,
-    targetType: 'user',
-    message: `User ${username} registered successfully`,
-    ipAddress: req.ip
-  });
-
-  const userObj = {
-    id: userId,
-    username,
-    role: userRole,
-    tier: userTier,
-    quota: {
-      max_nodes: maxNodes,
-      max_bandwidth_gb: maxBwGb
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Missing required registration fields' });
     }
-  };
 
-  const token = signToken(userObj);
-  const refreshToken = signRefreshToken(userObj);
+    const userId = `usr-${uuidv4().substring(0, 8)}`;
+    const userRole = role === 'super-admin' ? 'super-admin' : 'user';
+    const userTier = tier || 'hybrid_byos';
+    const userEmail = email || `${username}@sovereign.local`;
+    const salt = bcrypt.genSaltSync(10);
+    const passwordHash = bcrypt.hashSync(password, salt);
 
-  return res.status(201).json({
-    token,
-    refreshToken,
-    user: userObj
-  });
+    const maxNodes = userTier === 'cloud_managed' || userTier === 'managed_cloud' ? 50 : 5;
+    const maxBwGb = userTier === 'cloud_managed' || userTier === 'managed_cloud' ? 1000 : 100;
+
+    if (isPostgres()) {
+      const pool = getPgPool();
+      const existing = await pool.query('SELECT id FROM users WHERE username = $1', [username]);
+      if (existing.rows.length > 0) {
+        return res.status(409).json({ error: 'Username already exists' });
+      }
+
+      await pool.query(`
+        INSERT INTO users (
+          id, username, email, password_hash, role, tier, status,
+          bandwidth_quota_gb, bandwidth_used_bytes, max_nodes, bypass_apps
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6, 'active', $7, 0, $8, '[]'::jsonb
+        )
+      `, [userId, username, userEmail, passwordHash, userRole, userTier, maxBwGb, maxNodes]);
+    } else {
+      const db = getDatabase();
+      const existing = db.prepare('SELECT id FROM users WHERE username = ?').get(username);
+      if (existing) {
+        return res.status(409).json({ error: 'Username already exists' });
+      }
+
+      db.prepare(`
+        INSERT INTO users (
+          id, username, email, password_hash, role, tier, status,
+          bandwidth_quota_gb, bandwidth_used_bytes, max_nodes
+        ) VALUES (
+          ?, ?, ?, ?, ?, ?, 'active', ?, 0, ?
+        )
+      `).run(userId, username, userEmail, passwordHash, userRole, userTier, maxBwGb, maxNodes);
+    }
+
+    logAuditEvent({
+      eventType: 'USER_REGISTER',
+      severity: 'info',
+      actorUserId: userId,
+      actorUsername: username,
+      targetId: userId,
+      targetType: 'user',
+      message: `User ${username} registered successfully`,
+      ipAddress: req.ip
+    });
+
+    const userObj = {
+      id: userId,
+      username,
+      role: userRole,
+      tier: userTier,
+      quota: {
+        max_nodes: maxNodes,
+        max_bandwidth_gb: maxBwGb
+      }
+    };
+
+    const token = signToken(userObj);
+    const refreshToken = signRefreshToken(userObj);
+
+    return res.status(201).json({
+      token,
+      refreshToken,
+      user: userObj
+    });
+  } catch (err) {
+    next(err);
+  }
 });
 
-// 2. Login User (Public)
-router.post('/login', (req, res) => {
-  const { username, password } = req.body || {};
-
-  if (!username || !password) {
-    return res.status(400).json({ error: 'Missing username or password' });
-  }
-
-  const db = getDatabase();
-  const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
-
-  if (!user) {
-    return res.status(401).json({ error: 'Invalid username or password' });
-  }
-
-  let isMatch = false;
+// 2. Login User (Public - Strict bcrypt + constant-time dummy verification)
+router.post('/login', async (req, res, next) => {
   try {
-    isMatch = bcrypt.compareSync(password, user.password_hash);
-  } catch (err) {
-    isMatch = false;
-  }
+    const { username, password } = req.body || {};
 
-  if (!isMatch) {
-    return res.status(401).json({ error: 'Invalid username or password' });
-  }
-
-  if (user.status === 'suspended' || user.status === 'revoked') {
-    return res.status(403).json({ error: 'Account is suspended or revoked' });
-  }
-
-  const userPayload = {
-    id: user.id,
-    username: user.username,
-    role: user.role,
-    tier: user.tier,
-    quota: {
-      max_nodes: user.max_nodes,
-      max_bandwidth_gb: user.bandwidth_quota_gb
+    if (!username || !password) {
+      return res.status(400).json({ error: 'Missing username or password' });
     }
-  };
 
-  const token = signToken(userPayload);
-  const refreshToken = signRefreshToken(userPayload);
+    let user = null;
 
-  logAuditEvent({
-    eventType: 'AUTH_LOGIN',
-    severity: 'info',
-    actorUserId: user.id,
-    actorUsername: user.username,
-    targetId: user.id,
-    targetType: 'user',
-    message: `User ${user.username} logged in successfully`,
-    ipAddress: req.ip
-  });
+    if (isPostgres()) {
+      const pool = getPgPool();
+      const userRes = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+      user = userRes.rows[0] || null;
+    } else {
+      const db = getDatabase();
+      user = db.prepare('SELECT * FROM users WHERE username = ?').get(username) || null;
+    }
 
-  return res.status(200).json({
-    token,
-    refreshToken,
-    user: userPayload
-  });
+    // Timing side-channel mitigation: If user doesn't exist, perform dummy bcrypt comparison
+    if (!user) {
+      await bcrypt.compare(password, DUMMY_BCRYPT_HASH);
+      return res.status(401).json({ error: 'Invalid username or password' });
+    }
+
+    let isMatch = false;
+    try {
+      isMatch = await bcrypt.compare(password, user.password_hash);
+    } catch (err) {
+      isMatch = false;
+    }
+
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Invalid username or password' });
+    }
+
+    if (user.status === 'suspended' || user.status === 'revoked') {
+      return res.status(403).json({ error: 'Account is suspended or revoked' });
+    }
+
+    const userPayload = {
+      id: user.id,
+      username: user.username,
+      role: user.role,
+      tier: user.tier,
+      quota: {
+        max_nodes: user.max_nodes,
+        max_bandwidth_gb: user.bandwidth_quota_gb
+      }
+    };
+
+    const token = signToken(userPayload);
+    const refreshToken = signRefreshToken(userPayload);
+
+    logAuditEvent({
+      eventType: 'AUTH_LOGIN',
+      severity: 'info',
+      actorUserId: user.id,
+      actorUsername: user.username,
+      targetId: user.id,
+      targetType: 'user',
+      message: `User ${user.username} logged in successfully`,
+      ipAddress: req.ip
+    });
+
+    return res.status(200).json({
+      token,
+      refreshToken,
+      user: userPayload
+    });
+  } catch (err) {
+    next(err);
+  }
 });
 
 // 3. Refresh Token
-router.post('/refresh', (req, res) => {
-  const authHeader = req.headers['authorization'] || req.headers['Authorization'] || '';
-  let token = '';
+router.post('/refresh', async (req, res, next) => {
+  try {
+    const authHeader = req.headers['authorization'] || req.headers['Authorization'] || '';
+    let token = '';
 
-  if (authHeader.startsWith('Bearer ')) {
-    token = authHeader.substring(7).trim();
-  } else if (req.body && req.body.refreshToken) {
-    token = req.body.refreshToken;
+    if (authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7).trim();
+    } else if (req.body && req.body.refreshToken) {
+      token = req.body.refreshToken;
+    }
+
+    if (!token) {
+      return res.status(401).json({ error: 'Missing token for refresh' });
+    }
+
+    const blacklisted = await isTokenBlacklisted(token);
+    if (blacklisted) {
+      return res.status(401).json({ error: 'Token has been revoked' });
+    }
+
+    const decoded = verifyToken(token) || verifyRefreshToken(token);
+    if (!decoded) {
+      return res.status(401).json({ error: 'Invalid or expired refresh token' });
+    }
+
+    const newToken = signToken({
+      id: decoded.sub || decoded.id,
+      username: decoded.username,
+      role: decoded.role,
+      tier: decoded.tier
+    });
+
+    return res.status(200).json({ token: newToken });
+  } catch (err) {
+    next(err);
   }
-
-  if (!token) {
-    return res.status(401).json({ error: 'Missing token for refresh' });
-  }
-
-  const db = getDatabase();
-  const revoked = db.prepare('SELECT id FROM refresh_tokens WHERE token_hash = ? AND revoked = 1').get(token);
-  if (revoked) {
-    return res.status(401).json({ error: 'Token has been revoked' });
-  }
-
-  const { verifyToken, verifyRefreshToken } = require('../middleware/auth');
-  const decoded = verifyToken(token) || verifyRefreshToken(token);
-
-  if (!decoded) {
-    return res.status(401).json({ error: 'Invalid or expired refresh token' });
-  }
-
-  const newToken = signToken({
-    id: decoded.sub || decoded.id,
-    username: decoded.username,
-    role: decoded.role,
-    tier: decoded.tier
-  });
-
-  return res.status(200).json({ token: newToken });
 });
 
 // 4. Get Current User (Authenticated)
-router.get('/me', authenticateToken, (req, res) => {
-  const db = getDatabase();
-  const user = db.prepare('SELECT id, username, email, role, tier, status, bandwidth_quota_gb, bandwidth_used_bytes, max_nodes, created_at FROM users WHERE id = ?').get(req.user.id);
-
-  if (!user) {
-    return res.status(404).json({ error: 'User not found' });
-  }
-
-  return res.status(200).json({
-    user: {
-      id: user.id,
-      username: user.username,
-      email: user.email,
-      role: user.role,
-      tier: user.tier,
-      status: user.status,
-      quota: {
-        max_nodes: user.max_nodes,
-        max_bandwidth_gb: user.bandwidth_quota_gb,
-        bandwidth_used_bytes: user.bandwidth_used_bytes
-      },
-      created_at: user.created_at
+router.get('/me', authenticateToken, async (req, res, next) => {
+  try {
+    let user = null;
+    if (isPostgres()) {
+      const pool = getPgPool();
+      const userRes = await pool.query(
+        'SELECT id, username, email, role, tier, status, bandwidth_quota_gb, bandwidth_used_bytes, max_nodes, bypass_apps, created_at FROM users WHERE id = $1',
+        [req.user.id]
+      );
+      user = userRes.rows[0] || null;
+    } else {
+      const db = getDatabase();
+      user = db.prepare('SELECT id, username, email, role, tier, status, bandwidth_quota_gb, bandwidth_used_bytes, max_nodes, bypass_apps, created_at FROM users WHERE id = ?').get(req.user.id);
     }
-  });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    let bypassApps = user.bypass_apps;
+    if (typeof bypassApps === 'string') {
+      try {
+        bypassApps = JSON.parse(bypassApps);
+      } catch (e) {
+        bypassApps = [];
+      }
+    }
+
+    return res.status(200).json({
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        tier: user.tier,
+        status: user.status,
+        bypass_apps: bypassApps || [],
+        quota: {
+          max_nodes: user.max_nodes,
+          max_bandwidth_gb: user.bandwidth_quota_gb,
+          bandwidth_used_bytes: user.bandwidth_used_bytes || 0
+        },
+        created_at: user.created_at
+      }
+    });
+  } catch (err) {
+    next(err);
+  }
 });
 
-// 5. Logout (Authenticated)
-router.post('/logout', authenticateToken, (req, res) => {
-  const db = getDatabase();
-  const token = req.token;
+// 5. Logout (Authenticated - adds token to Valkey revocation cache)
+router.post('/logout', authenticateToken, async (req, res, next) => {
+  try {
+    const token = req.token;
 
-  if (token) {
-    db.prepare(`
-      INSERT INTO refresh_tokens (id, user_id, token_hash, expires_at, revoked, ip_address)
-      VALUES (?, ?, ?, datetime('now', '+7 days'), 1, ?)
-    `).run(`tok-${uuidv4().substring(0, 8)}`, req.user.id, token, req.ip || '127.0.0.1');
+    if (token) {
+      // 1. Blacklist in Valkey with 15m TTL
+      await blacklistToken(token, 900);
+
+      // 2. Persist in database refresh_tokens table
+      try {
+        if (isPostgres()) {
+          const pool = getPgPool();
+          await pool.query(`
+            INSERT INTO refresh_tokens (id, user_id, token_hash, expires_at, revoked, ip_address)
+            VALUES ($1, $2, $3, NOW() + INTERVAL '7 days', TRUE, $4)
+          `, [`tok-${uuidv4().substring(0, 8)}`, req.user.id, token, req.ip || '127.0.0.1']);
+        } else {
+          const db = getDatabase();
+          db.prepare(`
+            INSERT INTO refresh_tokens (id, user_id, token_hash, expires_at, revoked, ip_address)
+            VALUES (?, ?, ?, datetime('now', '+7 days'), 1, ?)
+          `).run(`tok-${uuidv4().substring(0, 8)}`, req.user.id, token, req.ip || '127.0.0.1');
+        }
+      } catch (e) {
+        // Table fallback
+      }
+    }
+
+    logAuditEvent({
+      eventType: 'AUTH_LOGOUT',
+      severity: 'info',
+      actorUserId: req.user.id,
+      actorUsername: req.user.username,
+      targetId: req.user.id,
+      targetType: 'user',
+      message: `User ${req.user.username} logged out`,
+      ipAddress: req.ip
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Logged out successfully'
+    });
+  } catch (err) {
+    next(err);
   }
-
-  logAuditEvent({
-    eventType: 'AUTH_LOGOUT',
-    severity: 'info',
-    actorUserId: req.user.id,
-    actorUsername: req.user.username,
-    targetId: req.user.id,
-    targetType: 'user',
-    message: `User ${req.user.username} logged out`,
-    ipAddress: req.ip
-  });
-
-  return res.status(200).json({
-    success: true,
-    message: 'Logged out successfully'
-  });
 });
 
 module.exports = router;

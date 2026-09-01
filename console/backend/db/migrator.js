@@ -1,6 +1,10 @@
+const fs = require('fs');
+const path = require('path');
 const logger = require('../utils/logger');
 
-const MIGRATIONS = [
+const MIGRATIONS_DIR = path.resolve(__dirname, 'migrations');
+
+const SQLITE_MIGRATIONS = [
   {
     name: '001_initial_schema',
     sql: `
@@ -16,6 +20,8 @@ const MIGRATIONS = [
           bandwidth_quota_gb INTEGER NOT NULL DEFAULT 100,
           bandwidth_used_bytes INTEGER NOT NULL DEFAULT 0,
           max_nodes INTEGER NOT NULL DEFAULT 5,
+          bypass_apps TEXT DEFAULT '[]',
+          scheduled_deletion_at DATETIME,
           created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
           updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
       );
@@ -41,9 +47,13 @@ const MIGRATIONS = [
           asn INTEGER DEFAULT 0,
           endpoints TEXT DEFAULT '[]',
           onion_routing_enabled INTEGER NOT NULL DEFAULT 0,
+          onion_hops INTEGER NOT NULL DEFAULT 0,
+          kill_switch_enabled INTEGER NOT NULL DEFAULT 0,
           is_healthy INTEGER NOT NULL DEFAULT 1,
           is_quarantined INTEGER NOT NULL DEFAULT 0,
           quarantine_reason TEXT,
+          risk_score INTEGER NOT NULL DEFAULT 0,
+          last_geo_drift_at DATETIME,
           last_heartbeat DATETIME,
           latency_ms REAL NOT NULL DEFAULT 0.0,
           tx_bytes INTEGER NOT NULL DEFAULT 0,
@@ -51,6 +61,8 @@ const MIGRATIONS = [
           cpu_usage_pct REAL DEFAULT 0.0,
           memory_usage_pct REAL DEFAULT 0.0,
           battery_pct REAL DEFAULT 100.0,
+          posture_checks TEXT DEFAULT '{"compliant": true, "disk_encrypted": true, "os": "Linux"}',
+          metadata TEXT DEFAULT '{}',
           created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
           updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
       );
@@ -165,7 +177,7 @@ const MIGRATIONS = [
       CREATE INDEX IF NOT EXISTS idx_nerodrop_user_id ON nerodrop_sessions(user_id);
       CREATE INDEX IF NOT EXISTS idx_nerodrop_status ON nerodrop_sessions(status);
 
-      -- 8. App Share Links Table (Guacamole Clientless RDP Public Gateway)
+      -- 8. App Share Links Table
       CREATE TABLE IF NOT EXISTS app_share_links (
           id TEXT PRIMARY KEY,
           app_id TEXT NOT NULL REFERENCES app_bundles(id) ON DELETE CASCADE,
@@ -209,12 +221,108 @@ const MIGRATIONS = [
       CREATE INDEX IF NOT EXISTS idx_app_share_links_user_id ON app_share_links(user_id);
     `,
     run: (db) => {
-      // Safely alter nodes table to add onion_routing_enabled if missing
       const tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='nodes'").all();
       if (tables.length > 0) {
         const nodeCols = db.pragma('table_info(nodes)').map(c => c.name);
         if (!nodeCols.includes('onion_routing_enabled')) {
           db.exec('ALTER TABLE nodes ADD COLUMN onion_routing_enabled INTEGER NOT NULL DEFAULT 0;');
+        }
+        if (!nodeCols.includes('kill_switch_enabled')) {
+          db.exec('ALTER TABLE nodes ADD COLUMN kill_switch_enabled INTEGER NOT NULL DEFAULT 0;');
+        }
+      }
+    }
+  },
+  {
+    name: '003_m2_advanced_engines',
+    sql: `
+      CREATE TABLE IF NOT EXISTS geofencing_policies (
+          id TEXT PRIMARY KEY,
+          country_code TEXT NOT NULL UNIQUE,
+          country_name TEXT NOT NULL,
+          action TEXT NOT NULL DEFAULT 'ALLOW' CHECK (action IN ('ALLOW', 'BLOCK', 'QUARANTINE')),
+          description TEXT,
+          is_active INTEGER NOT NULL DEFAULT 1,
+          created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_geofencing_policies_country ON geofencing_policies(country_code);
+
+      CREATE TABLE IF NOT EXISTS node_telemetry_history (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          node_id TEXT NOT NULL REFERENCES nodes(id) ON DELETE CASCADE,
+          ip_address TEXT NOT NULL,
+          latitude REAL,
+          longitude REAL,
+          country_code TEXT NOT NULL DEFAULT 'US',
+          latency_ms REAL NOT NULL DEFAULT 0.0,
+          calculated_speed_kmh REAL DEFAULT 0.0,
+          is_impossible_travel INTEGER NOT NULL DEFAULT 0,
+          recorded_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_node_telemetry_node_time ON node_telemetry_history(node_id, recorded_at DESC);
+
+      CREATE TABLE IF NOT EXISTS peering_agreements (
+          id TEXT PRIMARY KEY,
+          initiator_user_id TEXT REFERENCES users(id) ON DELETE CASCADE,
+          peer_name TEXT NOT NULL,
+          peer_endpoint TEXT NOT NULL,
+          peer_token_ed25519 TEXT NOT NULL,
+          peer_public_key_ed25519 TEXT NOT NULL,
+          scope_mode TEXT NOT NULL DEFAULT 'ALL' CHECK (scope_mode IN ('ALL', 'SPECIFIC_DEVICES', 'SPECIFIC_SUBNETS')),
+          shared_device_ids TEXT NOT NULL DEFAULT '[]',
+          shared_subnets TEXT NOT NULL DEFAULT '[]',
+          imported_nodes TEXT NOT NULL DEFAULT '[]',
+          status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'active', 'revoked', 'expired')),
+          expires_at DATETIME NOT NULL,
+          created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_peering_status ON peering_agreements(status);
+
+      CREATE TABLE IF NOT EXISTS cloud_pcs (
+          id TEXT PRIMARY KEY,
+          name TEXT NOT NULL,
+          user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          device_id TEXT NOT NULL,
+          specs TEXT NOT NULL DEFAULT '{"vcpus": 4, "ram_gb": 16}',
+          status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('provisioning', 'active', 'stopped', 'error')),
+          signaling_url TEXT NOT NULL DEFAULT 'wss://signal.internal.darknero.com/ws/selkies',
+          custom_domain TEXT,
+          created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_cloud_pcs_user ON cloud_pcs(user_id);
+
+      CREATE TABLE IF NOT EXISTS custom_domains (
+          id TEXT PRIMARY KEY,
+          domain_name TEXT NOT NULL UNIQUE,
+          cloud_pc_id TEXT NOT NULL,
+          user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          sso_gateway_enabled INTEGER NOT NULL DEFAULT 1,
+          otp_secret TEXT NOT NULL DEFAULT 'OTP123456',
+          webrtc_signaling_endpoint TEXT,
+          status TEXT NOT NULL DEFAULT 'active',
+          created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_custom_domains_domain ON custom_domains(domain_name);
+    `,
+    run: (db) => {
+      const adminUser = db.prepare("SELECT id FROM users WHERE role = 'super-admin' LIMIT 1").get();
+      const node = db.prepare("SELECT id FROM nodes LIMIT 1").get();
+      if (adminUser && node) {
+        const count = db.prepare('SELECT count(*) as cnt FROM cloud_pcs').get();
+        if (count && count.cnt === 0) {
+          db.prepare(`
+            INSERT OR IGNORE INTO cloud_pcs (id, name, user_id, device_id, specs, status, signaling_url, custom_domain)
+            VALUES ('cpc-0001', 'Admin GPU Workstation', ?, ?, '{"vcpus": 8, "ram_gb": 32, "gpu": "RTX 4090"}', 'active', 'wss://signal.internal.darknero.com/ws/selkies', 'desktop.admin.darknero.com')
+          `).run(adminUser.id, node.id);
+
+          db.prepare(`
+            INSERT OR IGNORE INTO custom_domains (id, domain_name, cloud_pc_id, user_id, sso_gateway_enabled, otp_secret)
+            VALUES ('cdom-0001', 'desktop.admin.darknero.com', 'cpc-0001', ?, 1, 'OTP123456')
+          `).run(adminUser.id);
         }
       }
     }
@@ -222,7 +330,7 @@ const MIGRATIONS = [
 ];
 
 function ensureSchemaIntegrity(db) {
-  // Guarantee all columns exist even if previous migrations had execution gaps
+  if (typeof db.prepare !== 'function') return;
   const tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='nodes'").all();
   if (tables.length > 0) {
     const nodeCols = db.pragma('table_info(nodes)').map(c => c.name);
@@ -230,11 +338,55 @@ function ensureSchemaIntegrity(db) {
       logger.info('Schema healing: Adding missing onion_routing_enabled column to nodes table...');
       db.exec('ALTER TABLE nodes ADD COLUMN onion_routing_enabled INTEGER NOT NULL DEFAULT 0;');
     }
+    if (!nodeCols.includes('kill_switch_enabled')) {
+      logger.info('Schema healing: Adding missing kill_switch_enabled column to nodes table...');
+      db.exec('ALTER TABLE nodes ADD COLUMN kill_switch_enabled INTEGER NOT NULL DEFAULT 0;');
+    }
   }
 }
 
-function runMigrations(db) {
-  // Create migrations table
+async function runPostgresMigrations(pool) {
+  const client = await pool.connect();
+  try {
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS _migrations (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) UNIQUE NOT NULL,
+        applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+
+    const res = await client.query('SELECT name FROM _migrations');
+    const appliedSet = new Set(res.rows.map(r => r.name));
+
+    if (fs.existsSync(MIGRATIONS_DIR)) {
+      const files = fs.readdirSync(MIGRATIONS_DIR)
+        .filter(f => f.endsWith('.sql'))
+        .sort();
+
+      for (const file of files) {
+        if (!appliedSet.has(file)) {
+          logger.info(`Applying PostgreSQL migration: ${file}...`);
+          const sql = fs.readFileSync(path.join(MIGRATIONS_DIR, file), 'utf8');
+          await client.query('BEGIN');
+          try {
+            await client.query(sql);
+            await client.query('INSERT INTO _migrations (name) VALUES ($1)', [file]);
+            await client.query('COMMIT');
+            logger.info(`PostgreSQL migration ${file} applied successfully.`);
+          } catch (mErr) {
+            await client.query('ROLLBACK');
+            throw mErr;
+          }
+        }
+      }
+    }
+  } finally {
+    client.release();
+  }
+}
+
+function runSQLiteMigrations(db) {
   db.exec(`
     CREATE TABLE IF NOT EXISTS _migrations (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -246,7 +398,7 @@ function runMigrations(db) {
   const appliedRows = db.prepare('SELECT name FROM _migrations').all();
   const appliedSet = new Set(appliedRows.map(r => r.name));
 
-  for (const migration of MIGRATIONS) {
+  for (const migration of SQLITE_MIGRATIONS) {
     if (!appliedSet.has(migration.name)) {
       logger.info(`Applying SQLite migration: ${migration.name}...`);
       db.transaction(() => {
@@ -262,8 +414,28 @@ function runMigrations(db) {
     }
   }
 
-  // Schema integrity guarantee for persistent databases
   ensureSchemaIntegrity(db);
 }
 
-module.exports = { runMigrations, ensureSchemaIntegrity, MIGRATIONS };
+function runMigrations(dbOrPool) {
+  if (dbOrPool && typeof dbOrPool.connect === 'function') {
+    return runPostgresMigrations(dbOrPool);
+  }
+  if (dbOrPool && typeof dbOrPool.prepare === 'function') {
+    return runSQLiteMigrations(dbOrPool);
+  }
+  const { isPostgres, getPgPool, getDatabase } = require('./index');
+  if (isPostgres()) {
+    return runPostgresMigrations(getPgPool());
+  } else {
+    return runSQLiteMigrations(getDatabase());
+  }
+}
+
+module.exports = {
+  runMigrations,
+  runPostgresMigrations,
+  runSQLiteMigrations,
+  ensureSchemaIntegrity,
+  MIGRATIONS: SQLITE_MIGRATIONS
+};
