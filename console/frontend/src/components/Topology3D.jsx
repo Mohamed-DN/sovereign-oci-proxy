@@ -26,26 +26,86 @@ import {
   Info
 } from 'lucide-react';
 
-export default function Topology3D({ onSelectNode }) {
-  const fgRef = useRef(null);
-  const containerRef = useRef(null);
-  const { role } = useAuth();
+const geometryCache = new Map();
+const materialCache = new Map();
 
+function getCachedOctahedron(radius) {
+  const key = `octa_${radius}`;
+  if (!geometryCache.has(key)) {
+    geometryCache.set(key, new THREE.OctahedronGeometry(radius, 0));
+  }
+  return geometryCache.get(key);
+}
+
+function getCachedSphere(radius) {
+  const key = `sphere_${radius}`;
+  if (!geometryCache.has(key)) {
+    geometryCache.set(key, new THREE.SphereGeometry(radius, 8, 8));
+  }
+  return geometryCache.get(key);
+}
+
+function getCachedTorus(radius, tube) {
+  const key = `torus_${radius}_${tube}`;
+  if (!geometryCache.has(key)) {
+    geometryCache.set(key, new THREE.TorusGeometry(radius, tube, 6, 12));
+  }
+  return geometryCache.get(key);
+}
+
+function getCachedPhongMaterial(colorHex) {
+  if (!materialCache.has(colorHex)) {
+    materialCache.set(
+      colorHex,
+      new THREE.MeshPhongMaterial({
+        color: new THREE.Color(colorHex),
+        emissive: new THREE.Color(colorHex),
+        emissiveIntensity: 0.5,
+        shininess: 90,
+        transparent: true,
+        opacity: 0.95
+      })
+    );
+  }
+  return materialCache.get(colorHex);
+}
+
+function getCachedBasicMaterial(colorHex, opacity = 0.25, wireframe = true) {
+  const key = `basic_${colorHex}_${opacity}_${wireframe}`;
+  if (!materialCache.has(key)) {
+    materialCache.set(
+      key,
+      new THREE.MeshBasicMaterial({
+        color: new THREE.Color(colorHex),
+        transparent: true,
+        opacity,
+        wireframe
+      })
+    );
+  }
+  return materialCache.get(key);
+}
+
+export default function Topology3D({ onSelectNode }) {
+  const { role } = useAuth();
   const [nodes, setNodes] = useState([]);
-  const [hoveredNode, setHoveredNode] = useState(null);
-  const [autoRotate, setAutoRotate] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRoleFilter, setSelectedRoleFilter] = useState('ALL');
-  const [dimensions, setDimensions] = useState({ width: 800, height: 580 });
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [hoveredNode, setHoveredNode] = useState(null);
+  const [autoRotate, setAutoRotate] = useState(true);
 
-  // Measure container dimensions
+  const containerRef = useRef(null);
+  const fgRef = useRef(null);
+  const [dimensions, setDimensions] = useState({ width: 800, height: 580 });
+
+  // Update container dimensions on resize
   useEffect(() => {
     const updateDimensions = () => {
       if (containerRef.current) {
         setDimensions({
           width: containerRef.current.clientWidth || 800,
-          height: isFullscreen ? window.innerHeight - 40 : (containerRef.current.clientHeight || 580)
+          height: isFullscreen ? window.innerHeight - 120 : 580
         });
       }
     };
@@ -75,15 +135,17 @@ export default function Topology3D({ onSelectNode }) {
   const graphData = useMemo(() => {
     if (!nodes.length) return { nodes: [], links: [] };
 
-    // Filter nodes by search and role
     const filtered = nodes.filter((n) => {
+      const nodeName = n.name || n.hostname || '';
+      const nodeIp = n.overlay_ipv4 || n.mesh_ip || '';
       const matchesSearch =
-        (n.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (n.overlay_ipv4 || '').includes(searchQuery);
+        nodeName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        nodeIp.includes(searchQuery);
       const matchesRole =
         selectedRoleFilter === 'ALL' ||
         (selectedRoleFilter === 'PEERED' && (n.is_peered || n.role === 'PEERED')) ||
         (selectedRoleFilter === 'QUARANTINED' && (n.is_quarantined || (n.risk_score || 0) > 75)) ||
+        (selectedRoleFilter === 'CLIENT_ORIGIN' && (n.role === 'CLIENT_ORIGIN' || n.role === 'EDGE_CLIENT')) ||
         n.role === selectedRoleFilter;
       return matchesSearch && matchesRole;
     });
@@ -92,35 +154,34 @@ export default function Topology3D({ onSelectNode }) {
     const graphLinks = [];
 
     if (isSuperAdmin) {
-      // Super-Admin Global Mesh View
       filtered.forEach((node) => {
         const isQuarantined = Boolean(node.is_quarantined || (node.risk_score || 0) > 75);
         const isPeered = Boolean(node.is_peered || node.role === 'PEERED');
-        let nodeColor = '#38bdf8'; // Client Sky
+        let nodeColor = '#38bdf8';
         let nodeVal = 7;
 
         if (isQuarantined) {
-          nodeColor = '#ef4444'; // Critical Red
+          nodeColor = '#ef4444';
           nodeVal = 9;
         } else if (isPeered) {
-          nodeColor = '#a855f7'; // Purple Peered
+          nodeColor = '#a855f7';
           nodeVal = 8;
         } else if (node.role === 'RELAY') {
-          nodeColor = '#10b981'; // Emerald Relay
+          nodeColor = '#10b981';
           nodeVal = 12;
         } else if (node.role === 'EXIT_BRIDGE') {
-          nodeColor = '#6366f1'; // Indigo Exit
+          nodeColor = '#6366f1';
           nodeVal = 9;
         } else if (node.role === 'HYBRID') {
-          nodeColor = '#06b6d4'; // Cyan Hybrid
+          nodeColor = '#06b6d4';
           nodeVal = 8;
         }
 
         graphNodes.push({
           id: node.id,
-          name: node.name,
-          role: node.role,
-          overlay_ipv4: node.overlay_ipv4,
+          name: node.name || node.hostname || node.id,
+          role: node.role === 'EDGE_CLIENT' ? 'CLIENT_ORIGIN' : (node.role || 'CLIENT_ORIGIN'),
+          overlay_ipv4: node.overlay_ipv4 || node.mesh_ip || '',
           country_code: node.country_code,
           city: node.city,
           latency_ms: node.latency_ms || 14.5,
@@ -133,39 +194,32 @@ export default function Topology3D({ onSelectNode }) {
         });
       });
 
-      // Backbone Relay Links
       const relays = graphNodes.filter((n) => n.role === 'RELAY');
       for (let i = 0; i < relays.length; i++) {
         for (let j = i + 1; j < relays.length; j++) {
           graphLinks.push({
             source: relays[i].id,
             target: relays[j].id,
-            color: 'rgba(16, 185, 129, 0.65)',
+            color: 'rgba(16, 185, 129, 0.5)',
             curvature: 0.1,
-            particles: 4,
             speed: 0.008
           });
         }
       }
 
-      // Connect Non-Relay nodes to closest Relay
       graphNodes.forEach((node, idx) => {
         if (node.role !== 'RELAY' && relays.length > 0) {
           const nearestRelay = relays[idx % relays.length];
-          let linkColor = 'rgba(56, 189, 248, 0.4)';
-          let particles = 2;
+          let linkColor = 'rgba(56, 189, 248, 0.35)';
           let speed = 0.005;
 
           if (node.is_quarantined) {
             linkColor = 'rgba(239, 68, 68, 0.35)';
-            particles = 0;
           } else if (node.is_peered) {
-            linkColor = 'rgba(168, 85, 247, 0.6)';
-            particles = 3;
+            linkColor = 'rgba(168, 85, 247, 0.45)';
             speed = 0.006;
           } else if (node.role === 'EXIT_BRIDGE') {
-            linkColor = 'rgba(99, 102, 241, 0.5)';
-            particles = 3;
+            linkColor = 'rgba(99, 102, 241, 0.45)';
           }
 
           graphLinks.push({
@@ -173,13 +227,11 @@ export default function Topology3D({ onSelectNode }) {
             target: node.id,
             color: linkColor,
             curvature: 0.15,
-            particles,
             speed
           });
         }
       });
     } else {
-      // Regular User Isolated Mesh View (Alice)
       const designatedRelay = {
         id: 'relay-iad-core',
         name: 'neronet-relay-iad-01',
@@ -201,11 +253,11 @@ export default function Topology3D({ onSelectNode }) {
         const isQuarantined = Boolean(node.is_quarantined || (node.risk_score || 0) > 75);
         const nodeColor = isQuarantined ? '#ef4444' : node.role === 'HYBRID' ? '#06b6d4' : '#38bdf8';
 
-        const userGraphNode = {
+        graphNodes.push({
           id: node.id,
-          name: node.name,
-          role: node.role,
-          overlay_ipv4: node.overlay_ipv4,
+          name: node.name || node.hostname || node.id,
+          role: node.role === 'EDGE_CLIENT' ? 'CLIENT_ORIGIN' : (node.role || 'CLIENT_ORIGIN'),
+          overlay_ipv4: node.overlay_ipv4 || node.mesh_ip || '',
           country_code: node.country_code,
           city: node.city,
           latency_ms: node.latency_ms || 18.0,
@@ -215,127 +267,132 @@ export default function Topology3D({ onSelectNode }) {
           val: 8,
           color: nodeColor,
           rawNode: node
-        };
-        graphNodes.push(userGraphNode);
+        });
 
-        // Direct link to designated relay
         graphLinks.push({
           source: designatedRelay.id,
           target: node.id,
-          color: isQuarantined ? 'rgba(239, 68, 68, 0.4)' : 'rgba(56, 189, 248, 0.65)',
+          color: isQuarantined ? 'rgba(239, 68, 68, 0.35)' : 'rgba(56, 189, 248, 0.35)',
           curvature: 0.1,
-          particles: isQuarantined ? 0 : 3,
           speed: 0.007
         });
       });
 
-      // P2P direct mesh link between Alice's devices
       const clientNodes = graphNodes.filter((n) => n.id !== designatedRelay.id);
       if (clientNodes.length >= 2) {
         graphLinks.push({
           source: clientNodes[0].id,
           target: clientNodes[1].id,
-          color: 'rgba(99, 102, 241, 0.55)',
+          color: 'rgba(99, 102, 241, 0.45)',
           curvature: 0.2,
-          particles: 2,
           speed: 0.009
         });
       }
     }
 
+    let totalAllocatedParticles = 0;
+    const maxGlobalParticles = 50;
+    graphLinks.forEach((link) => {
+      if (totalAllocatedParticles < maxGlobalParticles) {
+        const canTake = Math.min(2, maxGlobalParticles - totalAllocatedParticles);
+        link.particles = canTake;
+        totalAllocatedParticles += canTake;
+      } else {
+        link.particles = 0;
+      }
+    });
+
     return { nodes: graphNodes, links: graphLinks };
   }, [nodes, isSuperAdmin, searchQuery, selectedRoleFilter]);
 
-  // Handle smooth camera float on node hover
-  const handleNodeHover = useCallback(
-    (node) => {
-      setHoveredNode(node || null);
-      if (node && fgRef.current) {
-        // Smooth camera float toward the hovered node
-        const distance = 140;
-        const distRatio = 1 + distance / Math.hypot(node.x || 1, node.y || 1, node.z || 1);
-        fgRef.current.cameraPosition(
-          {
-            x: (node.x || 0) * distRatio,
-            y: (node.y || 0) * distRatio + 15,
-            z: (node.z || 0) * distRatio
-          },
-          node, // lookAt target
-          1200 // 1.2s smooth tween
-        );
-      }
-    },
-    []
-  );
+  const handleNodeHover = useCallback((node) => {
+    setHoveredNode(node || null);
+    if (containerRef.current) {
+      containerRef.current.style.cursor = node ? 'pointer' : 'default';
+    }
+  }, []);
 
-  // Handle node click -> triggers right-side NodeActions drawer
   const handleNodeClick = useCallback(
-    (node) => {
-      if (node && onSelectNode) {
-        const fullNode = node.rawNode || nodes.find((n) => n.id === node.id) || node;
-        onSelectNode(fullNode);
+    (graphNode) => {
+      if (!graphNode) return;
+      const matched = nodes.find((n) => n.id === graphNode.id);
+      if (matched && onSelectNode) {
+        onSelectNode(matched);
+      } else if (graphNode.rawNode && onSelectNode) {
+        onSelectNode(graphNode.rawNode);
       }
     },
     [nodes, onSelectNode]
   );
 
-  // Reset Camera View
   const handleResetCamera = useCallback(() => {
     if (fgRef.current) {
       fgRef.current.cameraPosition({ x: 0, y: 0, z: 320 }, { x: 0, y: 0, z: 0 }, 1000);
     }
   }, []);
 
-  // Custom 3D Object Rendering for Nodes (Three.js Spheres, Halos, Pulsing Shells)
+  useEffect(() => {
+    if (fgRef.current) {
+      try {
+        fgRef.current.d3Force('charge')?.strength(-30);
+        fgRef.current.d3VelocityDecay(0.3);
+        fgRef.current.d3AlphaDecay(0.035);
+      } catch (e) {}
+    }
+  }, [graphData]);
+
+  useEffect(() => {
+    if (fgRef.current) {
+      try {
+        const scene = fgRef.current.scene();
+        if (scene && !scene.getObjectByName('neronet_starfield')) {
+          const starCount = 400;
+          const starGeo = new THREE.BufferGeometry();
+          const positions = new Float32Array(starCount * 3);
+          for (let i = 0; i < starCount * 3; i += 3) {
+            positions[i] = (Math.random() - 0.5) * 1400;
+            positions[i + 1] = (Math.random() - 0.5) * 1400;
+            positions[i + 2] = (Math.random() - 0.5) * 1400;
+          }
+          starGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+          const starMat = new THREE.PointsMaterial({
+            color: 0x64748b,
+            size: 1.5,
+            transparent: true,
+            opacity: 0.55
+          });
+          const starfield = new THREE.Points(starGeo, starMat);
+          starfield.name = 'neronet_starfield';
+          scene.add(starfield);
+        }
+      } catch (e) {}
+    }
+  }, [dimensions]);
+
   const nodeThreeObject = useCallback((node) => {
     const group = new THREE.Group();
+    const radius = node.role === 'RELAY' ? 5.5 : Math.max(3.5, node.val * 0.55);
+    const geometry = node.role === 'RELAY' ? getCachedOctahedron(radius) : getCachedSphere(radius);
+    const material = getCachedPhongMaterial(node.color);
+    const mesh = new THREE.Mesh(geometry, material);
+    group.add(mesh);
 
-    // Core Sphere
-    const radius = node.role === 'RELAY' ? 6.5 : node.val * 0.65;
-    const geometry = new THREE.SphereGeometry(radius, 24, 24);
-    const material = new THREE.MeshPhongMaterial({
-      color: new THREE.Color(node.color),
-      emissive: new THREE.Color(node.color),
-      emissiveIntensity: 0.45,
-      shininess: 80,
-      transparent: true,
-      opacity: 0.95
-    });
-    const sphere = new THREE.Mesh(geometry, material);
-    group.add(sphere);
-
-    // Glowing Halo Shell
-    const haloGeometry = new THREE.SphereGeometry(radius * 1.35, 16, 16);
-    const haloMaterial = new THREE.MeshBasicMaterial({
-      color: new THREE.Color(node.color),
-      transparent: true,
-      opacity: 0.22,
-      wireframe: true
-    });
+    const haloGeometry = getCachedOctahedron(radius * 1.35);
+    const haloMaterial = getCachedBasicMaterial(node.color, 0.22, true);
     const halo = new THREE.Mesh(haloGeometry, haloMaterial);
     group.add(halo);
 
-    // High Risk (>75) or Quarantined: Red Pulsing Outer Ring
     if (node.is_quarantined || (node.risk_score || 0) > 75) {
-      const dangerGeometry = new THREE.TorusGeometry(radius * 1.9, 0.7, 8, 24);
-      const dangerMaterial = new THREE.MeshBasicMaterial({
-        color: new THREE.Color('#ef4444'),
-        transparent: true,
-        opacity: 0.85
-      });
+      const dangerGeometry = getCachedTorus(radius * 1.8, 0.5);
+      const dangerMaterial = getCachedBasicMaterial('#ef4444', 0.85, false);
       const dangerRing = new THREE.Mesh(dangerGeometry, dangerMaterial);
       dangerRing.rotation.x = Math.PI / 2;
       group.add(dangerRing);
     }
 
-    // Peered Nodes: Purple Outer Gyro Ring
     if (node.is_peered) {
-      const peerGeometry = new THREE.TorusGeometry(radius * 1.7, 0.5, 8, 24);
-      const peerMaterial = new THREE.MeshBasicMaterial({
-        color: new THREE.Color('#a855f7'),
-        transparent: true,
-        opacity: 0.8
-      });
+      const peerGeometry = getCachedTorus(radius * 1.6, 0.4);
+      const peerMaterial = getCachedBasicMaterial('#a855f7', 0.8, false);
       const peerRing = new THREE.Mesh(peerGeometry, peerMaterial);
       peerRing.rotation.y = Math.PI / 3;
       group.add(peerRing);
@@ -346,95 +403,55 @@ export default function Topology3D({ onSelectNode }) {
 
   return (
     <div className={`space-y-4 ${isFullscreen ? 'fixed inset-0 z-50 bg-dark-canvas p-6' : ''}`}>
-      {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold text-slate-100 flex items-center space-x-2">
             <Globe2 className="w-5 h-5 text-accent-primary animate-pulse" />
             <span>Interactive 3D Spiderweb Topology</span>
-            <span
-              className={`text-xs font-mono px-2 py-0.5 rounded border ${
-                isSuperAdmin
-                  ? 'bg-accent-primary/20 text-accent-primary border-accent-primary/40'
-                  : 'bg-neon-emerald/20 text-neon-emerald border-neon-emerald/40'
-              }`}
-            >
-              {isSuperAdmin ? 'Global Mesh (Super-Admin)' : 'Isolated Mesh (Tenant)'}
-            </span>
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
-            {isSuperAdmin
-              ? 'Physics-based 3D graph: Regional Relays, Exit Gateways, Cross-Mesh Peering, and quarantined devices.'
-              : 'Zero-Knowledge scoped view: Strictly Alice’s personal devices connected to regional relay.'}
-          </p>
         </div>
-
-        {/* Filters and Search Bar */}
         <div className="flex items-center space-x-2">
-          <div className="relative">
-            <Search className="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Filter node or VIP..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-8 pr-3 py-1.5 text-xs bg-dark-card border border-dark-border rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:border-accent-primary font-mono w-44 sm:w-56"
-            />
-          </div>
-
-          <select
-            value={selectedRoleFilter}
-            onChange={(e) => setSelectedRoleFilter(e.target.value)}
-            className="px-2.5 py-1.5 text-xs bg-dark-card border border-dark-border rounded-lg text-slate-200 focus:outline-none focus:border-accent-primary font-mono"
-          >
-            <option value="ALL">All Roles</option>
-            <option value="RELAY">Relays (Emerald)</option>
-            <option value="EXIT_BRIDGE">Exits (Indigo)</option>
-            <option value="CLIENT_ORIGIN">Clients (Sky)</option>
-            <option value="PEERED">Peered (Purple)</option>
-            <option value="QUARANTINED">High Risk / Quarantined (Red)</option>
-          </select>
-
+          <input
+            type="text"
+            placeholder="Filter node or VIP..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="px-3 py-1.5 text-xs bg-dark-card border border-dark-border rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none w-44 sm:w-56"
+          />
           <button
             onClick={() => setIsFullscreen(!isFullscreen)}
-            className="p-2 rounded-lg bg-dark-card border border-dark-border text-slate-400 hover:text-white transition-colors"
-            title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
+            className="p-2 rounded-lg bg-dark-card border border-dark-border text-slate-400"
           >
             {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
           </button>
         </div>
       </div>
 
-      {/* 3D Force Graph Viewport */}
-      <div
-        ref={containerRef}
-        className="relative w-full h-[580px] rounded-2xl bg-dark-canvas border border-dark-border overflow-hidden shadow-2xl group"
-      >
+      <div ref={containerRef} className="relative w-full h-[580px] rounded-2xl bg-dark-canvas border border-dark-border overflow-hidden shadow-2xl">
         <ForceGraph3D
           ref={fgRef}
           width={dimensions.width}
           height={dimensions.height}
           graphData={graphData}
-          backgroundColor="#0f172a"
+          backgroundColor="#030712"
           showNavInfo={false}
           nodeThreeObject={nodeThreeObject}
-          nodeLabel={(node) => `${node.name} (${node.overlay_ipv4})`}
+          nodeLabel={(node) => `${node.name || node.hostname || node.id}`}
           onNodeHover={handleNodeHover}
           onNodeClick={handleNodeClick}
-          linkWidth={1.4}
+          linkWidth={0.8}
           linkColor={(link) => link.color}
           linkCurvature={(link) => link.curvature || 0}
           linkDirectionalParticles={(link) => link.particles || 0}
           linkDirectionalParticleSpeed={(link) => link.speed || 0.005}
-          linkDirectionalParticleWidth={2.4}
+          linkDirectionalParticleWidth={1.8}
           linkDirectionalParticleColor={(link) => link.color}
           enableNodeDrag={true}
           enableNavigationControls={true}
           controlType="orbit"
         />
 
-        {/* HUD Top Left: Active Stats */}
-        <div className="absolute top-4 left-4 p-3.5 rounded-xl bg-dark-card/90 border border-dark-border/80 backdrop-blur-md text-xs font-mono space-y-1.5 pointer-events-none shadow-xl">
+        <div className="absolute top-4 left-4 p-3.5 rounded-xl bg-dark-card/90 border border-dark-border/80 backdrop-blur-md text-xs font-mono shadow-xl pointer-events-none">
           <div className="flex items-center space-x-2 text-slate-200 font-bold">
             <Layers className="w-4 h-4 text-accent-primary" />
             <span>{isSuperAdmin ? 'SCOPE: GLOBAL MESH' : 'SCOPE: TENANT ISOLATED'}</span>

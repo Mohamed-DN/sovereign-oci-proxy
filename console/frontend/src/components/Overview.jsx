@@ -106,89 +106,103 @@ export default function Overview({ onSelectNode, onNavigateTab }) {
       </div>
 
       {/* KPI Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Metric 1: Nodes */}
-        <div className="p-4 rounded-xl bg-dark-card border border-dark-border relative overflow-hidden group hover:border-dark-border/80 transition-all shadow-lg">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-mono">Active Sovereign Nodes</span>
-            <Server className="w-4 h-4 text-neon-cyan" />
-          </div>
-          <div className="flex items-baseline space-x-2">
-            <span className="text-2xl font-bold text-slate-100 font-mono">
-              {stats?.active_nodes || 17}
-            </span>
-            <span className="text-xs text-slate-500 font-mono">/ {stats?.total_nodes || 18} Enrolled</span>
-          </div>
-          <div className="mt-3 flex items-center justify-between text-[11px] font-mono">
-            <span className="text-neon-emerald flex items-center space-x-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-neon-emerald"></span>
-              <span>17 Compliant</span>
-            </span>
-            <span className="text-neon-rose flex items-center space-x-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-neon-rose"></span>
-              <span>1 Quarantined</span>
-            </span>
-          </div>
-        </div>
+      {(() => {
+        const activeNodes = stats?.active_nodes ?? 0;
+        const totalNodes = stats?.total_nodes ?? (stats?.active_nodes ?? 0);
+        const quarantinedNodes = stats?.quarantined_nodes ?? 0;
+        const compliantNodes = Math.max(0, activeNodes - quarantinedNodes);
+        const activeUsers = stats?.active_users ?? 0;
+        const rxBandwidth = stats?.total_bandwidth_rx_mb_s ?? 88.4;
+        const txBandwidth = stats?.total_bandwidth_tx_mb_s ?? 64.1;
+        const totalBandwidth = +(rxBandwidth + txBandwidth).toFixed(1);
+        const healthScore = stats?.network_health_score ?? (totalNodes === 0 ? 100 : 98.4);
 
-        {/* Metric 2: Users */}
-        <div className="p-4 rounded-xl bg-dark-card border border-dark-border relative overflow-hidden group hover:border-dark-border/80 transition-all shadow-lg">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-mono">Total Users & Tiers</span>
-            <Users className="w-4 h-4 text-neon-indigo" />
-          </div>
-          <div className="flex items-baseline space-x-2">
-            <span className="text-2xl font-bold text-slate-100 font-mono">
-              {stats?.active_users || 4}
-            </span>
-            <span className="text-xs text-slate-500 font-mono">Active Tenants</span>
-          </div>
-          <div className="mt-3 flex items-center justify-between text-[11px] font-mono">
-            <span className="text-neon-emerald">2 Hybrid BYOS ($0)</span>
-            <span className="text-neon-cyan">2 Cloud Managed</span>
-          </div>
-        </div>
+        return (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Metric 1: Nodes */}
+            <div className="p-4 rounded-xl bg-dark-card border border-dark-border relative overflow-hidden group hover:border-dark-border/80 transition-all shadow-lg">
+              <div className="flex items-center justify-between text-slate-400 mb-2">
+                <span className="text-xs font-mono">Active Sovereign Nodes</span>
+                <Server className="w-4 h-4 text-neon-cyan" />
+              </div>
+              <div className="flex items-baseline space-x-2">
+                <span className="text-2xl font-bold text-slate-100 font-mono">
+                  {activeNodes}
+                </span>
+                <span className="text-xs text-slate-500 font-mono">/ {totalNodes} Enrolled</span>
+              </div>
+              <div className="mt-3 flex items-center justify-between text-[11px] font-mono">
+                <span className="text-neon-emerald flex items-center space-x-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-neon-emerald"></span>
+                  <span>{compliantNodes} Compliant</span>
+                </span>
+                <span className="text-neon-rose flex items-center space-x-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-neon-rose"></span>
+                  <span>{quarantinedNodes} Quarantined</span>
+                </span>
+              </div>
+            </div>
 
-        {/* Metric 3: Aggregate Bandwidth */}
-        <div className="p-4 rounded-xl bg-dark-card border border-dark-border relative overflow-hidden group hover:border-dark-border/80 transition-all shadow-lg">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-mono">Live Line-Rate (Throughput)</span>
-            <Activity className="w-4 h-4 text-neon-emerald" />
-          </div>
-          <div className="flex items-baseline space-x-2">
-            <span className="text-2xl font-bold text-slate-100 font-mono">152.5</span>
-            <span className="text-xs text-slate-400 font-mono">MB/s</span>
-          </div>
-          <div className="mt-3 flex items-center justify-between text-[11px] font-mono text-slate-400">
-            <span className="text-neon-cyan flex items-center space-x-1">
-              <ArrowDownLeft className="w-3 h-3" />
-              <span>RX: 88.4 MB/s</span>
-            </span>
-            <span className="text-neon-indigo flex items-center space-x-1">
-              <ArrowUpRight className="w-3 h-3" />
-              <span>TX: 64.1 MB/s</span>
-            </span>
-          </div>
-        </div>
+            {/* Metric 2: Users */}
+            <div className="p-4 rounded-xl bg-dark-card border border-dark-border relative overflow-hidden group hover:border-dark-border/80 transition-all shadow-lg">
+              <div className="flex items-center justify-between text-slate-400 mb-2">
+                <span className="text-xs font-mono">Total Users & Tiers</span>
+                <Users className="w-4 h-4 text-neon-indigo" />
+              </div>
+              <div className="flex items-baseline space-x-2">
+                <span className="text-2xl font-bold text-slate-100 font-mono">
+                  {activeUsers}
+                </span>
+                <span className="text-xs text-slate-500 font-mono">Active Tenants</span>
+              </div>
+              <div className="mt-3 flex items-center justify-between text-[11px] font-mono">
+                <span className="text-neon-emerald">{Math.ceil(activeUsers / 2)} Hybrid BYOS ($0)</span>
+                <span className="text-neon-cyan">{Math.floor(activeUsers / 2)} Cloud Managed</span>
+              </div>
+            </div>
 
-        {/* Metric 4: Posture Health Score */}
-        <div className="p-4 rounded-xl bg-dark-card border border-dark-border relative overflow-hidden group hover:border-dark-border/80 transition-all shadow-lg">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-mono">Mesh Posture Score</span>
-            <ShieldCheck className="w-4 h-4 text-neon-emerald" />
+            {/* Metric 3: Aggregate Bandwidth */}
+            <div className="p-4 rounded-xl bg-dark-card border border-dark-border relative overflow-hidden group hover:border-dark-border/80 transition-all shadow-lg">
+              <div className="flex items-center justify-between text-slate-400 mb-2">
+                <span className="text-xs font-mono">Live Line-Rate (Throughput)</span>
+                <Activity className="w-4 h-4 text-neon-emerald" />
+              </div>
+              <div className="flex items-baseline space-x-2">
+                <span className="text-2xl font-bold text-slate-100 font-mono">{totalBandwidth}</span>
+                <span className="text-xs text-slate-400 font-mono">MB/s</span>
+              </div>
+              <div className="mt-3 flex items-center justify-between text-[11px] font-mono text-slate-400">
+                <span className="text-neon-cyan flex items-center space-x-1">
+                  <ArrowDownLeft className="w-3 h-3" />
+                  <span>RX: {rxBandwidth} MB/s</span>
+                </span>
+                <span className="text-neon-indigo flex items-center space-x-1">
+                  <ArrowUpRight className="w-3 h-3" />
+                  <span>TX: {txBandwidth} MB/s</span>
+                </span>
+              </div>
+            </div>
+
+            {/* Metric 4: Posture Health Score */}
+            <div className="p-4 rounded-xl bg-dark-card border border-dark-border relative overflow-hidden group hover:border-dark-border/80 transition-all shadow-lg">
+              <div className="flex items-center justify-between text-slate-400 mb-2">
+                <span className="text-xs font-mono">Mesh Posture Score</span>
+                <ShieldCheck className="w-4 h-4 text-neon-emerald" />
+              </div>
+              <div className="flex items-baseline space-x-2">
+                <span className="text-2xl font-bold text-neon-emerald font-mono">
+                  {healthScore}%
+                </span>
+                <span className="text-xs text-slate-400 font-mono">Optimal</span>
+              </div>
+              <div className="mt-3 flex items-center justify-between text-[11px] font-mono text-slate-400">
+                <span>Avg Latency: 16.2ms</span>
+                <span className="text-neon-cyan">Jitter: &lt;1.2ms</span>
+              </div>
+            </div>
           </div>
-          <div className="flex items-baseline space-x-2">
-            <span className="text-2xl font-bold text-neon-emerald font-mono">
-              {stats?.network_health_score || 98.4}%
-            </span>
-            <span className="text-xs text-slate-400 font-mono">Optimal</span>
-          </div>
-          <div className="mt-3 flex items-center justify-between text-[11px] font-mono text-slate-400">
-            <span>Avg Latency: 16.2ms</span>
-            <span className="text-neon-cyan">Jitter: &lt;1.2ms</span>
-          </div>
-        </div>
-      </div>
+        );
+      })()}
 
       {/* Main Grid: Live Bandwidth Chart & Geographic Matrix */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

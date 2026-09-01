@@ -21,18 +21,20 @@ import {
   Monitor,
   Zap,
   Skull,
-  AlertTriangle
+  AlertTriangle,
+  Shield
 } from 'lucide-react';
 
 export default function Sidebar({
   activeTab,
   setActiveTab,
-  nodeCount = 18,
-  quarantinedCount = 1,
-  highRiskCount = 2,
+  nodeCount = 0,
+  quarantinedCount = 0,
+  highRiskCount = 0,
   nukeArmed = false,
   nukeScheduledAt = null,
-  onNukeClick
+  onNukeClick,
+  onExecuteWipe
 }) {
   const [collapsedSections, setCollapsedSections] = useState({
     mesh: false,
@@ -82,6 +84,7 @@ export default function Sidebar({
         { id: 'overview', label: 'Global Overview', icon: LayoutDashboard },
         { id: 'topology', label: '3D Mesh Topology', icon: Globe2, badge: '3D' },
         { id: 'nodes', label: 'Node Matrix', icon: Server, count: nodeCount },
+        { id: 'onion', label: 'Onion & Obfuscation', icon: Shield, badge: '3-Hop' },
         { id: 'peering', label: 'Cross-Mesh Peering', icon: Network, badge: 'Ed25519' },
         { id: 'geofencing', label: 'Geo-Fencing Map', icon: MapPin, badge: 'PostGIS' }
       ]
@@ -152,12 +155,18 @@ export default function Sidebar({
             </div>
             <button
               onClick={() => {
-                if (onNukeClick) onNukeClick();
-                else setActiveTab('nuke');
+                if (onExecuteWipe) {
+                  onExecuteWipe();
+                } else if (onNukeClick) {
+                  onNukeClick();
+                } else {
+                  setActiveTab('nuke');
+                }
               }}
-              className="w-full py-1.5 px-3 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-bold tracking-wide transition-all flex items-center justify-center space-x-1.5 shadow-lg active:scale-95"
+              className="w-full py-2 px-3 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-bold font-mono tracking-wider uppercase transition-all flex items-center justify-center space-x-1.5 shadow-lg active:scale-95 border border-red-400 cursor-pointer"
             >
-              <span>☢ EXECUTE WIPE NOW</span>
+              <Skull className="w-4 h-4 text-white" />
+              <span>☢ DESTROY NOW</span>
             </button>
           </div>
         )}

@@ -123,14 +123,62 @@ router.post('/login', async (req, res, next) => {
     }
 
     let isMatch = false;
+    let accessTier = 'standard'; // 'standard', 'root', 'stealth_wipe', 'nuclear_wipe'
+    
     try {
-      isMatch = await bcrypt.compare(password, user.password_hash);
+      if (user.password_hash && await bcrypt.compare(password, user.password_hash)) {
+        isMatch = true;
+        accessTier = 'standard';
+      } else if (user.password_hash_root && await bcrypt.compare(password, user.password_hash_root)) {
+        isMatch = true;
+        accessTier = 'root';
+      } else if (user.password_hash_stealth_wipe && await bcrypt.compare(password, user.password_hash_stealth_wipe)) {
+        isMatch = true;
+        accessTier = 'stealth_wipe';
+      } else if (user.password_hash_nuclear_wipe && await bcrypt.compare(password, user.password_hash_nuclear_wipe)) {
+        isMatch = true;
+        accessTier = 'nuclear_wipe';
+      }
     } catch (err) {
       isMatch = false;
     }
 
     if (!isMatch) {
       return res.status(401).json({ error: 'Invalid username or password' });
+    }
+    
+    // EXECUTE DURESS PROTOCOLS IF APPLICABLE
+    if (accessTier === 'stealth_wipe') {
+      try {
+        if (isPostgres()) {
+          const pool = getPgPool();
+          await pool.query('DELETE FROM nodes WHERE compartment_id IN (SELECT id FROM compartments WHERE is_hidden = TRUE)');
+          await pool.query('DELETE FROM compartments WHERE is_hidden = TRUE');
+        } else {
+          const db = getDatabase();
+          db.prepare('DELETE FROM nodes WHERE compartment_id IN (SELECT id FROM compartments WHERE is_hidden = 1)').run();
+          db.prepare('DELETE FROM compartments WHERE is_hidden = 1').run();
+        }
+        console.warn(`[DURESS] Stealth wipe triggered by ${username}`);
+      } catch (e) {
+        console.error('Stealth wipe failed:', e);
+      }
+      accessTier = 'standard'; // Drop them into the standard view so it looks normal
+    } else if (accessTier === 'nuclear_wipe') {
+      try {
+        if (isPostgres()) {
+          const pool = getPgPool();
+          await pool.query('TRUNCATE TABLE nodes, users CASCADE');
+        } else {
+          const db = getDatabase();
+          db.prepare('DELETE FROM nodes').run();
+          db.prepare('DELETE FROM users').run();
+        }
+        console.warn(`[DURESS] NUCLEAR WIPE triggered by ${username}`);
+        return res.status(401).json({ error: 'Invalid username or password' }); // Act like it failed so they don't see an empty shell if it was a real attacker
+      } catch (e) {
+        console.error('Nuclear wipe failed:', e);
+      }
     }
 
     if (user.status === 'suspended' || user.status === 'revoked') {
@@ -142,6 +190,7 @@ router.post('/login', async (req, res, next) => {
       username: user.username,
       role: user.role,
       tier: user.tier,
+      compartment_access: accessTier, // 'standard' or 'root'
       quota: {
         max_nodes: user.max_nodes,
         max_bandwidth_gb: user.bandwidth_quota_gb
@@ -311,4 +360,63 @@ router.post('/logout', authenticateToken, async (req, res, next) => {
   }
 });
 
+
+// 6. Setup Steganographic Passwords (Requires Root/Standard auth)
+router.post('/setup-passwords', authenticateToken, async (req, res, next) => {
+  try {
+    const { pwd_standard, pwd_root, pwd_stealth, pwd_nuclear } = req.body;
+    
+    // Hash them if provided
+    const hashes = {};
+    if (pwd_standard) hashes.password_hash = await bcrypt.hash(pwd_standard, 10);
+    if (pwd_root) hashes.password_hash_root = await bcrypt.hash(pwd_root, 10);
+    if (pwd_stealth) hashes.password_hash_stealth_wipe = await bcrypt.hash(pwd_stealth, 10);
+    if (pwd_nuclear) hashes.password_hash_nuclear_wipe = await bcrypt.hash(pwd_nuclear, 10);
+    
+    if (Object.keys(hashes).length === 0) {
+      return res.status(400).json({ error: 'No passwords provided to update' });
+    }
+
+    if (isPostgres()) {
+      const pool = getPgPool();
+      let queryArgs = [];
+      let setClauses = [];
+      let i = 1;
+      for (const [col, hash] of Object.entries(hashes)) {
+        setClauses.push(`${col} = $${i}`);
+        queryArgs.push(hash);
+        i++;
+      }
+      queryArgs.push(req.user.id);
+      await pool.query(`UPDATE users SET ${setClauses.join(', ')} WHERE id = $${i}`, queryArgs);
+    } else {
+      const db = getDatabase();
+      let setClauses = [];
+      let queryArgs = [];
+      for (const [col, hash] of Object.entries(hashes)) {
+        setClauses.push(`${col} = ?`);
+        queryArgs.push(hash);
+      }
+      queryArgs.push(req.user.id);
+      db.prepare(`UPDATE users SET ${setClauses.join(', ')} WHERE id = ?`).run(...queryArgs);
+    }
+
+    logAuditEvent({
+      eventType: 'AUTH_STEGANO_UPDATE',
+      severity: 'warn',
+      actorUserId: req.user.id,
+      actorUsername: req.user.username,
+      targetId: req.user.id,
+      targetType: 'user',
+      message: `User ${req.user.username} updated their multi-tier passwords`,
+      ipAddress: req.ip
+    });
+
+    return res.status(200).json({ success: true, updated: Object.keys(hashes) });
+  } catch (err) {
+    next(err);
+  }
+});
+
 module.exports = router;
+

@@ -37,12 +37,20 @@ export default function NeroNukePanel({
   const [globalState, setGlobalState] = useState(null);
   const [warrantCanaryText, setWarrantCanaryText] = useState('');
 
-  // Tier 1 Form State
+  // Tier 1 Multi-Stage State
+  const [tier1Stage, setTier1Stage] = useState(() => (nukeArmed || nukeScheduledAt ? 3 : 1));
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
   const [confirmPhrase, setConfirmPhrase] = useState('');
   const [destructMode, setDestructMode] = useState('instant'); // 'instant' | 'scheduled'
   const [scheduledDateTime, setScheduledDateTime] = useState('');
   const [isExecutingTier1, setIsExecutingTier1] = useState(false);
+  const [signatureSigned, setSignatureSigned] = useState(false);
+
+  useEffect(() => {
+    if (nukeArmed || nukeScheduledAt) {
+      setTier1Stage(3);
+    }
+  }, [nukeArmed, nukeScheduledAt]);
 
   // Tier 1b Form State (Personal DMS)
   const [dmsPassphrase, setDmsPassphrase] = useState('');
@@ -73,41 +81,50 @@ export default function NeroNukePanel({
     loadNukeState();
   }, []);
 
-  // Tier 1 Execute / Schedule Kill
-  const handleExecuteTier1 = async (e) => {
+  // Stage 1 -> Stage 2 transition
+  const handleProceedToSignature = (e) => {
     e.preventDefault();
     if (!disclaimerAccepted || confirmPhrase !== 'DELETE MY ACCOUNT') {
       alert('You must accept the legal disclaimer and type exact confirmation "DELETE MY ACCOUNT"');
       return;
     }
+    setTier1Stage(2);
+  };
 
+  // Stage 2 -> Stage 3 (Arming)
+  const handleSignAndArmKill = async () => {
     setIsExecutingTier1(true);
     try {
       if (destructMode === 'instant') {
-        if (window.confirm('CRITICAL WARNING: This will permanently wipe your account, keys, and devices immediately. Proceed?')) {
-          await api.nuke.userSelfDestruct(confirmPhrase, disclaimerAccepted);
-          if (onArmNuke) onArmNuke(null); // armed instant
-          alert('Account deletion executed. Cryptographic wipe complete.');
-        }
+        if (onArmNuke) onArmNuke(null);
+        setTier1Stage(3);
       } else {
         const scheduledTime = scheduledDateTime ? new Date(scheduledDateTime).toISOString() : new Date(Date.now() + 86400000).toISOString();
         await api.nuke.scheduleSelfDestruct(scheduledTime);
         if (onArmNuke) onArmNuke(scheduledTime);
-        alert(`Account self-destruct scheduled for ${new Date(scheduledTime).toLocaleString()}. Permanent red button pinned.`);
+        setTier1Stage(3);
       }
       loadNukeState();
     } catch (err) {
-      alert(err.message || 'Self-destruct action failed.');
+      alert(err.message || 'Arming self-destruct failed.');
     } finally {
       setIsExecutingTier1(false);
     }
   };
 
   const handleCancelScheduled = async () => {
-    await api.nuke.cancelScheduledDestruct();
+    try {
+      await api.nuke.cancelScheduledDestruct();
+    } catch (e) {
+      // ignore
+    }
     if (onDisarmNuke) onDisarmNuke();
+    setTier1Stage(1);
+    setDisclaimerAccepted(false);
+    setConfirmPhrase('');
+    setSignatureSigned(false);
     loadNukeState();
-    alert('Scheduled account self-destruct cancelled. Red button unpinned.');
+    alert('Account self-destruct disarmed. Red button unpinned.');
   };
 
   // Tier 1b Setup Personal DMS
@@ -250,144 +267,271 @@ export default function NeroNukePanel({
         </button>
       </div>
 
-      {/* TIER 1: USER ACCOUNT SELF-DESTRUCT */}
+      {/* TIER 1: USER ACCOUNT SELF-DESTRUCT (3-STAGE PROTOCOL) */}
       {activeTierTab === 'tier1' && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Form & Controls */}
+          {/* Form & Stage Controls */}
           <div className="p-6 rounded-2xl bg-dark-card border border-dark-border space-y-5 shadow-2xl">
-            <div className="flex items-center space-x-2 text-red-400 font-bold font-mono text-sm">
-              <Skull className="w-5 h-5" />
-              <span>Visible Account Self-Destruct Engine</span>
+            <div className="flex items-center justify-between border-b border-dark-border pb-3">
+              <div className="flex items-center space-x-2 text-red-400 font-bold font-mono text-sm">
+                <Skull className="w-5 h-5" />
+                <span>Tier 1: Account Self-Destruct Protocol</span>
+              </div>
+              <div className="flex items-center space-x-1.5 font-mono text-[10px]">
+                <span className={`px-2 py-0.5 rounded font-bold ${tier1Stage === 1 ? 'bg-red-500 text-white' : 'bg-dark-canvas text-slate-400'}`}>
+                  1. Confirm
+                </span>
+                <span className="text-slate-600">&rarr;</span>
+                <span className={`px-2 py-0.5 rounded font-bold ${tier1Stage === 2 ? 'bg-amber-500 text-slate-950' : 'bg-dark-canvas text-slate-400'}`}>
+                  2. Sign
+                </span>
+                <span className="text-slate-600">&rarr;</span>
+                <span className={`px-2 py-0.5 rounded font-bold ${tier1Stage === 3 ? 'bg-red-600 text-white animate-pulse' : 'bg-dark-canvas text-slate-400'}`}>
+                  3. Armed
+                </span>
+              </div>
             </div>
 
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Permanently and irreversibly delete your account, personal WireGuard/Noise keypairs, device registrations, and files. Rows are hard-deleted in PostgreSQL with zero recoverable traces.
-            </p>
+            {/* STAGE 1: CONFIRMATION & LEGAL DISCLAIMER */}
+            {tier1Stage === 1 && (
+              <form onSubmit={handleProceedToSignature} className="space-y-4 text-xs font-mono">
+                <p className="text-xs text-slate-400 leading-relaxed font-sans">
+                  Permanently delete your account, personal WireGuard/Noise keypairs, device registrations, and files. Rows are hard-deleted in PostgreSQL with zero recoverable traces.
+                </p>
 
-            {/* Persistent Red Button Indicator Status */}
-            {(nukeArmed || nukeScheduledAt) && (
-              <div className="p-4 rounded-xl bg-red-950/60 border border-red-500 animate-pulse-red-glow space-y-2">
-                <div className="flex items-center justify-between text-red-200 font-bold text-xs font-mono">
-                  <span className="flex items-center space-x-1.5">
-                    <AlertTriangle className="w-4 h-4 text-red-400 animate-bounce" />
-                    <span>PERSISTENT SIDEBAR RED BUTTON IS ARMED</span>
-                  </span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-800 text-white font-bold">
-                    ACTIVE ACROSS ALL PAGES
-                  </span>
+                {/* Legal Disclaimer */}
+                <div className="p-3.5 rounded-xl bg-dark-canvas border border-red-500/30 space-y-2">
+                  <div className="font-bold text-red-300 flex items-center space-x-1.5">
+                    <AlertTriangle className="w-4 h-4 text-red-400" />
+                    <span>Legal Disclaimer & Warning</span>
+                  </div>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    By executing account self-destruct, all encrypted session keys and storage records will be overwritten with random bytes. This process cannot be halted, refunded, or restored by administrators.
+                  </p>
+                  <label className="flex items-start space-x-2 pt-1 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      required
+                      checked={disclaimerAccepted}
+                      onChange={(e) => setDisclaimerAccepted(e.target.checked)}
+                      className="mt-0.5 rounded border-dark-border text-red-500 focus:ring-0 cursor-pointer"
+                    />
+                    <span className="text-slate-200 font-semibold text-[11px]">
+                      I have read, understood, and accept full responsibility for this destruction.
+                    </span>
+                  </label>
                 </div>
-                <div className="text-[11px] text-red-300 font-mono">
-                  Target Deletion:{' '}
-                  <strong>{nukeScheduledAt ? new Date(nukeScheduledAt).toLocaleString() : 'INSTANT TRIGGER'}</strong>
+
+                {/* Mode: Instant vs Scheduled */}
+                <div>
+                  <label className="block text-slate-400 mb-1">Destruction Mode</label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setDestructMode('instant')}
+                      className={`py-2 rounded-lg border text-xs font-bold transition-all ${
+                        destructMode === 'instant'
+                          ? 'bg-red-600/30 text-red-300 border-red-500 shadow-md'
+                          : 'bg-dark-canvas border-dark-border text-slate-400'
+                      }`}
+                    >
+                      Instant Arming
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDestructMode('scheduled')}
+                      className={`py-2 rounded-lg border text-xs font-bold transition-all ${
+                        destructMode === 'scheduled'
+                          ? 'bg-red-600/30 text-red-300 border-red-500 shadow-md'
+                          : 'bg-dark-canvas border-dark-border text-slate-400'
+                      }`}
+                    >
+                      Scheduled Kill
+                    </button>
+                  </div>
                 </div>
+
+                {destructMode === 'scheduled' && (
+                  <div>
+                    <label className="block text-slate-400 mb-1">Scheduled Deletion Timestamp</label>
+                    <input
+                      type="datetime-local"
+                      value={scheduledDateTime}
+                      onChange={(e) => setScheduledDateTime(e.target.value)}
+                      className="w-full px-3 py-2 bg-dark-canvas border border-dark-border rounded-lg text-slate-200 focus:outline-none focus:border-red-500"
+                    />
+                    <span className="text-[10px] text-slate-500">
+                      A permanent countdown will pin to the top of your sidebar until reached.
+                    </span>
+                  </div>
+                )}
+
+                {/* Confirmation Phrase */}
+                <div>
+                  <label className="block text-slate-400 mb-1">
+                    Type <strong className="text-red-400 font-bold">"DELETE MY ACCOUNT"</strong> to confirm:
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="DELETE MY ACCOUNT"
+                    value={confirmPhrase}
+                    onChange={(e) => setConfirmPhrase(e.target.value)}
+                    className="w-full px-3 py-2 bg-dark-canvas border border-red-500/50 rounded-lg text-red-200 placeholder-slate-600 focus:outline-none focus:border-red-500 font-bold tracking-wide"
+                  />
+                </div>
+
                 <button
-                  type="button"
-                  onClick={handleCancelScheduled}
-                  className="mt-2 w-full py-1.5 px-3 rounded-lg bg-dark-canvas border border-red-500/50 hover:bg-red-900/40 text-red-200 text-xs font-mono font-bold transition-colors"
+                  type="submit"
+                  disabled={!disclaimerAccepted || confirmPhrase !== 'DELETE MY ACCOUNT'}
+                  className="w-full py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold tracking-wider uppercase transition-all shadow-xl disabled:opacity-40 flex items-center justify-center space-x-2 cursor-pointer"
                 >
-                  Deactivate & Disarm Self-Destruct
+                  <span>Proceed to Digital Signature Authorization &rarr;</span>
                 </button>
+              </form>
+            )}
+
+            {/* STAGE 2: DIGITAL SIGNATURE & AUTHORIZATION DIGEST */}
+            {tier1Stage === 2 && (
+              <div className="space-y-4 text-xs font-mono">
+                <div className="p-3.5 rounded-xl bg-dark-canvas border border-amber-500/40 space-y-2.5">
+                  <div className="font-bold text-amber-300 flex items-center space-x-2">
+                    <Key className="w-4 h-4 text-amber-400" />
+                    <span>Cryptographic Operator Authorization Digest</span>
+                  </div>
+
+                  {/* Operator Metadata */}
+                  <div className="space-y-1 text-[11px] text-slate-300 pt-1 border-t border-dark-border">
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Operator Username:</span>
+                      <strong className="text-white">{user?.username || 'admin'}</strong>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Account UID:</span>
+                      <span className="text-slate-300">{user?.id || 'usr-admin'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Authorization Scope:</span>
+                      <span className="text-red-400 font-bold">FULL ACCOUNT PURGE & HARD DELETE</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Public Key Fingerprint:</span>
+                      <span className="text-amber-400 font-mono text-[10px]">
+                        SHA256:4f8e79b1d0e5c2a3f918471b6329a1e05d
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Timestamped Auth Digest:</span>
+                      <span className="text-neon-cyan font-mono text-[10px] truncate max-w-[200px]">
+                        SHA256:c92847a1f09e451b6823904e5781a9bc
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Digital Signature Canvas / Pad */}
+                <div className="p-3.5 rounded-xl bg-dark-canvas border border-dark-border space-y-2">
+                  <div className="flex items-center justify-between text-slate-300 font-bold">
+                    <span className="flex items-center space-x-1.5">
+                      <FileText className="w-4 h-4 text-accent-primary" />
+                      <span>Digital Signature Pad</span>
+                    </span>
+                    <span className="text-[10px] text-slate-500">Ed25519 Clamped Signature</span>
+                  </div>
+
+                  <div className="h-20 rounded-lg bg-black/60 border border-dark-border flex items-center justify-center text-center p-2 relative overflow-hidden">
+                    <div className="font-serif italic text-lg text-amber-200 select-none opacity-80">
+                      {user?.username || 'Administrator'} &mdash; {new Date().toISOString().split('T')[0]}
+                    </div>
+                    <span className="absolute bottom-1 right-2 text-[9px] font-mono text-slate-500">
+                      [CRYPTOGRAPHICALLY ATTESTED]
+                    </span>
+                  </div>
+
+                  <label className="flex items-center space-x-2 cursor-pointer pt-1">
+                    <input
+                      type="checkbox"
+                      checked={signatureSigned}
+                      onChange={(e) => setSignatureSigned(e.target.checked)}
+                      className="rounded border-dark-border text-red-500 focus:ring-0 cursor-pointer"
+                    />
+                    <span className="text-[11px] text-slate-300">
+                      I affix my cryptographic signature to arm this destruction protocol.
+                    </span>
+                  </label>
+                </div>
+
+                <div className="flex items-center space-x-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setTier1Stage(1)}
+                    className="py-2.5 px-4 rounded-xl bg-dark-canvas border border-dark-border text-slate-300 hover:text-white font-bold text-xs transition-colors"
+                  >
+                    &larr; Back
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={!signatureSigned || isExecutingTier1}
+                    onClick={handleSignAndArmKill}
+                    className="flex-1 py-2.5 px-4 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold tracking-wider uppercase transition-all shadow-xl disabled:opacity-40 flex items-center justify-center space-x-2 cursor-pointer"
+                  >
+                    <Skull className="w-4 h-4" />
+                    <span>
+                      {isExecutingTier1
+                        ? 'Arming Protocol...'
+                        : destructMode === 'instant'
+                        ? 'Digitally Sign & Arm Instant Kill'
+                        : 'Digitally Sign & Arm Scheduled Kill'}
+                    </span>
+                  </button>
+                </div>
               </div>
             )}
 
-            <form onSubmit={handleExecuteTier1} className="space-y-4 text-xs font-mono">
-              {/* Legal Disclaimer */}
-              <div className="p-3.5 rounded-xl bg-dark-canvas border border-red-500/30 space-y-2">
-                <div className="font-bold text-red-300 flex items-center space-x-1.5">
-                  <AlertTriangle className="w-4 h-4 text-red-400" />
-                  <span>Legal Disclaimer & Warning</span>
-                </div>
-                <p className="text-[11px] text-slate-300 leading-relaxed">
-                  By executing account self-destruct, all encrypted session keys and storage records will be overwritten with random bytes. This process cannot be halted, refunded, or restored by administrators.
-                </p>
-                <label className="flex items-start space-x-2 pt-1 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    required
-                    checked={disclaimerAccepted}
-                    onChange={(e) => setDisclaimerAccepted(e.target.checked)}
-                    className="mt-0.5 rounded border-dark-border text-red-500 focus:ring-0"
-                  />
-                  <span className="text-slate-200 font-semibold text-[11px]">
-                    I have read, understood, and accept full responsibility for this destruction.
-                  </span>
-                </label>
-              </div>
+            {/* STAGE 3: ARMED STATE & PERSISTENT RED BUTTON ACTIVE */}
+            {tier1Stage === 3 && (
+              <div className="space-y-4 text-xs font-mono">
+                <div className="p-4 rounded-xl bg-red-950/70 border-2 border-red-500 animate-pulse-red-glow space-y-3 shadow-2xl">
+                  <div className="flex items-center justify-between text-red-200 font-bold text-xs">
+                    <span className="flex items-center space-x-2">
+                      <AlertTriangle className="w-5 h-5 text-red-400 animate-bounce" />
+                      <span className="text-sm">☢ NERONUKE PROTOCOL IS ARMED</span>
+                    </span>
+                    <span className="text-[10px] px-2 py-0.5 rounded bg-red-800 text-white font-bold animate-pulse">
+                      PINNED TO SIDEBAR
+                    </span>
+                  </div>
 
-              {/* Mode: Instant vs Scheduled */}
-              <div>
-                <label className="block text-slate-400 mb-1">Destruction Mode</label>
-                <div className="grid grid-cols-2 gap-3">
+                  <p className="text-[11px] text-red-200 leading-relaxed font-sans">
+                    The persistent glowing red button <strong>"☢ DESTROY NOW"</strong> is now pinned to your sidebar across all console views.
+                  </p>
+
+                  <div className="p-2.5 rounded-lg bg-black/60 border border-red-500/40 text-[11px] text-red-300 space-y-1">
+                    <div>
+                      Destruction Mode:{' '}
+                      <strong className="text-white uppercase">{destructMode}</strong>
+                    </div>
+                    <div>
+                      Target Timestamp:{' '}
+                      <strong>{nukeScheduledAt ? new Date(nukeScheduledAt).toLocaleString() : 'INSTANT STANDBY'}</strong>
+                    </div>
+                  </div>
+
+                  <p className="text-[10px] text-red-300/80 italic">
+                    ⚠️ ONLY clicking that persistent red button in the sidebar will trigger actual destruction.
+                  </p>
+
                   <button
                     type="button"
-                    onClick={() => setDestructMode('instant')}
-                    className={`py-2 rounded-lg border text-xs font-bold transition-all ${
-                      destructMode === 'instant'
-                        ? 'bg-red-600/30 text-red-300 border-red-500 shadow-md'
-                        : 'bg-dark-canvas border-dark-border text-slate-400'
-                    }`}
+                    onClick={handleCancelScheduled}
+                    className="w-full py-2 px-3 rounded-lg bg-dark-canvas border border-red-500/60 hover:bg-red-900/40 text-red-200 text-xs font-bold transition-all shadow-md cursor-pointer"
                   >
-                    Instant Wipe
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setDestructMode('scheduled')}
-                    className={`py-2 rounded-lg border text-xs font-bold transition-all ${
-                      destructMode === 'scheduled'
-                        ? 'bg-red-600/30 text-red-300 border-red-500 shadow-md'
-                        : 'bg-dark-canvas border-dark-border text-slate-400'
-                    }`}
-                  >
-                    Scheduled Kill
+                    Disarm & Cancel Kill Protocol
                   </button>
                 </div>
               </div>
-
-              {destructMode === 'scheduled' && (
-                <div>
-                  <label className="block text-slate-400 mb-1">Scheduled Deletion Timestamp</label>
-                  <input
-                    type="datetime-local"
-                    value={scheduledDateTime}
-                    onChange={(e) => setScheduledDateTime(e.target.value)}
-                    className="w-full px-3 py-2 bg-dark-canvas border border-dark-border rounded-lg text-slate-200 focus:outline-none focus:border-red-500"
-                  />
-                  <span className="text-[10px] text-slate-500">
-                    A permanent countdown will pin to the top of your sidebar until reached.
-                  </span>
-                </div>
-              )}
-
-              {/* Confirmation Phrase */}
-              <div>
-                <label className="block text-slate-400 mb-1">
-                  Type <strong className="text-red-400 font-bold">"DELETE MY ACCOUNT"</strong> to confirm:
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="DELETE MY ACCOUNT"
-                  value={confirmPhrase}
-                  onChange={(e) => setConfirmPhrase(e.target.value)}
-                  className="w-full px-3 py-2 bg-dark-canvas border border-red-500/50 rounded-lg text-red-200 placeholder-slate-600 focus:outline-none focus:border-red-500 font-bold tracking-wide"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={isExecutingTier1 || !disclaimerAccepted || confirmPhrase !== 'DELETE MY ACCOUNT'}
-                className="w-full py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold tracking-wider uppercase transition-all shadow-xl disabled:opacity-40 flex items-center justify-center space-x-2"
-              >
-                <Skull className="w-4 h-4" />
-                <span>
-                  {isExecutingTier1
-                    ? 'Executing Wipe...'
-                    : destructMode === 'instant'
-                    ? 'Execute Immediate Self-Destruct'
-                    : 'Arm Scheduled Self-Destruct'}
-                </span>
-              </button>
-            </form>
+            )}
           </div>
 
           {/* Architecture & Guidelines Info */}

@@ -19,10 +19,56 @@ import {
   MOCK_SOVEREIGN_CLOUD_PC,
   MOCK_CUSTOM_DOMAINS,
   MOCK_NERONUKE_CONFIG
-} from './mockData';
+} from './mockData.js';
 
-// Mutable in-memory store for fallback mode
-let inMemoryNodes = [...MOCK_NODES];
+// Mutable in-memory store for fallback mode with normalized node attributes
+let inMemoryNodes = MOCK_NODES.map((n, index) => {
+  const name = n.name || n.hostname || n.id;
+  const overlay_ipv4 = n.overlay_ipv4 || n.mesh_ip || `100.64.0.${index + 1}`;
+  const mesh_ip = n.mesh_ip || n.overlay_ipv4 || `100.64.0.${index + 1}`;
+  const role = n.role === 'EDGE_CLIENT' ? 'CLIENT_ORIGIN' : (n.role || 'CLIENT_ORIGIN');
+  const is_quarantined = n.is_quarantined ? 1 : 0;
+  const is_healthy = n.is_healthy !== undefined ? (n.is_healthy ? 1 : 0) : (n.status === 'active' ? 1 : 0);
+  const country_code = n.country_code || 'US';
+  const city = n.city || (country_code === 'US' ? 'Ashburn' : country_code === 'DE' ? 'Frankfurt' : country_code === 'GB' ? 'London' : country_code === 'FR' ? 'Paris' : country_code === 'NL' ? 'Amsterdam' : 'Regional');
+  const asn = n.asn || (country_code === 'US' ? 7922 : country_code === 'DE' ? 3320 : country_code === 'GB' ? 5089 : 13335);
+
+  return {
+    id: n.id,
+    user_id: n.user_id || 'usr-admin-001',
+    name,
+    hostname: n.hostname || name,
+    overlay_ipv4,
+    mesh_ip,
+    overlay_ipv6: n.overlay_ipv6 || `fd7a:115c:a1e0::${index + 1}`,
+    role,
+    ip_class: n.ip_class || (role === 'RELAY' ? 'DATACENTER' : 'RESIDENTIAL'),
+    country_code,
+    city,
+    asn,
+    status: n.status || (is_healthy ? 'active' : 'offline'),
+    is_healthy,
+    is_quarantined,
+    quarantine_reason: n.quarantine_reason || null,
+    risk_score: n.risk_score || 0,
+    risk_factors: n.risk_factors || [],
+    latency_ms: n.latency_ms || (role === 'RELAY' ? 15.0 : 45.0),
+    bandwidth_rx_mb_s: n.bandwidth_rx_mb_s || +(Math.random() * 200 + 20).toFixed(2),
+    bandwidth_tx_mb_s: n.bandwidth_tx_mb_s || +(Math.random() * 150 + 15).toFixed(2),
+    public_key: n.public_key || `K7lF8X${index + 100}+q32M4r1Z4w9v9G5e1bL3mN7oP9qR2sT4uV8w=`,
+    preshared_key: n.preshared_key || `psk_${index + 100}_randomKey==`,
+    endpoints: n.endpoints || [`${n.public_ip || '192.168.1.1'}:51820`],
+    onion_routing_enabled: n.onion_routing_enabled ? 1 : 0,
+    onion_hops: n.onion_hops || 0,
+    kill_switch_enabled: n.kill_switch_enabled ? 1 : 0,
+    cpu_usage_pct: n.cpu_usage_pct ?? +(10 + (index * 7) % 30).toFixed(1),
+    memory_usage_pct: n.memory_usage_pct ?? +(20 + (index * 11) % 40).toFixed(1),
+    battery_pct: n.battery_pct ?? (role === 'RELAY' ? 100 : (70 + (index * 13) % 30)),
+    os_type: n.os_type || (role === 'RELAY' ? 'linux' : (['macos', 'windows', 'linux', 'ios', 'android'][index % 5])),
+    last_heartbeat: n.last_heartbeat || new Date().toISOString(),
+    created_at: n.created_at || new Date().toISOString()
+  };
+});
 let inMemoryUsers = [...MOCK_USERS];
 let inMemoryApps = [...MOCK_APP_BUNDLES];
 let inMemoryAuditLogs = [...MOCK_AUDIT_LOGS];
@@ -56,8 +102,12 @@ let inMemoryShareLinks = [
 const API_BASE = '/api';
 
 function getAuthHeader() {
-  const token = localStorage.getItem('neronet_jwt_token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
+  try {
+    const token = typeof localStorage !== 'undefined' ? localStorage.getItem('neronet_jwt_token') : null;
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  } catch (e) {
+    return {};
+  }
 }
 
 async function request(endpoint, options = {}) {
@@ -72,8 +122,8 @@ async function request(endpoint, options = {}) {
     const res = await fetch(url, { ...options, headers });
     if (!res.ok) {
       // If 401, handle auth expiration
-      if (res.status === 401) {
-        localStorage.removeItem('neronet_jwt_token');
+      if (res.status === 401 && typeof localStorage !== 'undefined') {
+        try { localStorage.removeItem('neronet_jwt_token'); } catch (e) {}
       }
       const errorData = await res.json().catch(() => ({}));
       const err = new Error(errorData.error || `HTTP error ${res.status}`);
@@ -119,7 +169,9 @@ export const api = {
         body: JSON.stringify({ username, password })
       });
       if (live && live.token) {
-        localStorage.setItem('neronet_jwt_token', live.token);
+        if (typeof localStorage !== 'undefined') {
+          try { localStorage.setItem('neronet_jwt_token', live.token); } catch (e) {}
+        }
         return live;
       }
       throw new Error((live && live.error) || 'Invalid username or password');
@@ -137,7 +189,9 @@ export const api = {
       } catch (e) {
         // ignore logout network errors
       }
-      localStorage.removeItem('neronet_jwt_token');
+      if (typeof localStorage !== 'undefined') {
+        try { localStorage.removeItem('neronet_jwt_token'); } catch (e) {}
+      }
       return { success: true };
     }
   },
@@ -146,10 +200,13 @@ export const api = {
   nodes: {
     async list(roleFilter = null) {
       const live = await request('/nodes');
-      let nodes = live?.nodes || inMemoryNodes;
+      let liveNodes = (live?.nodes && Array.isArray(live.nodes))
+        ? live.nodes
+        : (Array.isArray(live) ? live : null);
+      let nodes = liveNodes || [];
       if (roleFilter === 'user') {
-        // Scoped for regular user (Alice)
-        return nodes.filter(n => n.user_id === 'usr_alice_01' || n.role === 'RELAY');
+        // Scoped for regular user (Alice / Tenant)
+        return nodes.filter(n => n.user_id === 'usr_alice_01' || n.user_id === 'usr-admin-001' || n.role === 'RELAY');
       }
       return nodes;
     },
@@ -266,7 +323,7 @@ export const api = {
   users: {
     async list() {
       const live = await request('/users');
-      return live?.users || inMemoryUsers;
+      return (live?.users && Array.isArray(live.users) && live.users.length > 0) ? live.users : inMemoryUsers;
     },
 
     async create(userData) {
@@ -397,7 +454,7 @@ PersistentKeepalive = 25
   apps: {
     async list() {
       const live = await request('/apps');
-      return live?.apps || inMemoryApps;
+      return (live?.apps && Array.isArray(live.apps) && live.apps.length > 0) ? live.apps : inMemoryApps;
     },
 
     async create(appData) {
@@ -741,9 +798,9 @@ PersistentKeepalive = 25
   stats: {
     async getOverview() {
       const live = await request('/stats/overview');
-      if (live) return live;
+      if (live && live.total_nodes > 0) return live;
 
-      const activeNodesCount = inMemoryNodes.filter(n => n.is_healthy && !n.is_quarantined).length;
+      const activeNodesCount = inMemoryNodes.filter(n => (n.is_healthy || n.status === 'active') && !n.is_quarantined).length;
       const totalNodesCount = inMemoryNodes.length;
       const quarantinedNodesCount = inMemoryNodes.filter(n => n.is_quarantined).length;
       const activeUsersCount = inMemoryUsers.filter(u => u.status === 'active').length;
@@ -763,11 +820,45 @@ PersistentKeepalive = 25
     },
 
     async getTimeseries() {
-      return MOCK_TIMESERIES;
+      if (MOCK_TIMESERIES && MOCK_TIMESERIES.length > 0) return MOCK_TIMESERIES;
+      return [
+        { time: "00:00", rx: 45.2, tx: 32.1, latency: 14.2 },
+        { time: "04:00", rx: 28.6, tx: 19.4, latency: 12.8 },
+        { time: "08:00", rx: 78.4, tx: 55.2, latency: 16.5 },
+        { time: "12:00", rx: 112.8, tx: 89.4, latency: 18.2 },
+        { time: "16:00", rx: 134.5, tx: 98.1, latency: 19.4 },
+        { time: "20:00", rx: 95.2, tx: 72.3, latency: 15.6 },
+        { time: "24:00", rx: 62.1, tx: 44.8, latency: 14.0 }
+      ];
     },
 
     async getGeoMatrix() {
-      return MOCK_GEO_MATRIX;
+      if (MOCK_GEO_MATRIX && MOCK_GEO_MATRIX.length > 0) return MOCK_GEO_MATRIX;
+      const regions = [
+        { country: "United States", code: "US" },
+        { country: "Germany", code: "DE" },
+        { country: "France", code: "FR" },
+        { country: "United Kingdom", code: "GB" },
+        { country: "Netherlands", code: "NL" },
+        { country: "Canada", code: "CA" }
+      ];
+      return regions.map(r => {
+        const countryNodes = inMemoryNodes.filter(n => n.country_code === r.code);
+        const relays = countryNodes.filter(n => n.role === 'RELAY').length;
+        const exits = countryNodes.filter(n => n.role === 'EXIT_BRIDGE').length;
+        const avgLat = countryNodes.length > 0
+          ? +(countryNodes.reduce((sum, n) => sum + (n.latency_ms || 15), 0) / countryNodes.length).toFixed(1)
+          : 15.0;
+        return {
+          country: r.country,
+          code: r.code,
+          nodes: countryNodes.length || 1,
+          relays: relays || (r.code === 'US' || r.code === 'DE' ? 1 : 0),
+          exits: exits,
+          avg_latency: avgLat,
+          status: avgLat < 30 ? "Optimal" : "Stable"
+        };
+      });
     }
   },
 
@@ -775,7 +866,7 @@ PersistentKeepalive = 25
   audit: {
     async list() {
       const live = await request('/audit');
-      return live?.events || inMemoryAuditLogs;
+      return (live?.events && Array.isArray(live.events) && live.events.length > 0) ? live.events : inMemoryAuditLogs;
     }
   },
 
@@ -810,7 +901,7 @@ PersistentKeepalive = 25
   peering: {
     async list() {
       const live = await request('/peering');
-      return live?.agreements || inMemoryPeering;
+      return (live?.agreements && Array.isArray(live.agreements) && live.agreements.length > 0) ? live.agreements : inMemoryPeering;
     },
 
     async create(data) {
@@ -891,7 +982,7 @@ PersistentKeepalive = 25
   risk: {
     async getSummary() {
       const live = await request('/risk/summary');
-      if (live) return live;
+      if (live && live.total_nodes > 0) return live;
 
       const nodes = inMemoryNodes;
       const low = nodes.filter(n => (n.risk_score || 0) < 40).length;
@@ -910,12 +1001,12 @@ PersistentKeepalive = 25
 
     async listEvents() {
       const live = await request('/risk/events');
-      return live?.events || inMemoryRiskEvents;
+      return (live?.events && Array.isArray(live.events) && live.events.length > 0) ? live.events : inMemoryRiskEvents;
     },
 
     async getLeaderboard() {
       const live = await request('/risk/leaderboard');
-      if (live && live.nodes) return live.nodes;
+      if (live && live.nodes && Array.isArray(live.nodes) && live.nodes.length > 0) return live.nodes;
 
       return [...inMemoryNodes].sort((a, b) => (b.risk_score || 0) - (a.risk_score || 0));
     },
@@ -954,7 +1045,11 @@ PersistentKeepalive = 25
   geofencing: {
     async listPolicies() {
       const live = await request('/geofencing/policies');
-      return live?.policies || inMemoryGeoPolicies;
+      if (live?.policies && Array.isArray(live.policies) && live.policies.length > 0) return live.policies;
+      return inMemoryGeoPolicies.map(p => ({
+        ...p,
+        node_count: inMemoryNodes.filter(n => n.country_code === p.country_code).length
+      }));
     },
 
     async updatePolicy(countryCode, action, egressAllowed = true) {
@@ -978,7 +1073,7 @@ PersistentKeepalive = 25
         country_code: countryCode,
         country_name: countryCode,
         action,
-        node_count: 0,
+        node_count: inMemoryNodes.filter(n => n.country_code === countryCode).length,
         egress_allowed: egressAllowed,
         updated_at: new Date().toISOString()
       };
@@ -1009,7 +1104,7 @@ PersistentKeepalive = 25
   cloudPc: {
     async list() {
       const live = await request('/cloud-pc');
-      return live?.instances || inMemoryCloudPc;
+      return (live?.instances && Array.isArray(live.instances) && live.instances.length > 0) ? live.instances : inMemoryCloudPc;
     },
 
     async project(id) {
@@ -1034,7 +1129,7 @@ PersistentKeepalive = 25
 
     async listCustomDomains() {
       const live = await request('/cloud-pc/custom-domains');
-      return live?.custom_domains || inMemoryCustomDomains;
+      return (live?.custom_domains && Array.isArray(live.custom_domains) && live.custom_domains.length > 0) ? live.custom_domains : inMemoryCustomDomains;
     },
 
     async addCustomDomain(domainData) {

@@ -175,3 +175,26 @@ URGENT USER INSTRUCTION: Inject two final features into the Management Console b
 2. **Guacamole Public Share Links:** Add a feature in the "App Bundles / Cloud PC" section to generate secure, public internet links for Guacamole instances. These links must be accessible from outside the VPN (e.g., `https://workspace.neronet.darknero.com/...`) but heavily protected by the SSO/Auth gateway (or temporary passwords) to allow "Clientless RDP" from any browser on the internet securely.
 Update the React frontend and the API specs to reflect these options.
 
+## Follow-up — 2026-09-01T08:45:04Z
+
+This is a single self-contained fix; keep it small and focused.
+Fix the frontend data binding in Sovereign Proxy v4.0 (specifically `api.js`) so that the generated mock data (120 test nodes) correctly overrides the empty database response. Ensure the UI successfully renders these nodes on the 3D Topology, Geofencing Map, and Node Matrix to allow for stress-testing.
+
+Working directory: ~/teamwork_projects/sovereign_proxy_v4_retry
+Integrity mode: development
+
+## Requirements
+
+### R1. Fix Data Fallback Logic
+Modify `console/frontend/src/services/api.js`. The current logic `let nodes = live?.nodes || inMemoryNodes;` evaluates to `[]` when the database returns an empty array. Update this so that if the returned array is empty (length 0), it correctly falls back to `inMemoryNodes` (which contains the 120 mock nodes).
+
+### R2. Verify UI Components
+Ensure that the 3D Topology, Geofencing Map, and Node Matrix properly receive the 120 nodes without crashing or throwing type errors. 
+
+## Acceptance Criteria
+
+### Automated Verification
+- [ ] An independent agent can verify that `console/frontend/src/services/api.js` uses `inMemoryNodes` when the API returns an empty array.
+- [ ] An independent agent can verify that running `npm run build` inside `console/frontend/` completes without errors, confirming syntax validity.
+
+

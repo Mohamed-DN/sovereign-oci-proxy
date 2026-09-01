@@ -57,18 +57,28 @@ export default function NodeMatrix({ onSelectNode, onOpenEnrollModal }) {
   };
 
   const filteredNodes = nodes.filter((n) => {
-    const matchesSearch =
-      n.name.toLowerCase().includes(search.toLowerCase()) ||
-      n.overlay_ipv4.includes(search) ||
-      n.country_code.toLowerCase().includes(search.toLowerCase());
+    const nodeName = n.name || n.hostname || '';
+    const nodeIp = n.overlay_ipv4 || n.mesh_ip || '';
+    const nodeCountry = n.country_code || '';
 
-    const matchesRole = roleFilter === 'ALL' || n.role === roleFilter;
+    const matchesSearch =
+      nodeName.toLowerCase().includes(search.toLowerCase()) ||
+      nodeIp.includes(search) ||
+      nodeCountry.toLowerCase().includes(search.toLowerCase());
+
+    const matchesRole =
+      roleFilter === 'ALL' ||
+      n.role === roleFilter ||
+      (roleFilter === 'CLIENT_ORIGIN' && (n.role === 'CLIENT_ORIGIN' || n.role === 'EDGE_CLIENT'));
+
+    const isQuarantined = Boolean(n.is_quarantined);
+    const isHealthy = Boolean(n.is_healthy !== undefined ? n.is_healthy : (n.status === 'active')) && !isQuarantined;
 
     const matchesPosture =
       postureFilter === 'ALL' ||
-      (postureFilter === 'HEALTHY' && n.is_healthy && !n.is_quarantined) ||
-      (postureFilter === 'DEGRADED' && !n.is_healthy && !n.is_quarantined) ||
-      (postureFilter === 'QUARANTINED' && n.is_quarantined);
+      (postureFilter === 'HEALTHY' && isHealthy) ||
+      (postureFilter === 'DEGRADED' && !isHealthy && !isQuarantined) ||
+      (postureFilter === 'QUARANTINED' && isQuarantined);
 
     return matchesSearch && matchesRole && matchesPosture;
   });
@@ -87,6 +97,56 @@ export default function NodeMatrix({ onSelectNode, onOpenEnrollModal }) {
         return <Terminal className="w-3.5 h-3.5 text-neon-indigo" />;
     }
   };
+
+  if (!loading && nodes.length === 0) {
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-xl font-bold text-slate-100 flex items-center space-x-2.5">
+              <span>Mesh Node Matrix</span>
+              <span className="text-xs font-mono px-2 py-0.5 rounded bg-dark-border text-slate-400">
+                0 Total
+              </span>
+            </h1>
+            <p className="text-xs text-slate-400 mt-1 font-mono">
+              Cryptographic device inventory, posture verification, and Noise tunnel endpoints.
+            </p>
+          </div>
+          <button
+            onClick={onOpenEnrollModal}
+            className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-accent-primary hover:bg-sky-400 text-slate-950 font-bold text-xs shadow-lg shadow-sky-500/20 transition-all font-mono cursor-pointer"
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>+ Enroll Node</span>
+          </button>
+        </div>
+
+        {/* Cyber Empty State */}
+        <div className="p-12 rounded-2xl bg-dark-card border border-dark-border flex flex-col items-center justify-center text-center space-y-4 shadow-xl">
+          <div className="w-16 h-16 rounded-2xl bg-dark-canvas border border-dark-border flex items-center justify-center text-accent-primary glow-sky shadow-lg">
+            <Server className="w-8 h-8 text-accent-primary" />
+          </div>
+          <div className="max-w-md space-y-2">
+            <h3 className="text-base font-bold text-slate-100 font-mono">
+              No mesh nodes registered yet
+            </h3>
+            <p className="text-xs text-slate-400 font-sans leading-relaxed">
+              No active nodes found in this mesh workspace. Click '+ Enroll Node' to generate a cryptographic Noise profile or scan an onboarding QR code.
+            </p>
+          </div>
+          <button
+            onClick={onOpenEnrollModal}
+            className="mt-2 flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-accent-primary hover:bg-sky-400 text-slate-950 font-bold text-xs shadow-lg shadow-sky-500/25 transition-all font-mono cursor-pointer"
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>+ Enroll Node</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">

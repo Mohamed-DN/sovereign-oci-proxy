@@ -1,48 +1,95 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { api } from '../services/api';
-import { MOCK_USERS } from '../services/mockData';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [role, setRole] = useState(() => {
-    return localStorage.getItem('neronet_active_role') || 'super-admin';
-  });
-
-  const [user, setUser] = useState(() => {
-    return role === 'super-admin' ? MOCK_USERS[0] : MOCK_USERS[1];
-  });
-
   const [token, setToken] = useState(() => {
-    return localStorage.getItem('neronet_jwt_token') || 'mock_jwt_token_admin_sovereign';
+    return localStorage.getItem('neronet_jwt_token') || null;
   });
+  const [user, setUser] = useState(null);
+  const [role, setRole] = useState(() => {
+    return localStorage.getItem('neronet_active_role') || null;
+  });
+  const [loading, setLoading] = useState(true);
+
+  const clearAuth = useCallback(() => {
+    localStorage.removeItem('neronet_jwt_token');
+    localStorage.removeItem('neronet_active_role');
+    setToken(null);
+    setUser(null);
+    setRole(null);
+  }, []);
+
+  const verifySession = useCallback(async () => {
+    const savedToken = localStorage.getItem('neronet_jwt_token');
+    if (!savedToken) {
+      setToken(null);
+      setUser(null);
+      setRole(null);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const verifiedUser = await api.auth.me();
+      if (verifiedUser && verifiedUser.id) {
+        setUser(verifiedUser);
+        setRole(verifiedUser.role || 'user');
+        setToken(savedToken);
+        localStorage.setItem('neronet_active_role', verifiedUser.role || 'user');
+      } else {
+        clearAuth();
+      }
+    } catch (err) {
+      clearAuth();
+    } finally {
+      setLoading(false);
+    }
+  }, [clearAuth]);
 
   useEffect(() => {
-    localStorage.setItem('neronet_active_role', role);
-    const matchedUser = role === 'super-admin' ? MOCK_USERS[0] : MOCK_USERS[1];
-    setUser(matchedUser);
-  }, [role]);
+    verifySession();
+  }, [verifySession]);
 
   const switchRole = (newRole) => {
     setRole(newRole);
+    localStorage.setItem('neronet_active_role', newRole);
   };
 
   const login = async (username, password) => {
     const res = await api.auth.login(username, password);
-    if (res && res.user) {
+    if (res && res.user && res.token) {
+      localStorage.setItem('neronet_jwt_token', res.token);
+      localStorage.setItem('neronet_active_role', res.user.role || 'user');
       setUser(res.user);
-      setRole(res.user.role);
+      setRole(res.user.role || 'user');
       setToken(res.token);
       return res;
     }
-    throw new Error('Authentication failed');
+    throw new Error(res?.error || 'Authentication failed');
   };
 
   const logout = async () => {
-    await api.auth.logout();
-    setToken(null);
-    setRole('user');
-    setUser(MOCK_USERS[1]);
+    try {
+      await api.auth.logout();
+    } catch (err) {
+      // Ignore network errors on logout
+    }
+    clearAuth();
+  };
+
+  const refreshUser = async () => {
+    try {
+      const verifiedUser = await api.auth.me();
+      if (verifiedUser && verifiedUser.id) {
+        setUser(verifiedUser);
+        setRole(verifiedUser.role || 'user');
+      }
+    } catch (e) {
+      // ignore
+    }
   };
 
   return (
@@ -52,10 +99,12 @@ export function AuthProvider({ children }) {
         role,
         tier: user?.tier || 'cloud_managed',
         token,
-        isAuthenticated: !!token,
+        loading,
+        isAuthenticated: !!token && !!user,
         switchRole,
         login,
-        logout
+        logout,
+        refreshUser
       }}
     >
       {children}

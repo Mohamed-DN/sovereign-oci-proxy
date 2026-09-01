@@ -6,7 +6,15 @@
 -- 1. Enable Required Extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "postgis";
-CREATE EXTENSION IF NOT EXISTS "vector";
+-- pgvector is optional (reserved for future AI anomaly detection).
+-- Silently skip if not installed on this PostgreSQL image.
+DO $$
+BEGIN
+  CREATE EXTENSION IF NOT EXISTS "vector";
+EXCEPTION WHEN OTHERS THEN
+  RAISE NOTICE 'pgvector extension not available, skipping (will be enabled when available).';
+END;
+$$;
 
 -- 2. Users Table
 CREATE TABLE IF NOT EXISTS users (

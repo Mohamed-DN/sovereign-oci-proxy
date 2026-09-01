@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  real-node-1:
+    image: sovereign-real-node
+    container_name: neronet_real_node_1
+    environment:
+      - SOVEREIGN_CONTROL_PLANE_URL=http://frontend:8443
+      - SOVEREIGN_ENABLE_EXIT_BRIDGE=true
+    networks:
+      - neronet-isolated-mesh
+    command: ["/bin/sovereign-node", "-control-url", "http://frontend:8443", "-enable-exit=true"]
+
+  real-node-2:
+    image: sovereign-real-node
+    container_name: neronet_real_node_2
+    environment:
+      - SOVEREIGN_CONTROL_PLANE_URL=http://frontend:8443
+    networks:
+      - neronet-isolated-mesh
+    command: ["/bin/sovereign-node", "-control-url", "http://frontend:8443"]
+
+networks:
+  neronet-isolated-mesh:
+    external: true
+    name: sovereign_proxy_v4_retry_neronet-isolated-mesh
